@@ -16,7 +16,7 @@ function addFloatingHome() {
 
     // Cipta butang
     const link = document.createElement('a');
-    link.href = 'https://parkson127.github.io/all/';
+    link.href = 'https://parkson127.github.io/';
     link.className = 'floating-home';
     link.title = 'Kembali ke Laman Utama';
     link.innerHTML = `
