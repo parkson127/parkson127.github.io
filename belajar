@@ -1,0 +1,1148 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Belajar Suku Kata & Seronok 4-6 Tahun</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+            background: linear-gradient(145deg, #f9f3e6 0%, #ffe9d6 100%);
+            min-height: 100vh;
+            padding: 10px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 50px 50px 30px 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+            padding: 20px 25px 35px;
+            backdrop-filter: blur(8px);
+            border: 4px solid #fff3e0;
+        }
+        h1 {
+            text-align: center;
+            font-size: 2.4rem;
+            color: #6a1b4d;
+            text-shadow: 4px 4px 0 #f7d4e8, 6px 6px 0 rgba(106, 27, 77, 0.2);
+            letter-spacing: 2px;
+            margin: 5px 0 10px;
+            word-break: break-word;
+        }
+        .subtitle {
+            text-align: center;
+            font-size: 1.1rem;
+            color: #8b5a7b;
+            background: #fff0e8;
+            display: inline-block;
+            padding: 6px 28px;
+            border-radius: 40px;
+            margin: 0 auto 18px;
+            border: 2px dashed #d4a0c0;
+            letter-spacing: 1px;
+            font-weight: bold;
+        }
+        .nav-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 8px 12px;
+            margin: 15px 0 22px;
+        }
+        .nav-tabs button {
+            background: #fce4ec;
+            border: none;
+            border-radius: 60px;
+            padding: 12px 24px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #5d2e4a;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #d4a0c0;
+            transition: all 0.15s ease;
+            border: 2px solid transparent;
+            font-family: inherit;
+            flex: 0 1 auto;
+            min-width: 80px;
+        }
+        .nav-tabs button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #d4a0c0;
+        }
+        .nav-tabs button.active {
+            background: #6a1b4d;
+            color: #fff;
+            box-shadow: 0 4px 0 #3d0f2c;
+            border-color: #ffd9e8;
+            transform: scale(1.04);
+        }
+        .tab-content {
+            display: none;
+            animation: fadeUp 0.4s ease;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        @keyframes fadeUp {
+            0% {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Cards & Grids */
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+            margin: 15px 0;
+        }
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 18px;
+            margin: 15px 0;
+        }
+        .card {
+            background: #ffffffec;
+            border-radius: 28px;
+            padding: 16px 12px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+            border: 3px solid #f5d7e4;
+            text-align: center;
+            transition: transform 0.2s;
+        }
+        .card:hover {
+            transform: scale(1.02);
+        }
+        .card .big {
+            font-size: 3.2rem;
+            font-weight: bold;
+            color: #4a1e3a;
+            line-height: 1.2;
+        }
+        .card .big-jawi {
+            font-size: 3.6rem;
+            font-family: 'Traditional Arabic', 'Arial Unicode MS', serif;
+            color: #1d4a3e;
+        }
+        .card .emoji-row {
+            font-size: 2.4rem;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 6px 0;
+        }
+        .card .label {
+            font-size: 0.85rem;
+            color: #7a5a6a;
+            background: #fdeef6;
+            padding: 2px 14px;
+            border-radius: 30px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+        .card .sub-label {
+            font-size: 0.75rem;
+            color: #b28a9e;
+            margin-top: 2px;
+        }
+        .card.highlight {
+            border-color: #ffb07c;
+            background: #fff6ed;
+        }
+
+        .section-title {
+            font-size: 1.8rem;
+            color: #5d2e4a;
+            border-left: 12px solid #d4a0c0;
+            padding-left: 18px;
+            margin: 25px 0 15px;
+            background: linear-gradient(to right, #fce4ec, transparent);
+            border-radius: 0 30px 30px 0;
+        }
+        .section-title small {
+            font-size: 1rem;
+            color: #8b6a7a;
+            font-weight: normal;
+        }
+
+        /* Math */
+        .math-box {
+            background: #e3f0fa;
+            border-radius: 40px;
+            padding: 20px 20px 25px;
+            margin: 20px 0;
+            border: 4px solid #b8d4e8;
+        }
+        .math-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 14px;
+            margin: 12px 0;
+        }
+        .math-item {
+            background: white;
+            border-radius: 30px;
+            padding: 14px 8px;
+            text-align: center;
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #1a3a5c;
+            box-shadow: 0 4px 0 #b0c8d8;
+            border: 2px solid #c5ddee;
+            transition: 0.1s ease;
+        }
+        .math-item .math-ops {
+            font-size: 1.8rem;
+            color: #d46a3a;
+        }
+        .math-item .math-result {
+            display: inline-block;
+            background: #d4edda;
+            padding: 0 16px;
+            border-radius: 40px;
+            color: #1d6b3a;
+            font-size: 1.4rem;
+            margin-top: 2px;
+        }
+        .math-item .math-result.wrong {
+            background: #f8d7da;
+            color: #a13a3a;
+        }
+        .math-answer-input {
+            width: 70px;
+            font-size: 1.6rem;
+            text-align: center;
+            border: 3px solid #b8d4e8;
+            border-radius: 30px;
+            padding: 4px 0;
+            font-weight: bold;
+            color: #1a3a5c;
+            background: #faffff;
+            outline: none;
+            transition: 0.15s;
+        }
+        .math-answer-input:focus {
+            border-color: #6a1b4d;
+            box-shadow: 0 0 0 4px #f7d4e8;
+        }
+        .math-check-btn {
+            background: #6a1b4d;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 18px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.15s;
+            margin-left: 6px;
+            font-family: inherit;
+        }
+        .math-check-btn:hover {
+            transform: scale(1.05);
+            background: #8a2d66;
+        }
+        .math-check-btn:active {
+            transform: scale(0.95);
+        }
+
+        .math-score {
+            text-align: center;
+            font-size: 1.3rem;
+            background: #fff5e6;
+            border-radius: 60px;
+            padding: 8px 20px;
+            display: inline-block;
+            border: 3px solid #f7d4a0;
+            margin: 10px auto;
+        }
+        .math-oper-tabs {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 10px 0 18px;
+        }
+        .math-oper-tabs button {
+            padding: 10px 28px;
+            border-radius: 60px;
+            border: none;
+            font-size: 1.3rem;
+            font-weight: bold;
+            background: #e8f0fe;
+            color: #2a4a6a;
+            cursor: pointer;
+            transition: 0.15s;
+            box-shadow: 0 3px 0 #b0c8d8;
+            font-family: inherit;
+        }
+        .math-oper-tabs button.active {
+            background: #2a4a6a;
+            color: white;
+            box-shadow: 0 3px 0 #0f2a3a;
+        }
+        .math-oper-tabs button:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Arabic / Jawi */
+        .arabic-card {
+            background: #f4f0e8;
+            border-radius: 30px;
+            padding: 16px;
+            border: 3px solid #dac8a8;
+            text-align: center;
+        }
+        .arabic-card .arabic-text {
+            font-size: 2.6rem;
+            font-family: 'Traditional Arabic', 'Arial Unicode MS', serif;
+            color: #1d3d2a;
+        }
+        .arabic-card .malay-text {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #5a4a2a;
+        }
+        .arabic-card .emoji-big {
+            font-size: 3.2rem;
+        }
+
+        /* Jawi special */
+        .jawi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 18px;
+        }
+        .jawi-card {
+            background: #faf6e8;
+            border-radius: 30px;
+            padding: 16px 10px;
+            border: 3px solid #c8b898;
+            text-align: center;
+        }
+        .jawi-card .jawi-char {
+            font-size: 3.8rem;
+            font-family: 'Traditional Arabic', 'Arial Unicode MS', serif;
+            color: #1d3d2a;
+        }
+        .jawi-card .jawi-example {
+            font-size: 2rem;
+            font-family: 'Traditional Arabic', 'Arial Unicode MS', serif;
+            color: #3a5a3a;
+            margin: 4px 0;
+        }
+        .jawi-card .jawi-meaning {
+            font-size: 0.9rem;
+            color: #5a4a3a;
+            background: #ede6d8;
+            border-radius: 20px;
+            padding: 2px 12px;
+            display: inline-block;
+        }
+
+        /* Activities */
+        .activity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 18px;
+        }
+        .activity-card {
+            background: #fff9f0;
+            border-radius: 30px;
+            padding: 16px 10px;
+            border: 3px solid #f7d4b8;
+            text-align: center;
+            transition: 0.2s;
+        }
+        .activity-card:hover {
+            transform: scale(1.03);
+        }
+        .activity-card .act-emoji {
+            font-size: 3.4rem;
+        }
+        .activity-card .act-ar {
+            font-size: 2rem;
+            font-family: 'Traditional Arabic', 'Arial Unicode MS', serif;
+            color: #1d3d2a;
+        }
+        .activity-card .act-ms {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #5a3a2a;
+        }
+
+        /* Alphabet */
+        .alphabet-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            gap: 14px;
+        }
+        .alpha-card {
+            background: #fff5f5;
+            border-radius: 30px;
+            padding: 14px 6px;
+            border: 3px solid #f7c8d8;
+            text-align: center;
+            transition: 0.15s;
+        }
+        .alpha-card:hover {
+            transform: scale(1.03);
+        }
+        .alpha-card .alpha-char {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #4a1e3a;
+        }
+        .alpha-card .alpha-emojis {
+            font-size: 2rem;
+            display: flex;
+            justify-content: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* Consonant + Vowel */
+        .cv-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 18px;
+        }
+        .cv-card {
+            background: #f0f7fa;
+            border-radius: 30px;
+            padding: 16px 8px;
+            border: 3px solid #b8d8e8;
+            text-align: center;
+        }
+        .cv-card .cv-syllable {
+            font-size: 3.6rem;
+            font-weight: bold;
+            color: #1a4a5c;
+        }
+        .cv-card .cv-examples {
+            font-size: 1.8rem;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 4px 0;
+        }
+
+        /* Responsive */
+        @media (max-width: 700px) {
+            .container {
+                padding: 12px 14px 25px;
+                border-radius: 30px;
+            }
+            h1 {
+                font-size: 1.6rem;
+            }
+            .nav-tabs button {
+                padding: 8px 14px;
+                font-size: 0.9rem;
+                min-width: 60px;
+            }
+            .section-title {
+                font-size: 1.4rem;
+            }
+            .card .big {
+                font-size: 2.4rem;
+            }
+            .grid-4 {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            }
+            .grid-3 {
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            }
+            .math-grid {
+                grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+            }
+            .math-item {
+                font-size: 1.2rem;
+            }
+            .math-answer-input {
+                width: 55px;
+                font-size: 1.2rem;
+            }
+            .alphabet-grid {
+                grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            }
+            .cv-grid {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            }
+            .jawi-grid {
+                grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            }
+            .activity-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+            .arabic-card .arabic-text {
+                font-size: 2rem;
+            }
+            .jawi-card .jawi-char {
+                font-size: 3rem;
+            }
+        }
+        @media (max-width: 450px) {
+            .nav-tabs button {
+                font-size: 0.75rem;
+                padding: 6px 10px;
+                min-width: 50px;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
+            .subtitle {
+                font-size: 0.85rem;
+                padding: 4px 16px;
+            }
+        }
+
+        /* Animation extras */
+        .bounce-in {
+            animation: bounceIn 0.5s ease;
+        }
+        @keyframes bounceIn {
+            0% {
+                transform: scale(0.7);
+                opacity: 0;
+            }
+            60% {
+                transform: scale(1.08);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .pop {
+            animation: pop 0.3s ease;
+        }
+        @keyframes pop {
+            0% {
+                transform: scale(0.8);
+            }
+            50% {
+                transform: scale(1.15);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+        .float {
+            animation: float 3s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-8px);
+            }
+        }
+
+        .emoji-big {
+            font-size: 3rem;
+            display: inline-block;
+        }
+        .text-center {
+            text-align: center;
+        }
+        .mt-10 {
+            margin-top: 10px;
+        }
+        .mt-20 {
+            margin-top: 20px;
+        }
+        .mb-10 {
+            margin-bottom: 10px;
+        }
+        .flex-center {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .badge {
+            background: #f7d4e8;
+            border-radius: 40px;
+            padding: 2px 18px;
+            font-size: 0.9rem;
+            color: #5a2a4a;
+        }
+        .btn-reset-math {
+            background: #f5a0a0;
+            border: none;
+            border-radius: 40px;
+            padding: 6px 20px;
+            font-weight: bold;
+            color: #4a1a1a;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 0.95rem;
+            transition: 0.15s;
+        }
+        .btn-reset-math:hover {
+            transform: scale(1.05);
+            background: #f5b8b8;
+        }
+        .footer-note {
+            text-align: center;
+            color: #b08a9a;
+            font-size: 0.8rem;
+            margin-top: 30px;
+            border-top: 3px dashed #f0d8e0;
+            padding-top: 18px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="app">
+
+        <!-- Header -->
+        <div style="text-align:center;">
+            <h1>🌈 Belajar Suku Kata & Seronok!</h1>
+            <div class="subtitle">📚 4 – 6 Tahun • Jawi • Matematik • Alohabet • Arab</div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav-tabs">
+            <button class="active" data-tab="tab-alphabet">🔤 Alohabet</button>
+            <button data-tab="tab-cv">🔡 Suku Kata</button>
+            <button data-tab="tab-jawi">🕌 Jawi</button>
+            <button data-tab="tab-arabic">🌙 Arab</button>
+            <button data-tab="tab-math">🧮 Matematik</button>
+        </div>
+
+        <!-- ============ TAB 1: ALPHABET ============ -->
+        <div id="tab-alphabet" class="tab-content active">
+            <div class="section-title">🔤 Alohabet & Gambar <small>(klik untuk dengar)</small></div>
+            <div class="alphabet-grid" id="alphabetGrid"></div>
+        </div>
+
+        <!-- ============ TAB 2: CONSONANT + VOWEL ============ -->
+        <div id="tab-cv" class="tab-content">
+            <div class="section-title">🔡 Gabungan Konsonan + Vokal <small>ba be bi bo bu</small></div>
+            <div class="cv-grid" id="cvGrid"></div>
+            <div style="margin-top:20px; background:#e8f0e8; border-radius:30px; padding:14px 18px; border:3px solid #b8d0b8; text-align:center;">
+                <span style="font-size:1.2rem; font-weight:bold; color:#2a5a3a;">🎯 Contoh perkataan: </span>
+                <span style="font-size:1.6rem; display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:6px;">
+                    <span>🏀 <b>ba</b>·ju</span>
+                    <span>🐤 <b>be</b>·bek</span>
+                    <span>🌟 <b>bi</b>·ntang</span>
+                    <span>🧴 <b>bo</b>·tol</span>
+                    <span>📖 <b>bu</b>·ku</span>
+                </span>
+            </div>
+        </div>
+
+        <!-- ============ TAB 3: JAWI ============ -->
+        <div id="tab-jawi" class="tab-content">
+            <div class="section-title">🕌 Huruf Jawi & Contoh <small>Bahasa Melayu & Arab</small></div>
+            <div class="jawi-grid" id="jawiGrid"></div>
+        </div>
+
+        <!-- ============ TAB 4: ARABIC DAILY ACTIVITIES ============ -->
+        <div id="tab-arabic" class="tab-content">
+            <div class="section-title">🌙 Perbuatan Harian dalam Bahasa Arab</div>
+            <div class="activity-grid" id="activityGrid"></div>
+        </div>
+
+        <!-- ============ TAB 5: MATHEMATICS ============ -->
+        <div id="tab-math" class="tab-content">
+            <div class="section-title">🧮 Matematik Seronok <small>+  –  ×</small></div>
+
+            <div class="math-oper-tabs">
+                <button class="active" data-mathop="add">➕ Tambah</button>
+                <button data-mathop="sub">➖ Tolak</button>
+                <button data-mathop="mul">✖️ Darab</button>
+            </div>
+
+            <div class="math-box" id="mathBox">
+                <div style="display:flex; justify-content:space-between; flex-wrap:wrap; align-items:center; gap:8px;">
+                    <div class="math-score" id="mathScore">⭐ Skor: 0 / 20</div>
+                    <div>
+                        <button class="btn-reset-math" id="resetMathBtn">🔄 Soalan Baru</button>
+                        <span style="font-size:0.8rem; color:#7a6a5a; margin-left:6px;">(tukar setiap hari ✨)</span>
+                    </div>
+                </div>
+                <div class="math-grid" id="mathGrid"></div>
+                <div style="text-align:center; margin-top:16px;">
+                    <button class="math-check-btn" id="checkAllMath" style="font-size:1.2rem; padding:10px 40px;">✅ Semak Semua</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="footer-note">
+            🌟 Belajar sambil bermain • Setiap hari soalan baru • Sesuai 4–6 tahun
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // DATA
+        // ============================================================
+
+        // Alphabet: 26 letters with 3-4 emojis
+        const alphabetData = {
+            A: ['🍎', '🐜', '🚀', '🐊'],
+            B: ['⚽', '🍌', '🐦', '🚤'],
+            C: ['🐱', '🚗', '🎂', '🐄'],
+            D: ['🐶', '🐬', '🚪', '🦆'],
+            E: ['🐘', '🥚', '👁️', '🦅'],
+            F: ['🐟', '🌸', '🔥', '🦊'],
+            G: ['🎸', '🦒', '🍇', '🐐'],
+            H: ['🏠', '🐴', '🍯', '🦛'],
+            I: ['🍦', '🏝️', '🦎', '🧊'],
+            J: ['🧃', '✈️', '🦘', '👖'],
+            K: ['🪁', '🐨', '🔑', '👑'],
+            L: ['🦁', '🍋', '🐞', '🌙'],
+            M: ['🐒', '🍄', '🚗', '🐭'],
+            N: ['🪺', '🌰', '🦉', '🧵'],
+            O: ['🐙', '🍊', '🦉', '⚽'],
+            P: ['🐧', '🍕', '🐷', '✏️'],
+            Q: ['👑', '🦆', '❓', '🧵'],
+            R: ['🐇', '🌈', '🚀', '🐀'],
+            S: ['🐍', '⭐', '🌊', '☀️'],
+            T: ['🐯', '🍅', '🚂', '🌳'],
+            U: ['☂️', '🦄', '⬆️', '🧅'],
+            V: ['🏐', '🎻', '🌋', '🚐'],
+            W: ['🐳', '🌊', '🪐', '🍉'],
+            X: ['❌', '🦎', '🎷', '⚔️'],
+            Y: ['🟡', '🧶', '🍠', '🦍'],
+            Z: ['🦓', '⚡', '🧩', '🌽']
+        };
+
+        // Consonant + Vowel
+        const cvData = [{
+            syl: 'ba',
+            examples: ['🏀', '👕', '🐷'],
+            words: ['bola', 'baju', 'babi']
+        }, {
+            syl: 'be',
+            examples: ['🐤', '⚖️', '🍆'],
+            words: ['bebek', 'berat', 'belum']
+        }, {
+            syl: 'bi',
+            examples: ['🌟', '🔵', '🌱'],
+            words: ['bintang', 'biru', 'biji']
+        }, {
+            syl: 'bo',
+            examples: ['🧴', '📄', '💣'],
+            words: ['botol', 'bon', 'boma']
+        }, {
+            syl: 'bu',
+            examples: ['📖', '🐦', '🍎'],
+            words: ['buku', 'burung', 'buah']
+        }];
+
+        // Jawi: [huruf, contoh Melayu, contoh Arab, makna]
+        const jawiData = [
+            { char: 'ا', melayu: 'ابو', arab: 'أَب', meaning: 'bapa' },
+            { char: 'ب', melayu: 'بابو', arab: 'بَاب', meaning: 'pintu' },
+            { char: 'ت', melayu: 'تلي', arab: 'تَلْج', meaning: 'salji' },
+            { char: 'ج', melayu: 'جاجي', arab: 'جَامِعَة', meaning: 'universiti' },
+            { char: 'ح', melayu: 'حاجي', arab: 'حَاجّ', meaning: 'haji' },
+            { char: 'خ', melayu: 'خبز', arab: 'خُبْز', meaning: 'roti' },
+            { char: 'د', melayu: 'دوري', arab: 'دَوْر', meaning: 'peranan' },
+            { char: 'ر', melayu: 'روم', arab: 'رُوم', meaning: 'bilik' },
+            { char: 'س', melayu: 'سلام', arab: 'سَلَام', meaning: 'sejahtera' },
+            { char: 'ع', melayu: 'علم', arab: 'عِلْم', meaning: 'ilmu' },
+            { char: 'ف', melayu: 'فضل', arab: 'فَضْل', meaning: 'kelebihan' },
+            { char: 'م', melayu: 'ماء', arab: 'مَاء', meaning: 'air' },
+            { char: 'ن', melayu: 'نور', arab: 'نُور', meaning: 'cahaya' },
+        ];
+
+        // Arabic daily activities
+        const activityData = [
+            { ar: 'جُلُوس', ms: 'duduk', emoji: '🧘' },
+            { ar: 'وُقُوف', ms: 'berdiri', emoji: '🧍' },
+            { ar: 'اِسْتِيقَاظ', ms: 'bangun', emoji: '🌅' },
+            { ar: 'أَكْل', ms: 'makan', emoji: '🍽️' },
+            { ar: 'شُرْب', ms: 'minum', emoji: '🥤' },
+            { ar: 'نَوْم', ms: 'tidur', emoji: '😴' },
+            { ar: 'لَعِب', ms: 'bermain', emoji: '🧸' },
+            { ar: 'غَسْل', ms: 'basuh', emoji: '🧼' },
+            { ar: 'صَلَاة', ms: 'solat', emoji: '🕌' },
+        ];
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+
+        function getDateSeed() {
+            const d = new Date();
+            return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
+        }
+
+        // Seeded random (simple)
+        function seededRandom(seed) {
+            let s = seed;
+            return function() {
+                s = (s * 9301 + 49297) % 233280;
+                return s / 233280;
+            };
+        }
+
+        function shuffleArray(arr, seed) {
+            const rng = seededRandom(seed);
+            const a = [...arr];
+            for (let i = a.length - 1; i > 0; i--) {
+                const j = Math.floor(rng() * (i + 1));
+                [a[i], a[j]] = [a[j], a[i]];
+            }
+            return a;
+        }
+
+        function pickN(arr, n, seed) {
+            const shuffled = shuffleArray(arr, seed);
+            return shuffled.slice(0, n);
+        }
+
+        // ============================================================
+        // RENDER: ALPHABET
+        // ============================================================
+
+        function renderAlphabet() {
+            const grid = document.getElementById('alphabetGrid');
+            let html = '';
+            for (const [letter, emojis] of Object.entries(alphabetData)) {
+                html += `
+                    <div class="alpha-card">
+                        <div class="alpha-char">${letter}</div>
+                        <div class="alpha-emojis">${emojis.slice(0,4).join('')}</div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+        }
+
+        // ============================================================
+        // RENDER: CV
+        // ============================================================
+
+        function renderCV() {
+            const grid = document.getElementById('cvGrid');
+            let html = '';
+            for (const item of cvData) {
+                html += `
+                    <div class="cv-card">
+                        <div class="cv-syllable">${item.syl}</div>
+                        <div class="cv-examples">${item.examples.join(' ')}</div>
+                        <div style="font-size:0.8rem; color:#3a6a5a;">${item.words.join(' · ')}</div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+        }
+
+        // ============================================================
+        // RENDER: JAWI
+        // ============================================================
+
+        function renderJawi() {
+            const grid = document.getElementById('jawiGrid');
+            let html = '';
+            for (const item of jawiData) {
+                html += `
+                    <div class="jawi-card">
+                        <div class="jawi-char">${item.char}</div>
+                        <div class="jawi-example">${item.melayu}</div>
+                        <div class="jawi-example" style="font-size:1.6rem;">${item.arab}</div>
+                        <div class="jawi-meaning">🇲🇾 ${item.melayu} · 🇸🇦 ${item.arab} · ${item.meaning}</div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+        }
+
+        // ============================================================
+        // RENDER: ARABIC ACTIVITIES
+        // ============================================================
+
+        function renderArabic() {
+            const grid = document.getElementById('activityGrid');
+            let html = '';
+            for (const item of activityData) {
+                html += `
+                    <div class="activity-card">
+                        <div class="act-emoji">${item.emoji}</div>
+                        <div class="act-ar">${item.ar}</div>
+                        <div class="act-ms">${item.ms}</div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+        }
+
+        // ============================================================
+        // MATH ENGINE
+        // ============================================================
+
+        let mathState = {
+            operation: 'add', // 'add' | 'sub' | 'mul'
+            questions: [],
+            answers: [],
+            checked: [],
+            score: 0,
+            total: 20,
+        };
+
+        function generateMathQuestions(op, seed) {
+            const rng = seededRandom(seed);
+            const qs = [];
+            const maxNum = op === 'mul' ? 5 : 10;
+
+            for (let i = 0; i < 20; i++) {
+                let a, b, answer, symbol;
+                switch (op) {
+                    case 'add':
+                        a = Math.floor(rng() * maxNum) + 1;
+                        b = Math.floor(rng() * maxNum) + 1;
+                        answer = a + b;
+                        symbol = '+';
+                        break;
+                    case 'sub':
+                        a = Math.floor(rng() * maxNum) + 1;
+                        b = Math.floor(rng() * a) + 1;
+                        answer = a - b;
+                        symbol = '−';
+                        break;
+                    case 'mul':
+                        a = Math.floor(rng() * 5) + 1;
+                        b = Math.floor(rng() * 5) + 1;
+                        answer = a * b;
+                        symbol = '×';
+                        break;
+                }
+                qs.push({ a, b, answer, symbol, userAnswer: null, correct: null });
+            }
+            return qs;
+        }
+
+        function renderMath() {
+            const grid = document.getElementById('mathGrid');
+            const scoreEl = document.getElementById('mathScore');
+            const qs = mathState.questions;
+
+            let html = '';
+            for (let i = 0; i < qs.length; i++) {
+                const q = qs[i];
+                const isChecked = q.correct !== null;
+                const resultClass = isChecked ? (q.correct ? 'math-result' : 'math-result wrong') : 'math-result';
+                const resultText = isChecked ? (q.correct ? '✅' : '❌') : '?';
+                const val = q.userAnswer !== null ? q.userAnswer : '';
+
+                html += `
+                    <div class="math-item" data-idx="${i}">
+                        <div>${q.a} ${q.symbol} ${q.b} = </div>
+                        <div style="display:flex; align-items:center; justify-content:center; gap:4px; flex-wrap:wrap;">
+                            <input class="math-answer-input" type="number" id="mathInput_${i}" value="${val}" ${isChecked ? 'disabled' : ''} placeholder="?">
+                            <span class="${resultClass}">${resultText}</span>
+                        </div>
+                    </div>
+                `;
+            }
+            grid.innerHTML = html;
+
+            // update score
+            const total = qs.length;
+            const correct = qs.filter(q => q.correct === true).length;
+            mathState.score = correct;
+            mathState.total = total;
+            scoreEl.textContent = `⭐ Skor: ${correct} / ${total}`;
+
+            // Attach input events
+            for (let i = 0; i < qs.length; i++) {
+                const inp = document.getElementById(`mathInput_${i}`);
+                if (inp && !inp.disabled) {
+                    inp.addEventListener('input', function() {
+                        const val = this.value.trim();
+                        if (val === '') {
+                            mathState.questions[i].userAnswer = null;
+                        } else {
+                            const num = Number(val);
+                            if (!isNaN(num)) {
+                                mathState.questions[i].userAnswer = num;
+                            }
+                        }
+                    });
+                    inp.addEventListener('keydown', function(e) {
+                        if (e.key === 'Enter') {
+                            checkSingleMath(i);
+                        }
+                    });
+                }
+            }
+        }
+
+        function checkSingleMath(idx) {
+            const q = mathState.questions[idx];
+            if (q.correct !== null) return;
+            if (q.userAnswer === null) {
+                alert('✏️ Masukkan jawapan dulu!');
+                return;
+            }
+            const correct = q.userAnswer === q.answer;
+            q.correct = correct;
+            renderMath();
+            // auto check all after each? we just re-render
+            updateScoreOnly();
+        }
+
+        function checkAllMath() {
+            let allFilled = true;
+            for (let i = 0; i < mathState.questions.length; i++) {
+                const q = mathState.questions[i];
+                if (q.correct !== null) continue;
+                if (q.userAnswer === null) {
+                    allFilled = false;
+                    break;
+                }
+                q.correct = (q.userAnswer === q.answer);
+            }
+            if (!allFilled) {
+                alert('📝 Sila jawab semua soalan dahulu!');
+                return;
+            }
+            renderMath();
+            updateScoreOnly();
+
+            const correct = mathState.questions.filter(q => q.correct === true).length;
+            const total = mathState.questions.length;
+            if (correct === total) {
+                setTimeout(() => alert('🎉 Tahniah! Semua jawapan betul! Hebat! 🌟'), 200);
+            } else {
+                const wrong = total - correct;
+                setTimeout(() => alert(`📊 ${correct} betul, ${wrong} salah. Cuba lagi! 💪`), 200);
+            }
+        }
+
+        function updateScoreOnly() {
+            const scoreEl = document.getElementById('mathScore');
+            const correct = mathState.questions.filter(q => q.correct === true).length;
+            const total = mathState.questions.length;
+            scoreEl.textContent = `⭐ Skor: ${correct} / ${total}`;
+        }
+
+        function resetMath(operation) {
+            const seed = getDateSeed() + (operation === 'add' ? 1000 : operation === 'sub' ? 2000 : 3000);
+            mathState.operation = operation;
+            mathState.questions = generateMathQuestions(operation, seed);
+            mathState.answers = mathState.questions.map(q => q.answer);
+            mathState.checked = mathState.questions.map(() => false);
+            // reset user answers
+            for (const q of mathState.questions) {
+                q.userAnswer = null;
+                q.correct = null;
+            }
+            renderMath();
+            // update active tab button
+            document.querySelectorAll('.math-oper-tabs button').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.mathop === operation);
+            });
+        }
+
+        // ============================================================
+        // NAVIGATION
+        // ============================================================
+
+        document.querySelectorAll('.nav-tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.nav-tabs button').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                const target = this.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+                document.getElementById(target).classList.add('active');
+            });
+        });
+
+        // Math operation tabs
+        document.querySelectorAll('.math-oper-tabs button').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const op = this.dataset.mathop;
+                resetMath(op);
+            });
+        });
+
+        // Check all
+        document.getElementById('checkAllMath').addEventListener('click', checkAllMath);
+
+        // Reset / new questions
+        document.getElementById('resetMathBtn').addEventListener('click', function() {
+            const op = mathState.operation;
+            resetMath(op);
+            // add a little animation
+            const box = document.getElementById('mathBox');
+            box.classList.remove('pop');
+            void box.offsetWidth;
+            box.classList.add('pop');
+        });
+
+        // ============================================================
+        // INIT
+        // ============================================================
+
+        function init() {
+            renderAlphabet();
+            renderCV();
+            renderJawi();
+            renderArabic();
+
+            // Math: default add with today's seed
+            const seed = getDateSeed();
+            mathState.operation = 'add';
+            mathState.questions = generateMathQuestions('add', seed + 1000);
+            for (const q of mathState.questions) {
+                q.userAnswer = null;
+                q.correct = null;
+            }
+            renderMath();
+        }
+
+        init();
+
+        // Auto-refresh math if day changes (simple check every 60s)
+        let lastDate = new Date().getDate();
+        setInterval(() => {
+            const now = new Date().getDate();
+            if (now !== lastDate) {
+                lastDate = now;
+                const op = mathState.operation;
+                resetMath(op);
+            }
+        }, 60000);
+
+        // Keyboard shortcut: Ctrl+Enter to check all
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                const activeTab = document.querySelector('.tab-content.active');
+                if (activeTab && activeTab.id === 'tab-math') {
+                    checkAllMath();
+                }
+            }
+        });
+
+        console.log('🌈 Belajar Suku Kata & Seronok! 🎉');
+        console.log('📅 Soalan matematik berubah setiap hari.');
+        console.log('💡 Tekan Ctrl+Enter untuk semak semua jawapan matematik.');
+    </script>
+
+</body>
+</html>
