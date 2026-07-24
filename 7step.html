@@ -801,7 +801,7 @@
 </div>
 
 <!-- ===== BUTANG HOME (FLOATING) ===== -->
-<a href="https://parkson127.github.io/all/" class="home-btn" id="homeButton" title="Kembali ke Laman Utama">
+<a href="https://parkson127.github.io/" class="home-btn" id="homeButton" title="Kembali ke Laman Utama">
     <i class="fas fa-home"></i>
     <span class="tooltip">🏠 Laman Utama</span>
 </a>
@@ -838,7 +838,7 @@
             // Jika URL semasa adalah parkson127.github.io (atau localhost), kita boleh scroll ke atas
             // Tapi biar dia ikut href untuk ke root.
             // Tapi kita tambah logic: jika berada di root, scroll ke atas.
-            if (window.location.href === 'https://parkson127.github.io/all/' || window.location.href === 'https://parkson127.github.io/all') {
+            if (window.location.href === 'https://parkson127.github.io/' || window.location.href === 'https://parkson127.github.io/') {
                 e.preventDefault(); // elak reload
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
