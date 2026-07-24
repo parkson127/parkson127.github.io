@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📘 Parkson - Modul Latihan Perkhidmatan (Lengkap)</title>
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f8;
+            color: #1a1a2e;
+            padding: 25px;
+        }
+
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        .hero {
+            background: linear-gradient(145deg, #b71c1c 0%, #6d0000 100%);
+            border-radius: 28px;
+            padding: 30px 40px;
+            margin-bottom: 35px;
+            color: white;
+            box-shadow: 0 15px 35px rgba(183, 28, 28, 0.3);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .hero-left h1 {
+            font-size: 2.8rem;
+            font-weight: 800;
+            letter-spacing: -1px;
+        }
+        .hero-left h1 i { color: #ffd54f; }
+        .hero-left p { opacity: 0.9; font-weight: 300; margin-top: 5px; }
+
+        .hero-right {
+            background: rgba(255, 215, 0, 0.15);
+            padding: 12px 25px;
+            border-radius: 60px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            font-weight: 600;
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+        .hero-right span i { color: #ffd54f; margin-right: 8px; }
+
+        /* ===== TAB NAVIGATION ===== */
+        .tab-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 30px;
+            background: white;
+            padding: 12px 20px;
+            border-radius: 60px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+            justify-content: center;
+        }
+
+        .tab-btn {
+            padding: 10px 22px;
+            border: none;
+            border-radius: 40px;
+            background: transparent;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tab-btn i { font-size: 1rem; }
+        .tab-btn:hover { background: #f5f5f5; color: #b71c1c; }
+        .tab-btn.active {
+            background: #b71c1c;
+            color: white;
+            box-shadow: 0 5px 15px rgba(183, 28, 28, 0.3);
+        }
+
+        /* ===== TAB CONTENT (PAGES) ===== */
+        .tab-pages {
+            background: white;
+            border-radius: 28px;
+            padding: 35px 35px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.06);
+            min-height: 500px;
+            display: none;
+            animation: fadePage 0.4s ease;
+        }
+
+        .tab-pages.active-page { display: block; }
+
+        @keyframes fadePage {
+            0% { opacity: 0; transform: translateY(15px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
+        .page-header {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            border-bottom: 3px solid #f0f0f0;
+            padding-bottom: 18px;
+            margin-bottom: 25px;
+        }
+
+        .page-header .big-icon {
+            font-size: 2.8rem;
+            width: 70px;
+            height: 70px;
+            background: #f8f9fa;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #b71c1c;
+        }
+
+        .page-header h2 { font-size: 2rem; font-weight: 700; }
+        .page-header .day-tag {
+            background: #f0f0f0;
+            padding: 5px 18px;
+            border-radius: 40px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .page-body {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        /* ===== CARD DALAM PAGE ===== */
+        .detail-card {
+            background: #fafbfc;
+            border-radius: 18px;
+            padding: 20px 25px;
+            border-left: 6px solid #b71c1c;
+            transition: 0.2s;
+        }
+
+        .detail-card h3 {
+            font-size: 1.2rem;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .detail-card h3 i { color: #b71c1c; width: 24px; }
+
+        .detail-card ul, .detail-card .grid-2 {
+            padding-left: 5px;
+            list-style: none;
+        }
+
+        .detail-card li {
+            padding: 6px 0 6px 30px;
+            position: relative;
+            line-height: 1.6;
+            font-size: 0.95rem;
+            border-bottom: 1px dashed #eee;
+        }
+        .detail-card li:last-child { border-bottom: 0; }
+        .detail-card li i {
+            position: absolute;
+            left: 0;
+            top: 8px;
+            color: #b71c1c;
+            width: 22px;
+            text-align: center;
+        }
+
+        .example-box {
+            background: #fff8e1;
+            border-radius: 14px;
+            padding: 15px 20px;
+            margin-top: 12px;
+            border: 1px solid #ffecb3;
+            font-size: 0.95rem;
+        }
+        .example-box strong { color: #e65100; }
+        .example-box i { color: #f57c00; margin-right: 8px; }
+
+        .grid-2col {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 10px;
+        }
+
+        .badge-script {
+            background: #e3f2fd;
+            padding: 4px 14px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #0d47a1;
+            display: inline-block;
+        }
+
+        /* ===== TABLE UNTUK AYAT ===== */
+        .sentence-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.95rem;
+        }
+        .sentence-table th {
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        .sentence-table td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            vertical-align: top;
+        }
+        .sentence-table tr:hover { background: #f8f9ff; }
+        .sentence-table .num {
+            font-weight: 800;
+            color: #b71c1c;
+            width: 50px;
+        }
+
+        /* ========================== */
+        /* BUTANG HOME FLOATING      */
+        /* ========================== */
+        .home-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #b71c1c;
+            color: white;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            box-shadow: 0 10px 30px rgba(183, 28, 28, 0.4);
+            text-decoration: none;
+            z-index: 999;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+        }
+
+        .home-btn:hover {
+            background: #7f0000;
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(183, 28, 28, 0.6);
+            color: #ffd54f;
+        }
+
+        .home-btn i {
+            margin-right: 0;
+        }
+
+        /* Tooltip label kecil */
+        .home-btn .tooltip {
+            position: absolute;
+            right: 70px;
+            background: #1a1a2e;
+            color: white;
+            padding: 6px 16px;
+            border-radius: 30px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.3s ease;
+        }
+
+        .home-btn:hover .tooltip {
+            opacity: 1;
+            right: 80px;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            .hero { flex-direction: column; align-items: start; gap: 15px; }
+            .hero-left h1 { font-size: 2rem; }
+            .tab-nav { border-radius: 30px; gap: 5px; }
+            .tab-btn { padding: 8px 14px; font-size: 0.8rem; }
+            .tab-pages { padding: 20px 15px; }
+            .page-header h2 { font-size: 1.5rem; }
+            .grid-2col { grid-template-columns: 1fr; }
+            .sentence-table { font-size: 0.85rem; }
+            .sentence-table th, .sentence-table td { padding: 10px 8px; }
+            .home-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 1.4rem;
+                bottom: 20px;
+                right: 20px;
+            }
+            .home-btn .tooltip { display: none; }
+        }
+
+        @media print {
+            .tab-btn { display: none; }
+            .tab-pages { display: block !important; page-break-after: always; }
+            .hero { background: #b71c1c !important; -webkit-print-color-adjust: exact; }
+            .home-btn { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <!-- ===== HEADER ===== -->
+    <div class="hero">
+        <div class="hero-left">
+            <h1><i class="fas fa-store-alt"></i> Parkson Service Standard </h1>
+            <p>Modul Latihan Lengkap — 7 Langkah & 10 Ayat Ajaib</p>
+        </div>
+        <div class="hero-right">
+            <span><i class="fas fa-smile"></i> Senyum</span>
+            <span><i class="fas fa-hand-peace"></i> Sapa</span>
+            <span><i class="fas fa-headset"></i> Bantu</span>
+            <span><i class="fas fa-cart-plus"></i> Jual</span>
+            <span><i class="fas fa-heart"></i> Terima Kasih</span>
+        </div>
+    </div>
+
+    <!-- ===== TAB NAVIGATION ===== -->
+    <div class="tab-nav" id="tabNav">
+        <button class="tab-btn active" data-tab="tab1"><i class="fas fa-calendar-day"></i> 1. Isnin</button>
+        <button class="tab-btn" data-tab="tab2"><i class="fas fa-calendar-day"></i> 2. Selasa</button>
+        <button class="tab-btn" data-tab="tab3"><i class="fas fa-calendar-day"></i> 3. Rabu</button>
+        <button class="tab-btn" data-tab="tab4"><i class="fas fa-calendar-day"></i> 4. Khamis</button>
+        <button class="tab-btn" data-tab="tab5"><i class="fas fa-calendar-day"></i> 5. Jumaat</button>
+        <button class="tab-btn" data-tab="tab6"><i class="fas fa-calendar-day"></i> 6. Sabtu</button>
+        <button class="tab-btn" data-tab="tab7"><i class="fas fa-calendar-day"></i> 7. Ahad</button>
+        <button class="tab-btn" data-tab="tab8"><i class="fas fa-comment-dots"></i> 10 Ayat</button>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 1: ISNIN -->
+    <!-- ========================================================== -->
+    <div class="tab-pages active-page" id="tab1">
+        <div class="page-header">
+            <div class="big-icon" style="color:#1976d2;"><i class="fas fa-check-double"></i></div>
+            <div>
+                <h2>READY FOR SERVICE</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> ISNIN</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#1976d2;">
+                <h3><i class="fas fa-user-tie"></i> 1.1 Penampilan Diri (Grooming) — Checklist</h3>
+                <ul>
+                    <li><i class="fas fa-tshirt"></i> <strong>Uniform:</strong> Kemas, tidak berkedut, dan nama tag dipakai dengan jelas di dada kiri.</li>
+                    <li><i class="fas fa-cut"></i> <strong>Rambut:</strong> Rapi, terurus. Staf wanita disarankan mengikat rambut jika panjang; staf lelaki kemas dan tidak melebihi kolar.</li>
+                    <li><i class="fas fa-smile"></i> <strong>Dandanan:</strong> Make-up ringkas (untuk wanita), kelihatan segar. Kuku bersih & pendek (tidak berwarna terang melampau).</li>
+                    <li><i class="fas fa-shoe-prints"></i> <strong>Kasut:</strong> Hitam, berkilat, dan selesa (untuk berdiri lama).</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-clipboard-check"></i> <strong>Contoh Semakan Pagi:</strong> "Sebelum kedai buka, periksa cermin diri. Tanya rakan sekerja: 'Adakah nama tag saya lurus? Adakah penampilan saya profesional?'"
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#1976d2;">
+                <h3><i class="fas fa-laptop"></i> 1.2 Persediaan Staf & Kedai (Staff & Store Readiness)</h3>
+                <ul>
+                    <li><i class="fas fa-cash-register"></i> <strong>Sistem POS:</strong> Pastikan mesin kaunter, EDC (kad kredit/debit) dan sistem komputer berfungsi dengan baik.</li>
+                    <li><i class="fas fa-tags"></i> <strong>Harga & Tag:</strong> Semak semua tag harga dan pastikan harga di sistem sepadan dengan harga di rak.</li>
+                    <li><i class="fas fa-boxes"></i> <strong>Stok:</strong> Pastikan stok lantai mencukupi (size, warna). Barang yang habis stok perlu ditanda dengan segera.</li>
+                    <li><i class="fas fa-phone-alt"></i> <strong>Komunikasi:</strong> Walkie-talkie atau sistem interkom dibuka dan sedia digunakan.</li>
+                </ul>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#1976d2;">
+                <h3><i class="fas fa-broom"></i> 1.3 Kebersihan & Susun Atur (Housekeeping)</h3>
+                <ul>
+                    <li><i class="fas fa-tshirt"></i> <strong>Rak & Mannequin:</strong> Tiada habuk, mannequin berpakaian kemas dan menarik.</li>
+                    <li><i class="fas fa-couch"></i> <strong>Kawasan Perhimpunan:</strong> Tempat duduk pelanggan kemas, cermin bilik cuba bersih tanpa kesan cap jari.</li>
+                    <li><i class="fas fa-trash-alt"></i> <strong>Lantai & Koridor:</strong> Lantai bersih, tiada kotak atau barang penghalang laluan.</li>
+                    <li><i class="fas fa-wind"></i> <strong>Bau:</strong> Pastikan wangi-wangian kedai (jika ada) tidak terlalu kuat dan menyenangkan.</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-clipboard-list"></i> <strong>Senarai Tugas Harian:</strong> "Setiap pagi, luangkan 10 minit untuk 'Round of Respect' — berjalan di sekeliling bahagian dan betulkan apa yang tidak kena."
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 2: SELASA -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab2">
+        <div class="page-header">
+            <div class="big-icon" style="color:#00897b;"><i class="fas fa-handshake"></i></div>
+            <div>
+                <h2>ACKNOWLEDGE & GREET</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> SELASA</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#00897b;">
+                <h3><i class="fas fa-eye"></i> 2.1 Prinsip E.S.G (Wajib!)</h3>
+                <div class="grid-2col">
+                    <div style="background:#e0f2f1; border-radius:12px; padding:15px;">
+                        <h4 style="color:#00695c;"><i class="fas fa-eye"></i> E = Eye Contact</h4>
+                        <p style="font-size:0.9rem;">Hubungan mata selama <strong>3-5 saat</strong> semasa menyapa. Ini menunjukkan keyakinan dan tumpuan kepada pelanggan.</p>
+                    </div>
+                    <div style="background:#fff8e1; border-radius:12px; padding:15px;">
+                        <h4 style="color:#e65100;"><i class="fas fa-smile"></i> S = Smile</h4>
+                        <p style="font-size:0.9rem;">Senyuman yang tulus (menampakkan gigi). Senyuman memecah kebekuan dan membuat pelanggan selesa.</p>
+                    </div>
+                    <div style="background:#e8f5e9; border-radius:12px; padding:15px;">
+                        <h4 style="color:#1b5e20;"><i class="fas fa-hand-peace"></i> G = Greet</h4>
+                        <p style="font-size:0.9rem;">Sapa dengan <strong>intonasi yang ceria</strong>. Suara perlu jelas dan mesra, tidak terlalu kuat atau perlahan.</p>
+                    </div>
+                </div>
+                <div class="example-box">
+                    <i class="fas fa-comment-dots"></i> <strong>Skrip:</strong> "Good morning Sir/Ms.! <i class="fas fa-smile"></i> How may I help you today?" (Sambil senyum dan pandang mata).
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#00897b;">
+                <h3><i class="fas fa-users-cog"></i> 2.2 Pengurusan Barisan (Queue Management) — Tindakan Segera</h3>
+                <ul>
+                    <li><i class="fas fa-user"></i> <strong>1 – 3 pelanggan:</strong> Tiada tindakan. Fokus pada perkhidmatan semasa.</li>
+                    <li><i class="fas fa-user-friends"></i> <strong>4 – 5 pelanggan:</strong> <span class="badge-script">SOP</span> Maklumkan Penyelia: "Encik, kaunter ke-4 semakin panjang. Boleh minta bantuan buka kaunter baru?"</li>
+                    <li><i class="fas fa-users"></i> <strong>6 – 8 pelanggan:</strong> <span class="badge-script">Segera</span> Buka kaunter tambahan. Jika perlu, panggil 'Packer' untuk bantu membungkus barang dan mempercepatkan urusan.</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-arrow-right"></i> <strong>Contoh Situasi:</strong> "Jika nampak 5 orang beratur, ucap: 'Maaf atas penantian. Saya akan buka kaunter baru dalam masa 1 minit.' Pelanggan akan rasa dihargai."
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#00897b;">
+                <h3><i class="fas fa-heart"></i> 2.3 Ucap Terima Kasih Dengan Tulus</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> Selepas selesai urusan, sentiasa ucap: <strong>"Thank you, please come again"</strong>.</li>
+                    <li><i class="fas fa-arrow-right"></i> Jika pelanggan membuat pembelian besar, tambah: "Terima kasih atas kepercayaan anda. Selamat menikmati hari!"</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 3: RABU -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab3">
+        <div class="page-header">
+            <div class="big-icon" style="color:#7b1fa2;"><i class="fas fa-search"></i></div>
+            <div>
+                <h2>IDENTIFY NEEDS</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> RABU</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#7b1fa2;">
+                <h3><i class="fas fa-question-circle"></i> 3.1 Teknik 5W1H — Soalan Untuk Mencungkil Keperluan</h3>
+                <ul>
+                    <li><i class="fas fa-user"></i> <strong>Who (Siapa):</strong> "Siapa yang akan guna ini?" (Contoh: hadiah untuk ibu, baju untuk teman lelaki).</li>
+                    <li><i class="fas fa-tshirt"></i> <strong>What (Apa):</strong> "Apa jenis/bahan yang anda cari? Formal atau kasual?"</li>
+                    <li><i class="fas fa-clock"></i> <strong>When (Bila):</strong> "Bila anda perlu guna ini? (Contoh: majlis malam ini, percutian minggu depan)."</li>
+                    <li><i class="fas fa-map-pin"></i> <strong>Where (Di mana):</strong> "Di mana anda akan guna ini? (Pejabat, pantai, luar negara)."</li>
+                    <li><i class="fas fa-question"></i> <strong>Why (Kenapa):</strong> "Kenapa anda pilih warna/saiz ini?" (Untuk faham motivasi).</li>
+                    <li><i class="fas fa-tools"></i> <strong>How (Bagaimana):</strong> "Bagaimana anda akan padankan dengan barang sedia ada?"</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-bullseye"></i> <strong>Contoh Praktikal:</strong> "Pelanggan cari beg tangan. Tanya: 'Who are you purchasing for today?' Jika dia kata 'Untuk isteri', kita tanya: 'What color does she usually wear?' — Terus Zero Down ke pilihan!"
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#7b1fa2;">
+                <h3><i class="fas fa-crosshairs"></i> 3.2 Teknik "Zero Down" — Pilih Yang Paling Sesuai</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> Daripada banyak pilihan, <strong>tapis</strong> ke 2-3 pilihan terbaik sahaja. Jangan bagi terlalu banyak pilihan (akan kelirukan).</li>
+                    <li><i class="fas fa-arrow-right"></i> Contoh: "Daripada 20 jenis jam tangan, saya rasa 3 ini paling sesuai dengan gaya formal anda. Mana satu menarik minat?"</li>
+                </ul>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#7b1fa2;">
+                <h3><i class="fas fa-user-check"></i> 3.3 Jika Pelanggan Hanya Melihat-Lihat (Just Browsing)</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> Jangan paksa. Beri ruang.</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Skrip:</strong> "I'm Nabila. I will be here if you need me." (Sambil senyum dan undur sedikit).</li>
+                    <li><i class="fas fa-arrow-right"></i> Tambah: "Saya akan berada di kaunter ini. Jika ada apa-apa yang anda perlukan, hanya panggil saya."</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-lightbulb"></i> <strong>Tip:</strong> Pelanggan yang 'tengok-tengok' selalunya akan membeli jika kita tidak mendesak. Mereka perlukan masa.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 4: KHAMIS -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab4">
+        <div class="page-header">
+            <div class="big-icon" style="color:#f57c00;"><i class="fas fa-brain"></i></div>
+            <div>
+                <h2>ADVISE SOLUTION</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> KHAMIS</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#f57c00;">
+                <h3><i class="fas fa-ear-listen"></i> 4.1 Kemahiran Mendengar Aktif</h3>
+                <ul>
+                    <li><i class="fas fa-check-circle"></i> <strong>Isyarat Badan:</strong> Anggukkan kepala, condong ke hadapan, dan jangan bersilang tangan.</li>
+                    <li><i class="fas fa-comment"></i> <strong>Respons Lisan:</strong> Gunakan frasa seperti "Yes", "I see", "I understand", "Betul tu".</li>
+                    <li><i class="fas fa-arrow-right"></i> Ulang balik keperluan pelanggan untuk pengesahan: "Jadi anda cari kasut yang ringan dan tahan lasak, betul?"</li>
+                </ul>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#f57c00;">
+                <h3><i class="fas fa-chalkboard-user"></i> 4.2 Demonstrasi & Menonjolkan Manfaat (BENEFITS)</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Jangan sekadar baca spec.</strong> Tunjukkan bagaimana produk itu memudahkan hidup pelanggan.</li>
+                    <li><i class="fas fa-arrow-right"></i> Contoh: "Krim ini bukan saja melembapkan (ciri), tetapi ia akan memastikan kulit anda kekal anjal dan berseri sepanjang hari di pejabat berhawa dingin (manfaat)."</li>
+                    <li><i class="fas fa-arrow-right"></i> Biarkan pelanggang <strong>sentuh/rasa</strong> sendiri (untuk fabrik, tekstur, berat).</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-tag"></i> <strong>Pengetahuan Produk Wajib:</strong> Cara guna, Negara asal, Cara penjagaan (cucian), Jenis fabrik, Harga, dan Kualiti.
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#f57c00;">
+                <h3><i class="fas fa-handshake"></i> 4.3 Menangani Bantahan (Objection Handling)</h3>
+                <ul>
+                    <li><i class="fas fa-dollar-sign"></i> <strong>"Terlalu mahal."</strong> — "Saya faham. Namun, bahan ini tahan lasak dan tahan 5 tahun, berbanding yang murah perlu tukar setiap tahun."</li>
+                    <li><i class="fas fa-palette"></i> <strong>"Warna tak sesuai."</strong> — "Kami ada warna lain. Saya tunjukkan warna maroon yang lebih gelap, mungkin itu lebih sesuai dengan tone kulit anda."</li>
+                    <li><i class="fas fa-ruler"></i> <strong>"Saiz tak ada."</strong> — "Saya boleh semak stok di gudang atau cawangan lain. Saya akan call supervisor untuk bantu."</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-robot"></i> <strong>Formula Ajaib:</strong> Empati (Saya faham) + Sebab (Kerana...) + Tawaran Penyelesaian (Saya cadangkan...).
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 5: JUMAAT -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab5">
+        <div class="page-header">
+            <div class="big-icon" style="color:#d81b60;"><i class="fas fa-plus-circle"></i></div>
+            <div>
+                <h2>PLUS SELLING</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> JUMAAT</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#d81b60;">
+                <h3><i class="fas fa-link"></i> 5.1 Teknik Jualan Tambahan (Cross-Sell & Up-Sell)</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Cross-Sell:</strong> Tawarkan barang pelengkap. "Baju ini sangat cantik. Kami ada tali pinggang kulit yang padan dengan sempurna."</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Up-Sell:</strong> Tawarkan versi lebih baik. "Kasut ini bagus, tapi versi 'Premium' ini ada teknologi kusyen tambahan untuk keselesaan maksimum."</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-gift"></i> <strong>Galakkan Dengan Promosi:</strong> "Jika anda beli dua, anda layak untuk baucar RM20!" atau "Dengan pembelian ini, anda dapat Gift with Purchase (GWP) percuma!"
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#d81b60;">
+                <h3><i class="fas fa-credit-card"></i> 5.2 Kelebihan Kad Parkson (Daftar PERCUMA!)</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Diskaun Eksklusif:</strong> Nikmati diskaun awal untuk ahli.</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Kumpul Mata (Tier):</strong> Semakin banyak belanja, semakin tinggi tier (Silver, Gold, Platinum). Lebih tinggi tier, lebih banyak keistimewaan.</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Guna di Luar Negara:</strong> Berlaku di Malaysia, China, Vietnam, Indonesia & Myanmar.</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Bonuslink:</strong> Dapatkan mata Bonuslink serentak!</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-gem"></i> <strong>Tier Structure (Contoh):</strong> Silver (0-1000), Gold (1001-5000), Platinum (5001+) — setiap tier ada hari beli-belah istimewa dan baucar hari jadi.
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#d81b60;">
+                <h3><i class="fas fa-bullhorn"></i> 5.3 Promosi Lain Yang Boleh Ditawarkan</h3>
+                <ul>
+                    <li><i class="fas fa-ticket-alt"></i> Baucar Promosi bermusim (Hari Raya, Tahun Baru, Jualan Besar).</li>
+                    <li><i class="fas fa-hand-holding-usd"></i> Purchase with Purchase (PWP) — Beli pada harga istimewa untuk barang tertentu.</li>
+                    <li><i class="fas fa-calendar-check"></i> Promosi di bahagian lain (cth: Bahagian Kanak-kanak, Peralatan Rumah).</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 6: SABTU -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab6">
+        <div class="page-header">
+            <div class="big-icon" style="color:#2e7d32;"><i class="fas fa-hand-holding-usd"></i></div>
+            <div>
+                <h2>CLOSE THE SALE</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> SABTU</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#2e7d32;">
+                <h3><i class="fas fa-bullseye"></i> 6.1 Kenal Pasti Isyarat Positif (Buying Signals)</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Verbal:</strong> "Berapa harga ni?", "Ada warna lain?", "Boleh tahan lama ke?"</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Non-Verbal:</strong> Pelanggang memegang produk lama, melihat cermin dengan teliti, atau mengangguk-angguk.</li>
+                    <li><i class="fas fa-arrow-right"></i> Jika nampak isyarat ini, <strong>jangan lepaskan</strong> peluang!</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-check-circle" style="color:#2e7d32;"></i> <strong>Tindakan:</strong> "Nampaknya anda memang sukakannya. Jom saya bawa ke kaunter bayar."
+                </div>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#2e7d32;">
+                <h3><i class="fas fa-check-double"></i> 6.2 Teknik Menutup Jualan (Closing Techniques)</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Alternative Choice Close:</strong> "Anda nak yang merah atau biru?" (Anggap dia sudah beli).</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Summary Close:</strong> "Jadi kita ambil baju ini, tali pinggang, dan kasut. Saya bungkuskan semuanya ya?"</li>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Urgency Close:</strong> "Stok untuk saiz ini sangat terhad. Lebih baik kita ambil sekarang."</li>
+                </ul>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#2e7d32;">
+                <h3><i class="fas fa-route"></i> 6.3 Proses Ke Kaunter Bayar</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> <strong>Skrip:</strong> "Please follow me to the cashier counter Sir/Ms."</li>
+                    <li><i class="fas fa-arrow-right"></i> Berjalan di <strong>sisi</strong> pelanggan (bukan di depan atau belakang terlalu jauh).</li>
+                    <li><i class="fas fa-arrow-right"></i> Jika kaunter sibuk, katakan: "Sila tunggu sebentar, saya akan pastikan kaunter cepat."</li>
+                </ul>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 7: AHAD -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab7">
+        <div class="page-header">
+            <div class="big-icon" style="color:#c62828;"><i class="fas fa-concierge-bell"></i></div>
+            <div>
+                <h2>POST SALE SERVICE</h2>
+                <span class="day-tag"><i class="far fa-calendar-alt"></i> AHAD</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#c62828;">
+                <h3><i class="fas fa-list"></i> 7.1 Senarai Perkhidmatan Selepas Jualan</h3>
+                <ul>
+                    <li><i class="fas fa-suitcase"></i> <strong>Porter Service:</strong> Bantu bawa barang ke kereta. <span class="badge-script">SOP</span> Tanya: "Encik, perlukan bantuan ke kereta?"</li>
+                    <li><i class="fas fa-user-friends"></i> <strong>Escort Service:</strong> Teman pelanggan ke bahagian lain atau pintu keluar.</li>
+                    <li><i class="fas fa-cut"></i> <strong>Alteration:</strong> Perkhidmatan ubah suai pakaian (tempoh 3 hari bekerja, caj bergantung pada jenis ubah suai).</li>
+                    <li><i class="fas fa-exchange-alt"></i> <strong>Return & Exchange:</strong> Polisi: 14 hari dengan resit asal, barang tidak digunakan dan tag masih ada.</li>
+                    <li><i class="fas fa-gift"></i> <strong>Gift Wrapping:</strong> Pembalutan hadiah percuma untuk ahli Kad Parkson (atau caj minima untuk bukan ahli).</li>
+                    <li><i class="fas fa-truck"></i> <strong>Delivery Service:</strong> Penghantaran dalam radius 5km (caj mengikut jarak), tempoh 1-2 hari bekerja.</li>
+                    <li><i class="fas fa-shield-alt"></i> <strong>Warranty & Guarantee:</strong> Waranti 1 tahun untuk barangan elektronik/aksesori terpilih.</li>
+                    <li><i class="fas fa-umbrella"></i> <strong>Umbrella Service:</strong> Pinjaman payung percuma jika hujan (deposit dikembalikan).</li>
+                    <li><i class="fas fa-wheelchair"></i> <strong>Wheel Chair:</strong> Kerusi roda disediakan di pintu masuk utama (booking awal disarankan).</li>
+                </ul>
+            </div>
+
+            <div class="detail-card" style="border-left-color:#c62828;">
+                <h3><i class="fas fa-star"></i> 7.2 Cara Menawarkan Perkhidmatan</h3>
+                <ul>
+                    <li><i class="fas fa-arrow-right"></i> Semasa pembayaran: "Encik, adakah anda ingin kami balutkan hadiah ini secara percuma?"</li>
+                    <li><i class="fas fa-arrow-right"></i> Selepas pembayaran: "Jika ada sebarang isu, anda boleh kembali dalam masa 14 hari untuk pertukaran."</li>
+                    <li><i class="fas fa-arrow-right"></i> Jika hujan: "Nampaknya hujan di luar. Izinkan saya pinjamkan payung Parkson untuk anda."</li>
+                </ul>
+                <div class="example-box">
+                    <i class="fas fa-heart" style="color:#c62828;"></i> <strong>Kesan:</strong> Perkhidmatan ini mencipta 'WOW Factor' dan membuat pelanggan datang lagi.
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ========================================================== -->
+    <!-- TAB 8: 10 AYAT -->
+    <!-- ========================================================== -->
+    <div class="tab-pages" id="tab8">
+        <div class="page-header">
+            <div class="big-icon" style="color:#ffd54f; background:#1a1a2e;"><i class="fas fa-comment-dots"></i></div>
+            <div>
+                <h2>10 Ayat Ajaib Perkhidmatan</h2>
+                <span class="day-tag"><i class="fas fa-star"></i> Wajib Hafal & Amalkan</span>
+            </div>
+        </div>
+        <div class="page-body">
+
+            <div class="detail-card" style="border-left-color:#ffd54f; background:#fefefe;">
+                <h3><i class="fas fa-book-open"></i> Panduan Penggunaan Mengikut Situasi</h3>
+                <table class="sentence-table">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Ayat</th>
+                            <th>Bila & Cara Guna (Contoh Situasi)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td class="num">1</td>
+                            <td><strong>Good morning Sir / Madam</strong></td>
+                            <td>Sentiasa di awal pertemuan. Jika petang, ganti "Good afternoon". <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Good morning Sir! Selamat datang ke Parkson."</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">2</td>
+                            <td><strong>How may I help you?</strong></td>
+                            <td>Soalan pembuka untuk tahu keperluan. Gunakan nada mesra. <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "How may I help you today? Cari hadiah atau untuk sendiri?"</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">3</td>
+                            <td><strong>Let me show you</strong></td>
+                            <td>Semasa membawa pelanggan ke produk. <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Let me show you koleksi terbaru kami di sini."</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">4</td>
+                            <td><strong>I am ______. I will be here if you need me</strong></td>
+                            <td>Perkenalkan nama untuk perkhidmatan peribadi. <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "I am Sarah. I will be here if you need me." (Sambil undur).</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">5</td>
+                            <td><strong>Please wait</strong></td>
+                            <td>Guna jika perlu tinggalkan pelanggan sekejap (ambil stok, semak harga). <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Please wait sekejap ya, saya semak stok di belakang."</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">6</td>
+                            <td><strong>I will call my Supervisor or I will take the stock for you</strong></td>
+                            <td>Tunjukkan inisiatif untuk selesaikan isu (contoh: barang tak ada, perlu kelulusan). <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Stok warna ini habis. I will call my Supervisor untuk cek cawangan lain."</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">7</td>
+                            <td><strong>Thank you for waiting</strong></td>
+                            <td>Sentiasa ucap bila kembali selepas membuat pelanggan menunggu. <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Thank you for waiting. Saya dah jumpa stoknya!"</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">8</td>
+                            <td><strong>I am sorry</strong></td>
+                            <td>Guna jika ada kesilapan atau kekecewaan (contoh: barang rosak, sistem down). <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "I am sorry, sistem kami sedang down. Boleh tunggu sekejap?"</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">9</td>
+                            <td><strong>Please follow me to the cashier counter</strong></td>
+                            <td>Semasa membawa pelanggan ke kaunter bayar. <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Please follow me to the cashier counter, jom saya bantu uruskan pembayaran."</em></td>
+                        </tr>
+                        <tr>
+                            <td class="num">10</td>
+                            <td><strong>Thank you, please come again</strong></td>
+                            <td>Ucapan penutup yang wajib. <br> <i class="fas fa-arrow-right" style="color:#b71c1c;"></i> <em>Contoh: "Thank you, please come again! Jumpa lagi."</em></td>
+                        </tr>
+                    </tbody>
+                </table>
+                <div class="example-box" style="margin-top:20px;">
+                    <i class="fas fa-flag-checkered"></i> <strong>Cabaran 30 Hari:</strong> Amalkan 1 ayat baru setiap hari. Pada hari ke-10, anda sudah menguasai kesemuanya!
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ===== FOOTER ===== -->
+    <div style="text-align:center; margin-top:40px; color:#888; font-size:0.9rem; border-top:1px solid #ddd; padding-top:25px;">
+        <i class="fas fa-store" style="color:#b71c1c;"></i> Parkson Service Standard — Versi 3.0 (Modul Latihan Lengkap)
+        <br><span style="font-size:0.8rem;">"Kecemerlangan perkhidmatan bermula dari langkah pertama."</span>
+    </div>
+
+</div>
+
+<!-- ===== BUTANG HOME (FLOATING) ===== -->
+<a href="https://parkson127.github.io/all/" class="home-btn" id="homeButton" title="Kembali ke Laman Utama">
+    <i class="fas fa-home"></i>
+    <span class="tooltip">🏠 Laman Utama</span>
+</a>
+
+<!-- ===== JAVASCRIPT UNTUK TAB & HOME BUTTON ===== -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // ---- Fungsi Tab ----
+        const buttons = document.querySelectorAll('.tab-btn');
+        const pages = document.querySelectorAll('.tab-pages');
+
+        buttons.forEach(btn => {
+            btn.addEventListener('click', function() {
+                buttons.forEach(b => b.classList.remove('active'));
+                pages.forEach(p => p.classList.remove('active-page'));
+
+                this.classList.add('active');
+                const targetId = this.getAttribute('data-tab');
+                const targetPage = document.getElementById(targetId);
+                if (targetPage) {
+                    targetPage.classList.add('active-page');
+                }
+
+                document.querySelector('.tab-pages').scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            });
+        });
+
+        // ---- Butang Home: Jika di laman yang sama, scroll ke atas; jika di laman lain, ikut link ----
+        const homeBtn = document.getElementById('homeButton');
+        homeBtn.addEventListener('click', function(e) {
+            // Jika URL semasa adalah parkson127.github.io (atau localhost), kita boleh scroll ke atas
+            // Tapi biar dia ikut href untuk ke root.
+            // Tapi kita tambah logic: jika berada di root, scroll ke atas.
+            if (window.location.href === 'https://parkson127.github.io/all/' || window.location.href === 'https://parkson127.github.io/all') {
+                e.preventDefault(); // elak reload
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+            // Jika tidak, dia akan bawa ke https://parkson127.github.io/ (fungsi asal link)
+        });
+    });
+</script>
+
+</body>
+</html>

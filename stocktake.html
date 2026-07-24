@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stocktake Report Parser PRO</title>
+
+    <!-- ===== CDN / LIBRARY ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
+
+    <!-- ===== CSS TERPUSAT ===== -->
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="ui1.css">
+    <script src="common.js"></script>
+    <!-- ===== CSS KHUSUS STOCKTAKE ===== -->
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+            background: #f0f4f8;
+            color: #1a2332;
+            min-height: 100vh;
+            padding: 24px;
+        }
+
+        .container {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,20,40,.08);
+            padding: 32px 40px 40px;
+            transition: all .2s;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 28px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e9edf4;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .header-icon {
+            width: 44px;
+            height: 44px;
+            background: linear-gradient(135deg,#1a3a6b,#2a5298);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            color: #fff;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            font-weight: 700;
+            letter-spacing: -.3px;
+            color: #0b1e33;
+        }
+
+        .header h1 span {
+            color: #2a5298;
+        }
+
+        .header-sub {
+            font-size: 13px;
+            color: #6b7a8f;
+            font-weight: 400;
+            margin-top: 2px;
+        }
+
+        .header-badge {
+            background: #eef3fc;
+            padding: 6px 16px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #1a3a6b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .header-badge .dot {
+            width: 8px;
+            height: 8px;
+            background: #2ecc71;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .drop-zone {
+            border: 2px dashed #d0d9e8;
+            border-radius: 16px;
+            padding: 48px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all .25s ease;
+            background: #fafcff;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .drop-zone:hover {
+            border-color: #2a5298;
+            background: #f5f9ff;
+        }
+
+        .drop-zone.dragover {
+            border-color: #2a5298;
+            background: #eaf1fe;
+            transform: scale(1.005);
+        }
+
+        .drop-zone .icon {
+            font-size: 44px;
+            display: block;
+            margin-bottom: 12px;
+        }
+
+        .drop-zone h3 {
+            font-size: 17px;
+            font-weight: 600;
+            color: #1a2a44;
+        }
+
+        .drop-zone p {
+            color: #6b7f98;
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        .drop-zone .browse-btn {
+            display: inline-block;
+            margin-top: 14px;
+            padding: 10px 28px;
+            background: #1a3a6b;
+            color: #fff;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 14px;
+            transition: background .2s;
+            border: none;
+            cursor: pointer;
+        }
+
+        .drop-zone .browse-btn:hover {
+            background: #0f2a4f;
+        }
+
+        .drop-zone input[type="file"] {
+            display: none;
+        }
+
+        .file-info {
+            margin-top: 14px;
+            font-size: 14px;
+            color: #1a3a6b;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .file-info .remove-btn {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: none;
+            padding: 2px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .file-info .remove-btn:hover {
+            background: #fecaca;
+        }
+
+        #status {
+            padding: 12px 18px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            font-weight: 500;
+            display: none;
+            align-items: center;
+            gap: 10px;
+        }
+
+        #status.show { display: flex; }
+        #status.success { background: #e6f7ed; color: #0b5e3a; border: 1px solid #b8e6cf; }
+        #status.error { background: #feecec; color: #991b1b; border: 1px solid #fccccc; }
+        #status.info { background: #e6f0fa; color: #1a3a6b; border: 1px solid #b8d0e8; }
+
+        .summary-grid {
+            display: none;
+            grid-template-columns: repeat(auto-fit,minmax(150px,1fr));
+            gap: 12px;
+            background: #f7faff;
+            border-radius: 14px;
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            border: 1px solid #e9edf4;
+        }
+
+        .summary-grid.show { display: grid; }
+
+        .summary-item .label {
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: .4px;
+            color: #6b7f98;
+        }
+
+        .summary-item .value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #0b1e33;
+            margin-top: 2px;
+        }
+
+        .summary-item .value small {
+            font-size: 12px;
+            font-weight: 400;
+            color: #6b7f98;
+            margin-left: 4px;
+        }
+
+        .action-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .btn {
+            padding: 10px 24px;
+            border: none;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:disabled {
+            opacity: .5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-primary {
+            background: #1a3a6b;
+            color: #fff;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: #0f2a4f;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(26,58,107,.3);
+        }
+
+        .btn-secondary {
+            background: #e9edf4;
+            color: #1a2a44;
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            background: #d5dde8;
+        }
+
+        .btn-success {
+            background: #0b7a4a;
+            color: #fff;
+        }
+
+        .btn-success:hover:not(:disabled) {
+            background: #095e39;
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(11,122,74,.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: #1a3a6b;
+            border: 1.5px solid #d0d9e8;
+        }
+
+        .btn-outline:hover:not(:disabled) {
+            background: #f5f9ff;
+            border-color: #2a5298;
+        }
+
+        .filter-select {
+            padding: 10px 16px;
+            border-radius: 10px;
+            border: 1.5px solid #d0d9e8;
+            background: #fff;
+            font-size: 14px;
+            font-weight: 500;
+            color: #1a2332;
+            cursor: pointer;
+            outline: none;
+            transition: border .2s;
+            margin-left: auto;
+        }
+
+        .filter-select:focus {
+            border-color: #2a5298;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 4px;
+            border-bottom: 2px solid #e9edf4;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: transparent;
+            font-size: 14px;
+            font-weight: 600;
+            color: #6b7f98;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all .2s;
+            border-radius: 8px 8px 0 0;
+        }
+
+        .tab-btn:hover {
+            color: #1a3a6b;
+            background: #f5f9ff;
+        }
+
+        .tab-btn.active {
+            color: #1a3a6b;
+            border-bottom-color: #1a3a6b;
+            background: #f5f9ff;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e9edf4;
+            max-height: 520px;
+            overflow-y: auto;
+        }
+
+        .table-wrapper table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px;
+            background: #fff;
+        }
+
+        .table-wrapper thead {
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-wrapper th {
+            background: #f7faff;
+            color: #1a2a44;
+            font-weight: 700;
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: .3px;
+            padding: 10px 8px;
+            border-bottom: 2px solid #d0d9e8;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .table-wrapper td {
+            padding: 6px 8px;
+            border-bottom: 1px solid #eef2f7;
+            text-align: center;
+            vertical-align: middle;
+        }
+
+        .table-wrapper tr:hover td {
+            background: #f8fbff;
+        }
+
+        .table-wrapper .dept-header td {
+            background: #eaf1fe !important;
+            font-weight: 700;
+            color: #1a3a6b;
+            text-align: left;
+            padding: 8px 14px;
+            font-size: 12px;
+            border-bottom: 2px solid #d0d9e8;
+        }
+
+        .table-wrapper .brand-total td {
+            background: #e6f7ed !important;
+            font-weight: 700;
+            color: #0b5e3a;
+        }
+
+        .table-wrapper .total-row td {
+            background: #f5f0eb !important;
+            font-weight: 700;
+        }
+
+        .table-wrapper .neg {
+            color: #dc2626;
+            font-weight: 600;
+        }
+
+        .table-wrapper .pos {
+            color: #16a34a;
+            font-weight: 600;
+        }
+
+        .table-wrapper .total-label {
+            text-align: left !important;
+            padding-left: 16px;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-track {
+            background: #f0f4f8;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: #c0cbd8;
+            border-radius: 8px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb:hover {
+            background: #a0b0c0;
+        }
+
+        @media (max-width: 768px) {
+            .container { padding: 16px; }
+            .header { flex-direction: column; align-items: flex-start; }
+            .header h1 { font-size: 18px; }
+            .action-bar { flex-direction: column; align-items: stretch; }
+            .filter-select { margin-left: 0; }
+            .summary-grid { grid-template-columns: repeat(2,1fr); }
+            .drop-zone { padding: 32px 16px; }
+            .drop-zone .icon { font-size: 32px; }
+        }
+
+        @media (max-width: 480px) {
+            .summary-grid { grid-template-columns: 1fr; }
+            .tab-btn { padding: 8px 12px; font-size: 12px; }
+        }
+
+        /* ===== OVERRIDE DARK MODE UNTUK STOCKTAKE ===== */
+        @media (prefers-color-scheme: dark) {
+            body {
+                background: #1a1a2e;
+                color: #f0f0f5;
+            }
+
+            .container {
+                background: #2a2a3e;
+                border-color: #3a3a4e;
+                box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            }
+
+            .header {
+                border-bottom-color: #3a3a4e;
+            }
+
+            .header h1 {
+                color: #f0f0f5;
+            }
+
+            .header h1 span {
+                color: #C9A84C;
+            }
+
+            .header-badge {
+                background: #3a3a4e;
+                color: #f0f0f5;
+            }
+
+            .drop-zone {
+                background: #1a1a2e;
+                border-color: #3a3a4e;
+            }
+
+            .drop-zone:hover {
+                border-color: #C9A84C;
+                background: #2a2a3e;
+            }
+
+            .drop-zone h3 {
+                color: #f0f0f5;
+            }
+
+            .drop-zone p {
+                color: #8e8e93;
+            }
+
+            .drop-zone .browse-btn {
+                background: var(--gradient-gold, linear-gradient(135deg, #C9A84C, #E8D5A5));
+                color: #1a1a2e;
+            }
+
+            .drop-zone .browse-btn:hover {
+                background: #E8D5A5;
+            }
+
+            .file-info {
+                color: #C9A84C;
+            }
+
+            .summary-grid {
+                background: #1a1a2e;
+                border-color: #3a3a4e;
+            }
+
+            .summary-item .value {
+                color: #f0f0f5;
+            }
+
+            .summary-item .label {
+                color: #8e8e93;
+            }
+
+            .btn-secondary {
+                background: #3a3a4e;
+                color: #f0f0f5;
+            }
+
+            .btn-secondary:hover:not(:disabled) {
+                background: #4a4a5e;
+            }
+
+            .btn-success {
+                background: #0b7a4a;
+                color: #fff;
+            }
+
+            .btn-success:hover:not(:disabled) {
+                background: #095e39;
+            }
+
+            .filter-select {
+                background: #2a2a3e;
+                border-color: #3a3a4e;
+                color: #f0f0f5;
+            }
+
+            .filter-select:focus {
+                border-color: #C9A84C;
+            }
+
+            .tabs {
+                border-bottom-color: #3a3a4e;
+            }
+
+            .tab-btn {
+                color: #8e8e93;
+            }
+
+            .tab-btn:hover {
+                color: #f0f0f5;
+                background: #2a2a3e;
+            }
+
+            .tab-btn.active {
+                color: #C9A84C;
+                border-bottom-color: #C9A84C;
+                background: #2a2a3e;
+            }
+
+            .table-wrapper {
+                border-color: #3a3a4e;
+            }
+
+            .table-wrapper table {
+                background: #2a2a3e;
+            }
+
+            .table-wrapper th {
+                background: #1a1a2e;
+                color: #f0f0f5;
+                border-bottom-color: #3a3a4e;
+            }
+
+            .table-wrapper td {
+                border-bottom-color: #3a3a4e;
+                color: #f0f0f5;
+            }
+
+            .table-wrapper tr:hover td {
+                background: #3a3a4e;
+            }
+
+            .table-wrapper .dept-header td {
+                background: #1a2a4a !important;
+                color: #C9A84C;
+            }
+
+            .table-wrapper .brand-total td {
+                background: #1a3a2a !important;
+                color: #34c759;
+            }
+
+            .table-wrapper .total-row td {
+                background: #2a2a2a !important;
+            }
+
+            #status.success {
+                background: #1a3a2a;
+                color: #34c759;
+                border-color: #2a5a3a;
+            }
+
+            #status.error {
+                background: #3a1a1a;
+                color: #ff6b6b;
+                border-color: #5a2a2a;
+            }
+
+            #status.info {
+                background: #1a2a3a;
+                color: #4a90d9;
+                border-color: #2a4a5a;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HOME BAR ===== -->
+    <div class="home-bar">
+        <a href="https://parkson127.github.io/all/" class="home-btn">
+            🏠 Home
+        </a>
+        <span class="hint">← Back to dashboard</span>
+    </div>
+
+    <!-- ===== KANDUNGAN UTAMA ===== -->
+    <div class="container">
+        <div class="header">
+            <div class="header-left">
+                <div class="header-icon">📊</div>
+                <div>
+                    <h1>Stocktake <span>Parser</span></h1>
+                    <div class="header-sub">Parkson RA4A / RA04 · Export to Excel</div>
+                </div>
+            </div>
+            <div class="header-badge"><span class="dot"></span>Ready</div>
+        </div>
+
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click();">
+    <span class="icon">📁</span>
+    <h3>Seret & Lepas fail .txt di sini</h3>
+    <p>atau klik butang di bawah untuk pilih fail</p>
+    <button class="browse-btn" id="browseBtn" onclick="event.stopPropagation();">Pilih Fail</button>
+    <input type="file" id="fileInput" accept=".txt" style="display:none;">
+    <div class="file-info" id="fileInfo" style="display:none;">
+        <span id="fileName"></span>
+        <button class="remove-btn" id="removeFileBtn">✕</button>
+    </div>
+</div>
+
+        <div id="status"><span class="status-icon"></span><span id="statusMsg"></span></div>
+
+        <div class="summary-grid" id="summaryGrid">
+            <div class="summary-item"><span class="label">Format</span><span class="value" id="sumFormat">-</span></div>
+            <div class="summary-item"><span class="label">Records</span><span class="value" id="sumRecords">0</span></div>
+            <div class="summary-item"><span class="label">Brands</span><span class="value" id="sumBrands">0</span></div>
+            <div class="summary-item"><span class="label">Departments</span><span class="value" id="sumDepts">0</span></div>
+            <div class="summary-item"><span class="label">Totals</span><span class="value" id="sumTotals">0</span></div>
+            <div class="summary-item"><span class="label">Store</span><span class="value" id="sumStore">-</span></div>
+        </div>
+
+        <div class="action-bar">
+            <button class="btn btn-success" id="exportBtn" disabled onclick="exportExcel()">📥 Export Excel</button>
+            <button class="btn btn-secondary" id="previewBtn" disabled onclick="togglePreview()">👁️ Preview</button>
+            <select class="filter-select" id="typeFilter"><option value="both">Both</option><option value="outright" selected>Outright</option><option value="csgnmnt">Csgnmnt</option></select>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="productsTab">Products</button>
+            <button class="tab-btn" data-tab="brandTotalsTab">Brand Totals</button>
+            <button class="tab-btn" data-tab="allTotalsTab">All Totals</button>
+        </div>
+
+        <div id="productsTab" class="tab-content active">
+            <div class="table-wrapper" id="productsWrapper">
+                <table><thead id="productsHead"></thead><tbody id="productsBody"></tbody></table>
+            </div>
+        </div>
+
+        <div id="brandTotalsTab" class="tab-content">
+            <div class="table-wrapper" id="brandWrapper">
+                <table><thead id="brandHead"></thead><tbody id="brandBody"></tbody></table>
+            </div>
+        </div>
+
+        <div id="allTotalsTab" class="tab-content">
+            <div class="table-wrapper" id="allWrapper">
+                <table><thead id="allHead"></thead><tbody id="allBody"></tbody></table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ============================================================
+        // ===== SEMUA JAVASCRIPT SEDIA ADA (TANPA PERUBAHAN) =====
+        // ============================================================
+
+        // ===== VARIABLES =====
+        let reportRows = [], allTotals = [], brandTotals = [], deptTotals = [], divisionTotals = [], storeTotals = [], companyTotals = [];
+        let fileName = '', format = '', info = {}, debugLog = [], previewShow = false;
+        let currentDept = '', currentDeptName = '';
+
+        // ===== DOM REFERENCES =====
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const browseBtn = document.getElementById('browseBtn');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileNameEl = document.getElementById('fileName');
+        const removeFileBtn = document.getElementById('removeFileBtn');
+        const statusEl = document.getElementById('status');
+        const statusMsg = document.getElementById('statusMsg');
+        const summaryGrid = document.getElementById('summaryGrid');
+        const exportBtn = document.getElementById('exportBtn');
+        const previewBtn = document.getElementById('previewBtn');
+        const typeFilter = document.getElementById('typeFilter');
+        const productsBody = document.getElementById('productsBody');
+        const brandBody = document.getElementById('brandBody');
+        const allBody = document.getElementById('allBody');
+
+        // ===== TAB SWITCHER =====
+        document.querySelectorAll('.tab-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                document.querySelectorAll('.tab-content').forEach(tc => tc.classList.remove('active'));
+                document.getElementById(this.dataset.tab).classList.add('active');
+            });
+        });
+
+        // ===== DROP ZONE HANDLERS =====
+        browseBtn.addEventListener('click', () => fileInput.click());
+
+        dropZone.addEventListener('dragover', e => {
+            e.preventDefault();
+            dropZone.classList.add('dragover');
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.classList.remove('dragover');
+        });
+
+        dropZone.addEventListener('drop', e => {
+            e.preventDefault();
+            dropZone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) {
+                fileInput.files = e.dataTransfer.files;
+                fileInput.dispatchEvent(new Event('change'));
+            }
+        });
+
+        removeFileBtn.addEventListener('click', function() {
+            fileInput.value = '';
+            fileInfo.style.display = 'none';
+            statusEl.className = '';
+            statusEl.style.display = 'none';
+            summaryGrid.classList.remove('show');
+            exportBtn.disabled = true;
+            previewBtn.disabled = true;
+            resetState();
+            renderAll();
+        });
+
+        fileInput.addEventListener('change', function() {
+            if (this.files && this.files.length > 0) {
+                const f = this.files[0];
+                fileNameEl.textContent = '📎 ' + f.name;
+                fileInfo.style.display = 'flex';
+                processFile(f);
+            }
+        });
+
+        // ===== UTILITY FUNCTIONS =====
+        function resetState() {
+            reportRows = [];
+            allTotals = [];
+            brandTotals = [];
+            deptTotals = [];
+            divisionTotals = [];
+            storeTotals = [];
+            companyTotals = [];
+            debugLog = [];
+            currentDept = '';
+            currentDeptName = '';
+        }
+
+        function log(msg) {
+            debugLog.push(msg);
+            console.log(msg);
+        }
+
+        function toNum(x) {
+            if (!x) return 0;
+            x = x.toString().trim();
+            let isNeg = false;
+            if (x.endsWith('-')) {
+                isNeg = true;
+                x = x.slice(0, -1);
+            }
+            x = x.replace(/,/g, '').trim();
+            const num = parseFloat(x) || 0;
+            return isNeg ? -num : num;
+        }
+
+        function showVal(n) {
+            n = Number(n || 0);
+            return n === 0 ? '-' : n.toFixed(2);
+        }
+
+        function showStatus(msg, type) {
+            statusEl.className = 'show ' + type;
+            statusMsg.textContent = msg;
+            statusEl.style.display = 'flex';
+        }
+
+        function findSkuInLine(line) {
+            const match = line.match(/\b(\d{8})\b/);
+            return match ? match[1] : null;
+        }
+
+        function extractDeptInfo(line, sku) {
+            const deptMatch = line.match(/^(\d+)\s+/);
+            if (!deptMatch) return null;
+
+            const deptCode = deptMatch[1];
+            const beforeSku = line.substring(0, line.indexOf(sku)).trim();
+            let deptPart = beforeSku.replace(/^\d+\s+/, '').trim();
+            let deptName = '', brand = '';
+
+            const parts = deptPart.split(/\s{2,}/);
+            if (parts.length >= 2) {
+                deptName = parts[0].trim();
+                brand = parts.slice(1).join(' ').trim();
+            } else {
+                const singleParts = deptPart.split(/\s+/);
+                if (singleParts.length >= 3) {
+                    deptName = singleParts.slice(0, 2).join(' ');
+                    brand = singleParts.slice(2).join(' ');
+                } else if (singleParts.length === 2) {
+                    deptName = singleParts[0];
+                    brand = singleParts[1];
+                } else {
+                    deptName = deptPart;
+                }
+            }
+
+            if (!brand || brand.length > 60 || brand.includes('TOTAL')) {
+                const beforeSkuClean = beforeSku.replace(/^\d+\s+/, '').trim();
+                const brandMatch = beforeSkuClean.match(/([A-Z][A-Z\s\-&.]+)$/);
+                if (brandMatch && brandMatch[1].length > 2) {
+                    brand = brandMatch[1].trim();
+                    deptName = beforeSkuClean.substring(0, beforeSkuClean.lastIndexOf(brand)).trim();
+                }
+            }
+
+            if (deptName.length > 30) {
+                const words = deptName.split(/\s+/);
+                if (words.length > 2) {
+                    brand = words.pop() + ' ' + brand;
+                    deptName = words.join(' ');
+                }
+            }
+
+            currentDept = deptCode;
+            currentDeptName = deptName.trim();
+
+            return {
+                dept: deptCode,
+                deptName: deptName.trim(),
+                brand: brand.trim()
+            };
+        }
+
+        function extractData(line, isRA4A) {
+            const nums = line.match(/[\d.]+-?/g);
+            if (!nums) return null;
+            const p = nums.map(toNum);
+
+            if (isRA4A) {
+                if (p.length >= 12) {
+                    return {
+                        act_qty: 0, act_cost: p[0] || 0, act_retail: p[1] || 0, act_mo: p[2] || 0,
+                        ri_qty: 0, ri_cost: p[3] || 0, ri_retail: p[4] || 0, ri_mo: p[5] || 0,
+                        adj_qty: 0, adj_cost: p[6] || 0, adj_retail: p[7] || 0, adj_mo: p[8] || 0,
+                        var_qty: 0, var_cost: p[9] || 0, var_retail: p[10] || 0, var_mo: p[11] || 0
+                    };
+                } else if (p.length === 11) {
+                    return {
+                        act_qty: 0, act_cost: p[0] || 0, act_retail: p[1] || 0, act_mo: p[2] || 0,
+                        ri_qty: 0, ri_cost: p[3] || 0, ri_retail: p[4] || 0, ri_mo: p[5] || 0,
+                        adj_qty: 0, adj_cost: p[6] || 0, adj_retail: p[7] || 0, adj_mo: 0,
+                        var_qty: 0, var_cost: p[8] || 0, var_retail: p[9] || 0, var_mo: p[10] || 0
+                    };
+                } else if (p.length >= 9) {
+                    return {
+                        act_qty: 0, act_cost: p[0] || 0, act_retail: p[1] || 0, act_mo: p[2] || 0,
+                        ri_qty: 0, ri_cost: p[3] || 0, ri_retail: p[4] || 0, ri_mo: p[5] || 0,
+                        adj_qty: 0, adj_cost: 0, adj_retail: 0, adj_mo: 0,
+                        var_qty: 0, var_cost: p[6] || 0, var_retail: p[7] || 0, var_mo: p[8] || 0
+                    };
+                } else if (p.length >= 6) {
+                    return {
+                        act_qty: 0, act_cost: p[0] || 0, act_retail: p[1] || 0, act_mo: p[2] || 0,
+                        ri_qty: 0, ri_cost: p[3] || 0, ri_retail: p[4] || 0, ri_mo: p[5] || 0,
+                        adj_qty: 0, adj_cost: 0, adj_retail: 0, adj_mo: 0,
+                        var_qty: 0, var_cost: 0, var_retail: 0, var_mo: 0
+                    };
+                }
+            } else {
+                if (p.length >= 12) {
+                    return {
+                        act_qty: p[0] || 0, act_cost: p[1] || 0, act_retail: p[2] || 0, act_mo: p[3] || 0,
+                        ri_qty: p[4] || 0, ri_cost: p[5] || 0, ri_retail: p[6] || 0, ri_mo: p[7] || 0,
+                        adj_qty: 0, adj_cost: 0, adj_retail: 0, adj_mo: 0,
+                        var_qty: p[8] || 0, var_cost: p[9] || 0, var_retail: p[10] || 0, var_mo: p[11] || 0
+                    };
+                } else if (p.length >= 9) {
+                    return {
+                        act_qty: 0, act_cost: p[0] || 0, act_retail: p[1] || 0, act_mo: p[2] || 0,
+                        ri_qty: 0, ri_cost: p[3] || 0, ri_retail: p[4] || 0, ri_mo: p[5] || 0,
+                        adj_qty: 0, adj_cost: 0, adj_retail: 0, adj_mo: 0,
+                        var_qty: 0, var_cost: p[6] || 0, var_retail: p[7] || 0, var_mo: p[8] || 0
+                    };
+                }
+            }
+            return null;
+        }
+
+        function makeProduct(deptInfo, sku, description, rowNumber) {
+            return {
+                type: 'PRODUCT',
+                subType: 'Outright',
+                name: '',
+                class: '',
+                dept: deptInfo.dept || '',
+                deptName: deptInfo.deptName || '',
+                brand: deptInfo.brand || '',
+                sku: sku,
+                desc: description,
+                typeLabel: 'Outright',
+                aq: 0, ac: 0, ar: 0, am: 0,
+                rq: 0, rc: 0, rr: 0, rm: 0,
+                adjq: 0, adjc: 0, adjr: 0, adjm: 0,
+                vq: 0, vc: 0, vr: 0, vm: 0,
+                isTotal: false,
+                rowNumber: rowNumber
+            };
+        }
+
+        function applyData(row, data) {
+            Object.assign(row, {
+                aq: data.act_qty || 0,
+                ac: data.act_cost || 0,
+                ar: data.act_retail || 0,
+                am: data.act_mo || 0,
+                rq: data.ri_qty || 0,
+                rc: data.ri_cost || 0,
+                rr: data.ri_retail || 0,
+                rm: data.ri_mo || 0,
+                adjq: data.adj_qty || 0,
+                adjc: data.adj_cost || 0,
+                adjr: data.adj_retail || 0,
+                adjm: data.adj_mo || 0,
+                vq: data.var_qty || 0,
+                vc: data.var_cost || 0,
+                vr: data.var_retail || 0,
+                vm: data.var_mo || 0
+            });
+        }
+
+        // ===== UPDATED getTotalMeta =====
+        function getTotalMeta(trimmed) {
+            if (trimmed.includes('Company Total')) return ['Company', 'Company Total', 'company-total'];
+            if (trimmed.includes('Store Total')) return ['Store', 'Store Total', 'store-total'];
+            if (trimmed.includes('Division Total')) return ['Division', 'Division Total', 'division-total'];
+            if (trimmed.includes('Department Total') || trimmed.includes('Departmental')) {
+                const deptInfo = currentDept && currentDeptName ? ` (${currentDept} - ${currentDeptName})` : '';
+                return ['Department', `Department Total${deptInfo}`, 'dept-total'];
+            }
+            if (trimmed.includes('TOTAL')) {
+                let brandName = trimmed.substring(0, trimmed.indexOf('TOTAL')).trim().replace(/:$/, '');
+                if (brandName.includes('-')) brandName = brandName.split('-').pop().trim();
+                return ['Brand', brandName || 'Unknown Brand', 'brand-total'];
+            }
+            return ['', '', ''];
+        }
+
+        function addTotal(line, lines, index, isRA4A, rowNumber) {
+            const [totalType, totalName, rowClass] = getTotalMeta(line);
+            if (!totalName || totalName === 'TOTAL') return rowNumber;
+
+            let dataLine = '';
+            for (let j = index + 1; j < Math.min(index + 5, lines.length); j++) {
+                if (lines[j].includes('Outright') || lines[j].includes('Outrgt')) {
+                    dataLine = lines[j];
+                    break;
+                }
+            }
+
+            const data = dataLine && extractData(dataLine, isRA4A);
+            if (!data) return rowNumber;
+
+            const entry = {
+                type: 'TOTAL',
+                subType: totalType,
+                name: totalName,
+                class: rowClass,
+                dept: '',
+                deptName: '',
+                brand: totalName,
+                sku: '',
+                desc: totalName,
+                typeLabel: totalType,
+                aq: data.act_qty || 0,
+                ac: data.act_cost || 0,
+                ar: data.act_retail || 0,
+                am: data.act_mo || 0,
+                rq: data.ri_qty || 0,
+                rc: data.ri_cost || 0,
+                rr: data.ri_retail || 0,
+                rm: data.ri_mo || 0,
+                adjq: data.adj_qty || 0,
+                adjc: data.adj_cost || 0,
+                adjr: data.adj_retail || 0,
+                adjm: data.adj_mo || 0,
+                vq: data.var_qty || 0,
+                vc: data.var_cost || 0,
+                vr: data.var_retail || 0,
+                vm: data.var_mo || 0,
+                isTotal: true,
+                rowNumber: ++rowNumber
+            };
+
+            allTotals.push(entry);
+            reportRows.push(entry);
+
+            if (totalType === 'Brand') brandTotals.push(entry);
+            else if (totalType === 'Department') deptTotals.push(entry);
+            else if (totalType === 'Division') divisionTotals.push(entry);
+            else if (totalType === 'Store') storeTotals.push(entry);
+            else if (totalType === 'Company') companyTotals.push(entry);
+
+            return rowNumber;
+        }
+
+        function parse(lines, isRA4A) {
+            const skipLines = ['Dept', 'Report', 'Store        :', '----', 'PAGE', 'Code', 'Cost', 'Retail', 'MarkOn', 'Qty', '(RM)'];
+            let rowNumber = 0;
+
+            for (let i = 0; i < lines.length; i++) {
+                const trimmed = lines[i].trim();
+                if (!trimmed || skipLines.some(s => trimmed.includes(s))) continue;
+
+                const sku = findSkuInLine(trimmed);
+                if (sku) {
+                    const deptInfo = extractDeptInfo(trimmed, sku);
+                    if (deptInfo) {
+                        const product = makeProduct(deptInfo, sku, trimmed.substring(trimmed.indexOf(sku) + sku.length).trim(), ++rowNumber);
+                        const nextLine = i + 1 < lines.length ? lines[i + 1] : '';
+                        if (nextLine.includes(isRA4A ? 'Outrgt' : 'Outright')) {
+                            const data = extractData(nextLine, isRA4A);
+                            if (data) applyData(product, data);
+                            reportRows.push(product);
+                        }
+                    }
+                    continue;
+                }
+
+                if (trimmed.includes('TOTAL') || trimmed.includes('Total')) {
+                    rowNumber = addTotal(trimmed, lines, i, isRA4A, rowNumber);
+                    continue;
+                }
+
+                if (trimmed.includes('Outrgt') || trimmed.includes('Csgnmnt') || trimmed.includes('Outright')) continue;
+            }
+        }
+
+        // ============================================================
+        // ===== PROCESS FILE =====
+        // ============================================================
+        function processFile(file) {
+            if (!file.name.endsWith('.txt')) {
+                showStatus('❌ Sila muat naik fail .txt', 'error');
+                return;
+            }
+
+            resetState();
+            showStatus('⏳ Memproses fail...', 'info');
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const text = e.target.result;
+                    const lines = text.split('\n');
+                    const hasOutrgt = text.includes('Outrgt :');
+                    const hasOutright = text.includes('Outright:');
+
+                    if (hasOutrgt) {
+                        format = 'RA4A';
+                        parse(lines, true);
+                    } else if (hasOutright) {
+                        format = 'RA04';
+                        parse(lines, false);
+                    } else {
+                        showStatus('❌ Tiada data ditemui. Pastikan format laporan betul.', 'error');
+                        exportBtn.disabled = true;
+                        previewBtn.disabled = true;
+                        return;
+                    }
+
+                    if (reportRows.length === 0 && allTotals.length === 0) {
+                        showStatus('❌ Tiada data ditemui', 'error');
+                        exportBtn.disabled = true;
+                        previewBtn.disabled = true;
+                        return;
+                    }
+
+                    fileName = file.name.replace('.txt', '');
+                    showStatus(`✅ ${reportRows.length} rows, ${allTotals.length} totals (${format})`, 'success');
+                    exportBtn.disabled = false;
+                    previewBtn.disabled = false;
+                    updateSummary();
+                    renderAll();
+
+                } catch(err) {
+                    showStatus('❌ Error: ' + err.message, 'error');
+                    exportBtn.disabled = true;
+                    previewBtn.disabled = true;
+                }
+            };
+            reader.readAsText(file);
+        }
+
+        // ============================================================
+        // ===== UPDATE SUMMARY =====
+        // ============================================================
+        function updateSummary() {
+            document.getElementById('sumFormat').textContent = format || '-';
+            document.getElementById('sumRecords').textContent = reportRows.length;
+            document.getElementById('sumBrands').textContent = brandTotals.length;
+            document.getElementById('sumDepts').textContent = deptTotals.length;
+            document.getElementById('sumTotals').textContent = allTotals.length;
+            document.getElementById('sumStore').textContent = info.store || '-';
+            summaryGrid.classList.add('show');
+        }
+
+        // ============================================================
+        // ===== RENDER FUNCTIONS =====
+        // ============================================================
+        function renderAll() {
+            renderProducts();
+            renderBrandTotals();
+            renderAllTotals();
+        }
+
+        function calculateBrandTotal(deptRows, brand, isRA4A) {
+            const total = { ac: 0, ar: 0, am: 0, rc: 0, rr: 0, rm: 0, adjc: 0, adjr: 0, adjm: 0, vc: 0, vr: 0, vm: 0, aq: 0, rq: 0, vq: 0 };
+            const rows = deptRows.filter(r => r.brand === brand);
+            rows.forEach(r => {
+                const keys = isRA4A ? ['ac','ar','am','rc','rr','rm','adjc','adjr','adjm','vc','vr','vm'] : ['aq','ac','ar','am','rq','rc','rr','rm','vq','vc','vr','vm'];
+                keys.forEach(k => total[k] += r[k] || 0);
+            });
+            return total;
+        }
+
+        function getDisplayCols(isRA4A) {
+            if (isRA4A) {
+                return [['ac'],['ar'],['am'],['rc'],['rr'],['rm'],['adjc','', 'color:#856404;'],['adjr','', 'color:#856404;'],['adjm'],['vc','neg'],['vr','neg'],['vm']];
+            } else {
+                return [['aq'],['ac'],['ar'],['am'],['rq'],['rc'],['rr'],['rm'],['vq','neg'],['vc','neg'],['vr','neg'],['vm']];
+            }
+        }
+
+        function renderProducts() {
+            const filter = typeFilter.value;
+            productsBody.innerHTML = '';
+
+            const filtered = reportRows.filter(r => {
+                if (r.isTotal) return true;
+                if (filter === 'outright') return r.typeLabel === 'Outright' || r.typeLabel === '';
+                if (filter === 'csgnmnt') return r.typeLabel === 'Consignment';
+                return true;
+            });
+
+            const isRA4A = format === 'RA4A';
+            document.getElementById('productsHead').innerHTML = '<tr>' + getHeaders(isRA4A).map(h => `<th>${h}</th>`).join('') + '</tr>';
+
+            if (!filtered.length) {
+                productsBody.innerHTML = '<tr><td colspan="20" style="text-align:center;padding:20px;">Tiada data</td></tr>';
+                return;
+            }
+
+            let currentDept = '';
+            filtered.forEach(row => {
+                if (!row.isTotal && row.dept && row.dept !== currentDept) {
+                    currentDept = row.dept;
+                    const tr = document.createElement('tr');
+                    tr.className = 'dept-header';
+                    tr.innerHTML = `<td colspan="20" style="text-align:left;padding:5px 10px;font-weight:bold;">Dept ${row.dept} - ${row.deptName || ''}</td>`;
+                    productsBody.appendChild(tr);
+                }
+
+                const tr = document.createElement('tr');
+                if (row.isTotal) tr.className = row.class || 'total-row';
+
+                let cells = `<td>${row.rowNumber || ''}</td>`;
+                cells += `<td>${row.isTotal ? '' : (row.dept || '')}</td>`;
+                cells += `<td>${row.isTotal ? '' : (row.deptName || '')}</td>`;
+                cells += `<td>${row.isTotal ? '' : (row.brand || '')}</td>`;
+                cells += `<td>${row.isTotal ? '' : (row.sku || '')}</td>`;
+                cells += `<td style="text-align:left;">${row.isTotal ? row.name : (row.desc || '')}</td>`;
+                cells += `<td>${row.isTotal ? 'TOTAL' : (row.typeLabel || '')}</td>`;
+
+                getDisplayCols(isRA4A).forEach(([key, neg, style]) => {
+                    cells += `<td${neg && row[key] < 0 ? ' class="neg"' : ''}${style ? ` style="${style}"` : ''}>${showVal(row[key])}</td>`;
+                });
+
+                tr.innerHTML = cells;
+                productsBody.appendChild(tr);
+            });
+        }
+
+        function renderBrandTotals() {
+            brandBody.innerHTML = '';
+            if (!brandTotals.length) {
+                brandBody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:20px;">Tiada brand totals</td></tr>';
+                return;
+            }
+
+            document.getElementById('brandHead').innerHTML = '<tr><th>#</th><th>Brand</th><th>Cost</th><th>Retail</th><th>RI Cost</th><th>RI Retail</th><th>Adj Cost</th><th>Adj Retail</th><th>Var Cost</th><th>Var Retail</th></tr>';
+
+            brandTotals.forEach((row, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = 'brand-total';
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td style="text-align:left;"><strong>${row.name}</strong></td>
+                    <td>${showVal(row.ac)}</td>
+                    <td>${showVal(row.ar)}</td>
+                    <td>${showVal(row.rc)}</td>
+                    <td>${showVal(row.rr)}</td>
+                    <td>${showVal(row.adjc)}</td>
+                    <td>${showVal(row.adjr)}</td>
+                    <td class="${row.vc < 0 ? 'neg' : ''}">${showVal(row.vc)}</td>
+                    <td class="${row.vr < 0 ? 'neg' : ''}">${showVal(row.vr)}</td>
+                `;
+                brandBody.appendChild(tr);
+            });
+        }
+
+        function renderAllTotals() {
+            allBody.innerHTML = '';
+            if (!allTotals.length) {
+                allBody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:20px;">Tiada totals</td></tr>';
+                return;
+            }
+
+            document.getElementById('allHead').innerHTML = '<tr><th>#</th><th>Type</th><th>Name</th><th>Cost</th><th>Retail</th><th>RI Cost</th><th>RI Retail</th><th>Adj Cost</th><th>Adj Retail</th><th>Var Cost</th><th>Var Retail</th></tr>';
+
+            allTotals.forEach((row, idx) => {
+                const tr = document.createElement('tr');
+                tr.className = row.class || '';
+                tr.innerHTML = `
+                    <td>${idx + 1}</td>
+                    <td><strong>${row.type}</strong></td>
+                    <td style="text-align:left;">${row.name}</td>
+                    <td>${showVal(row.ac)}</td>
+                    <td>${showVal(row.ar)}</td>
+                    <td>${showVal(row.rc)}</td>
+                    <td>${showVal(row.rr)}</td>
+                    <td>${showVal(row.adjc)}</td>
+                    <td>${showVal(row.adjr)}</td>
+                    <td class="${row.vc < 0 ? 'neg' : ''}">${showVal(row.vc)}</td>
+                    <td class="${row.vr < 0 ? 'neg' : ''}">${showVal(row.vr)}</td>
+                `;
+                allBody.appendChild(tr);
+            });
+        }
+
+        // ============================================================
+        // ===== TOGGLE PREVIEW =====
+        // ============================================================
+        function togglePreview() {
+            if (!reportRows.length) return;
+            previewShow = !previewShow;
+            document.querySelector('.tabs').style.display = previewShow ? 'flex' : 'none';
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.style.display = previewShow ? (el.classList.contains('active') ? 'block' : 'none') : 'none';
+            });
+            previewBtn.textContent = previewShow ? '🙈 Tutup' : '👁️ Preview';
+            if (previewShow) renderAll();
+        }
+
+        // ============================================================
+        // ===== FORMAT ROW & HEADERS =====
+        // ============================================================
+        function formatRow(r, isRA4A, rowNum) {
+            const row = {
+                '#': rowNum || '',
+                'Dept': r.isTotal ? '' : (r.dept || ''),
+                'Dept Name': r.isTotal ? '' : (r.deptName || ''),
+                'Brand': r.isTotal ? '' : (r.brand || ''),
+                'SKU': r.isTotal ? '' : (r.sku || ''),
+                'Description': r.isTotal ? r.name : (r.desc || ''),
+                'Type': r.isTotal ? 'TOTAL' : (r.typeLabel || '')
+            };
+
+            const cols = isRA4A ? [
+                ['Act Cost', 'ac'], ['Act Retail', 'ar'], ['Act MO%', 'am'],
+                ['RI Cost', 'rc'], ['RI Retail', 'rr'], ['RI MO%', 'rm'],
+                ['Adj Cost', 'adjc'], ['Adj Retail', 'adjr'], ['Adj MO%', 'adjm'],
+                ['Var Cost', 'vc'], ['Var Retail', 'vr'], ['Var MO%', 'vm']
+            ] : [
+                ['Act Qty', 'aq'], ['Act Cost', 'ac'], ['Act Retail', 'ar'], ['Act MO%', 'am'],
+                ['RI Qty', 'rq'], ['RI Cost', 'rc'], ['RI Retail', 'rr'], ['RI MO%', 'rm'],
+                ['Var Qty', 'vq'], ['Var Cost', 'vc'], ['Var Retail', 'vr'], ['Var MO%', 'vm']
+            ];
+
+            cols.forEach(([label, key]) => {
+                row[label] = r[key] === 0 ? '-' : (r[key] || 0).toFixed(2);
+            });
+
+            return row;
+        }
+
+        function getHeaders(isRA4A) {
+            const common = ['#', 'Dept', 'Dept Name', 'Brand', 'SKU', 'Description', 'Type'];
+            return common.concat(isRA4A ? [
+                'Act Cost', 'Act Retail', 'Act MO%',
+                'RI Cost', 'RI Retail', 'RI MO%',
+                'Adj Cost', 'Adj Retail', 'Adj MO%',
+                'Var Cost', 'Var Retail', 'Var MO%'
+            ] : [
+                'Act Qty', 'Act Cost', 'Act Retail', 'Act MO%',
+                'RI Qty', 'RI Cost', 'RI Retail', 'RI MO%',
+                'Var Qty', 'Var Cost', 'Var Retail', 'Var MO%'
+            ]);
+        }
+
+        // ============================================================
+        // ===== APPLY STYLES TO SHEET =====
+        // ============================================================
+        function applyStyles(ws, isRA4A) {
+            if (!ws) return;
+
+            const range = XLSX.utils.decode_range(ws['!ref'] || 'A1');
+            const headers = getHeaders(isRA4A);
+
+            ws['!cols'] = headers.map(h => ({ wch: Math.max(h.length + 2, 12) }));
+
+            const totalRows = new Set();
+            const deptRows = new Set();
+
+            for (let R = range.s.r + 1; R <= range.e.r; R++) {
+                const descCell = ws[XLSX.utils.encode_cell({ r: R, c: 5 })];
+                const typeCell = ws[XLSX.utils.encode_cell({ r: R, c: 6 })];
+
+                if (descCell && typeof descCell.v === 'string' && descCell.v.includes('TOTAL')) {
+                    totalRows.add(R);
+                }
+                if (typeCell && typeof typeCell.v === 'string' && typeCell.v === 'TOTAL') {
+                    totalRows.add(R);
+                }
+
+                const deptCell = ws[XLSX.utils.encode_cell({ r: R, c: 0 })];
+                if (deptCell && typeof deptCell.v === 'string' && deptCell.v.startsWith('Dept')) {
+                    deptRows.add(R);
+                }
+            }
+
+            for (let R = range.s.r; R <= range.e.r; R++) {
+                for (let C = range.s.c; C <= range.e.c; C++) {
+                    const cellRef = XLSX.utils.encode_cell({ r: R, c: C });
+                    const cell = ws[cellRef];
+                    if (!cell) continue;
+
+                    if (!cell.s) cell.s = {};
+                    if (!cell.s.font) cell.s.font = {};
+                    if (!cell.s.border) cell.s.border = {};
+                    if (!cell.s.alignment) cell.s.alignment = {};
+
+                    cell.s.border = {
+                        top: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                        bottom: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                        left: { style: 'thin', color: { rgb: 'CCCCCC' } },
+                        right: { style: 'thin', color: { rgb: 'CCCCCC' } }
+                    };
+
+                    cell.s.alignment = {
+                        horizontal: (C === 5 || C === 6) ? 'left' : 'center',
+                        vertical: 'center',
+                        wrapText: false
+                    };
+
+                    if (R === 0) {
+                        cell.s.font = { bold: true, color: { rgb: 'FFFFFF' } };
+                        cell.s.fill = { fgColor: { rgb: '1A3A6B' } };
+                        continue;
+                    }
+
+                    if (deptRows.has(R)) {
+                        cell.s.font = { bold: true, color: { rgb: '1A3A6B' } };
+                        cell.s.fill = { fgColor: { rgb: 'EAF1FE' } };
+                        continue;
+                    }
+
+                    if (totalRows.has(R)) {
+                        cell.s.font = { bold: true, color: { rgb: '0B5E3A' } };
+                        cell.s.fill = { fgColor: { rgb: 'E6F7ED' } };
+                    }
+
+                    const val = cell.v;
+                    if (typeof val === 'number' && val < 0) {
+                        cell.s.font = { bold: true, color: { rgb: 'DC2626' } };
+                    }
+                }
+            }
+        }
+
+        // ============================================================
+        // ===== EXPORT EXCEL =====
+        // ============================================================
+        function exportExcel() {
+            if (!reportRows.length) {
+                showStatus('❌ Tiada data', 'error');
+                return;
+            }
+
+            try {
+                const wb = XLSX.utils.book_new();
+                const filter = typeFilter.value;
+                const isRA4A = format === 'RA4A';
+
+                const filtered = reportRows.filter(r => {
+                    if (r.isTotal) return true;
+                    if (filter === 'outright') return r.typeLabel === 'Outright' || r.typeLabel === '';
+                    if (filter === 'csgnmnt') return r.typeLabel === 'Consignment';
+                    return true;
+                });
+
+                // 1. ALL DATA
+                const allRows = filtered.map((r, idx) => formatRow(r, isRA4A, idx + 1));
+                const wsAll = XLSX.utils.json_to_sheet(allRows, { header: getHeaders(isRA4A) });
+                applyStyles(wsAll, isRA4A);
+                XLSX.utils.book_append_sheet(wb, wsAll, 'ALL DATA');
+
+                // 2. VARIANCE ONLY
+                const varFiltered = filtered.filter(r => {
+                    if (r.isTotal) return r.vc !== 0 || r.vr !== 0 || r.vq !== 0;
+                    return r.vq !== 0 || r.vc !== 0 || r.vr !== 0;
+                });
+                const varRows = varFiltered.map((r, idx) => formatRow(r, isRA4A, idx + 1));
+                if (varRows.length) {
+                    const wsVar = XLSX.utils.json_to_sheet(varRows, { header: getHeaders(isRA4A) });
+                    applyStyles(wsVar, isRA4A);
+                    XLSX.utils.book_append_sheet(wb, wsVar, 'VARIANCE ONLY');
+                }
+
+                // 3. DEPT TOTAL ONLY
+                const deptTotalFiltered = filtered.filter(r => r.isTotal === true && r.subType === 'Department');
+                const deptTotalRows = deptTotalFiltered.map((r, idx) => formatRow(r, isRA4A, idx + 1));
+                if (deptTotalRows.length) {
+                    const wsDeptTotal = XLSX.utils.json_to_sheet(deptTotalRows, { header: getHeaders(isRA4A) });
+                    applyStyles(wsDeptTotal, isRA4A);
+                    XLSX.utils.book_append_sheet(wb, wsDeptTotal, 'DEPT TOTAL ONLY');
+                }
+
+                // 4. SPLIT BY DEPT
+                const deptMap = {};
+                filtered.forEach(r => {
+                    if (!r.isTotal) {
+                        const key = (r.dept || 'NO') + ' - ' + (r.deptName || 'DEPT');
+                        if (!deptMap[key]) deptMap[key] = [];
+                        deptMap[key].push(r);
+                    }
+                });
+
+                Object.keys(deptMap).forEach(deptKey => {
+                    const deptRows = deptMap[deptKey];
+                    const rows = [];
+                    let rowCounter = 0;
+                    const deptCode = deptRows[0]?.dept || '';
+                    const deptName = deptRows[0]?.deptName || '';
+                    const brands = [...new Set(deptRows.map(r => r.brand).filter(b => b))];
+
+                    brands.forEach(brand => {
+                        const brandProducts = deptRows.filter(r => r.brand === brand);
+                        brandProducts.forEach(r => {
+                            rows.push(formatRow(r, isRA4A, ++rowCounter));
+                        });
+
+                        let brandTotal = filtered.find(r => r.isTotal && r.subType === 'Brand' && r.name === brand);
+                        if (!brandTotal) {
+                            const c = calculateBrandTotal(deptRows, brand, isRA4A);
+                            brandTotal = {
+                                isTotal: true,
+                                subType: 'Brand',
+                                name: brand,
+                                ...c,
+                                dept: deptCode,
+                                deptName: deptName,
+                                brand: brand
+                            };
+                        }
+                        rows.push(formatRow(brandTotal, isRA4A, ++rowCounter));
+                    });
+
+                    const deptTotal = filtered.find(r => r.isTotal && r.subType === 'Department' && (r.name.includes(deptCode) || r.name.includes(deptName)));
+                    if (deptTotal) {
+                        rows.push(formatRow(deptTotal, isRA4A, ++rowCounter));
+                    } else {
+                        const deptCalc = { ac: 0, ar: 0, rc: 0, rr: 0, adjc: 0, adjr: 0, vc: 0, vr: 0, aq: 0, rq: 0, vq: 0 };
+                        deptRows.forEach(r => {
+                            (isRA4A ? ['ac','ar','rc','rr','adjc','adjr','vc','vr'] : ['aq','ac','ar','rq','rc','rr','vq','vc','vr']).forEach(k => deptCalc[k] += r[k] || 0);
+                        });
+                        const fakeDeptTotal = {
+                            isTotal: true,
+                            subType: 'Department',
+                            name: 'Department Total (' + deptCode + ' - ' + deptName + ')',
+                            ...deptCalc,
+                            dept: deptCode,
+                            deptName: deptName,
+                            brand: ''
+                        };
+                        rows.push(formatRow(fakeDeptTotal, isRA4A, ++rowCounter));
+                    }
+
+                    ['Division', 'Store', 'Company'].forEach(type => {
+                        const total = filtered.find(r => r.isTotal && r.subType === type);
+                        if (total) {
+                            rows.push(formatRow(total, isRA4A, ++rowCounter));
+                        }
+                    });
+
+                    const ws = XLSX.utils.json_to_sheet(rows, { header: getHeaders(isRA4A) });
+                    applyStyles(ws, isRA4A);
+                    XLSX.utils.book_append_sheet(wb, ws, deptKey.substring(0, 31));
+                });
+
+                // 5. EXPORT
+                const today = new Date().toISOString().slice(0, 10);
+                const exportName = `${fileName || 'stocktake'}_${today}.xlsx`;
+                XLSX.writeFile(wb, exportName);
+                showStatus(`✅ Export berjaya: ${exportName}`, 'success');
+
+            } catch(err) {
+                showStatus('❌ Export error: ' + err.message, 'error');
+                console.error(err);
+            }
+        }
+
+        // ============================================================
+        // ===== FILTER CHANGE =====
+        // ============================================================
+        typeFilter.addEventListener('change', renderAll);
+
+        // ============================================================
+        // ===== INITIAL STATE =====
+        // ============================================================
+        statusEl.style.display = 'none';
+        summaryGrid.classList.remove('show');
+        exportBtn.disabled = true;
+        previewBtn.disabled = true;
+        document.querySelector('.tabs').style.display = 'none';
+        document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
+
+        console.log('📊 Stocktake Parser PRO loaded.');
+        console.log('📌 Department Total akan tunjuk dept code dan name.');
+        console.log('📌 Zero value = "-" | wrapText = false');
+    </script>
+
+</body>
+</html>

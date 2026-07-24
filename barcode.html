@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Auto POS Barcode System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+
+    <!-- ===== CDN / LIBRARY ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- ===== CSS TERPUSAT ===== -->
+    <link rel="stylesheet" href="common.css">
+    <link rel="stylesheet" href="ui1.css">
+    <script src="common.js"></script>
+    <!-- ===== CSS KHUSUS BARCODE ===== -->
+    <style>
+        /* ===== MAIN WRAPPER ===== */
+        .wrapper {
+            display: flex;
+            flex-direction: column;
+            padding: 16px 16px 24px;
+            gap: 16px;
+            flex: 1;
+        }
+
+        /* ===== INPUT SECTION ===== */
+        .input-section {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px 18px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 0.5px solid rgba(60, 60, 67, 0.06);
+        }
+
+        .input-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 12px;
+        }
+
+        .input-row .field {
+            flex: 1;
+        }
+
+        .input-row .field.small {
+            flex: 0.6;
+        }
+
+        .input-row .field.large {
+            flex: 1.4;
+        }
+
+        .field label {
+            display: block;
+            font-size: 11px;
+            font-weight: 600;
+            color: #8e8e93;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .field input {
+            width: 100%;
+            padding: 14px 14px;
+            border-radius: 14px;
+            border: 1.5px solid #e5e5ea;
+            font-size: 16px;
+            font-weight: 500;
+            font-family: inherit;
+            background: #f8f8fc;
+            color: #1c1c1e;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .field input:focus {
+            outline: none;
+            border-color: #E30613;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.08);
+        }
+
+        .field input::placeholder {
+            color: #aeaeb2;
+            font-weight: 400;
+        }
+
+        /* ===== GENERATE BUTTON ===== */
+        .generate-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #E30613, #b30510);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            box-shadow: 0 4px 16px rgba(227, 6, 19, 0.25);
+            letter-spacing: 0.3px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .generate-btn:active {
+            transform: scale(0.97);
+            box-shadow: 0 2px 8px rgba(227, 6, 19, 0.15);
+        }
+
+        /* ===== RECEIPT OUTPUT (Di Bawah Button Generate) ===== */
+        .receipt-output {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(60, 60, 67, 0.08);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .receipt-output.active {
+            display: flex;
+        }
+
+        .receipt-output .code-label {
+            font-size: 12px;
+            font-weight: 500;
+            color: #8e8e93;
+            margin-bottom: 8px;
+        }
+
+        .receipt-output .code-display {
+            font-size: 14px;
+            font-weight: 600;
+            color: #1c1c1e;
+            background: #f2f2f7;
+            padding: 4px 14px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+        }
+
+        /* ===== RECEIPT BARCODE & QR ===== */
+        .receipt-barcode-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            gap: 12px;
+        }
+
+        .barcode-wrapper-receipt {
+            width: 100%;
+            max-width: 400px;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: none;
+        }
+
+        .barcode-wrapper-receipt.show {
+            display: block;
+        }
+
+        .barcode-wrapper-receipt.zoomed {
+            transform: scale(1.6);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+            z-index: 50;
+            position: relative;
+        }
+
+        #receiptBarcode {
+            width: 100%;
+            height: auto;
+            display: block;
+            padding: 16px;
+            background: #ffffff;
+            border-radius: 12px;
+        }
+
+        /* ===== QR CODE ===== */
+        .qr-wrapper-receipt {
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+            display: none;
+            padding: 12px;
+            margin-top: 4px;
+        }
+
+        .qr-wrapper-receipt.show {
+            display: inline-block;
+        }
+
+        .qr-wrapper-receipt.zoomed {
+            transform: scale(1.6);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+            z-index: 50;
+            position: relative;
+        }
+
+        #receiptQR {
+            display: block;
+        }
+
+        #receiptQR canvas {
+            width: 150px !important;
+            height: 150px !important;
+            border-radius: 6px;
+            background: #ffffff !important;
+            display: block;
+        }
+
+        .zoom-hint-receipt {
+            text-align: center;
+            font-size: 11px;
+            color: #8e8e93;
+            margin-top: 4px;
+        }
+
+        .zoom-hint-receipt span {
+            background: #f2f2f7;
+            padding: 2px 12px;
+            border-radius: 12px;
+            display: inline-block;
+        }
+
+        /* ===== SKU & STAFF SECTION ===== */
+        .sku-staff-section {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 20px 18px;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
+            border: 0.5px solid rgba(60, 60, 67, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .sku-staff-section .row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .sku-staff-section .row .field {
+            flex: 1;
+        }
+
+        .sku-staff-section .row .field label {
+            font-size: 11px;
+            font-weight: 600;
+            color: #8e8e93;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+            display: block;
+        }
+
+        .sku-staff-section .row .field input {
+            width: 100%;
+            padding: 12px 14px;
+            border-radius: 14px;
+            border: 1.5px solid #e5e5ea;
+            font-size: 15px;
+            font-weight: 500;
+            font-family: inherit;
+            background: #f8f8fc;
+            color: #1c1c1e;
+            transition: all 0.2s;
+            -webkit-appearance: none;
+        }
+
+        .sku-staff-section .row .field input:focus {
+            outline: none;
+            border-color: #E30613;
+            background: #ffffff;
+            box-shadow: 0 0 0 4px rgba(227, 6, 19, 0.08);
+        }
+
+        /* ===== SKU & STAFF BARCODE ===== */
+        .barcode-wrapper-small {
+            max-width: 200px;
+            width: 100%;
+            cursor: pointer;
+            touch-action: manipulation;
+            transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s;
+            border-radius: 12px;
+            background: #ffffff;
+            border: 1px solid #e5e5ea;
+            flex-shrink: 0;
+            display: none;
+            padding: 6px;
+        }
+
+        .barcode-wrapper-small.show {
+            display: block;
+        }
+
+        .barcode-wrapper-small.zoomed {
+            transform: scale(1.6);
+            box-shadow: 0 8px 40px rgba(0, 0, 0, 0.18);
+            z-index: 50;
+            position: relative;
+        }
+
+        .barcode-wrapper-small svg {
+            width: 100%;
+            height: auto;
+            display: block;
+            background: #ffffff;
+            border-radius: 8px;
+        }
+
+        /* ===== HISTORY ===== */
+        .history-section {
+            margin-top: 16px;
+            padding-top: 16px;
+            border-top: 0.5px solid rgba(60, 60, 67, 0.08);
+        }
+
+        .history-section .history-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .history-section .history-header h4 {
+            font-size: 13px;
+            font-weight: 600;
+            color: #8e8e93;
+        }
+
+        .history-section .history-header .clear-btn {
+            font-size: 12px;
+            color: #E30613;
+            background: none;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .history-list {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            padding: 4px 0 8px;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+
+        .history-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .history-item {
+            background: #f2f2f7;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            color: #1c1c1e;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 0.5px solid rgba(60, 60, 67, 0.04);
+            flex-shrink: 0;
+        }
+
+        .history-item:active {
+            transform: scale(0.95);
+            background: #e5e5ea;
+        }
+
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(20px);
+            background: rgba(28, 28, 30, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: #fff;
+            padding: 12px 24px;
+            border-radius: 16px;
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.25, 0.1, 0.25, 1);
+            pointer-events: none;
+            z-index: 999;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 480px) {
+            .wrapper {
+                padding: 12px 12px 16px;
+            }
+
+            .input-section {
+                padding: 16px 14px;
+            }
+
+            .input-row {
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .input-row .field.small,
+            .input-row .field.large {
+                flex: 1;
+            }
+
+            .field input {
+                padding: 16px 14px;
+                font-size: 17px;
+            }
+
+            .generate-btn {
+                padding: 18px;
+                font-size: 17px;
+            }
+
+            .barcode-wrapper-receipt {
+                max-width: 300px;
+            }
+
+            .barcode-wrapper-receipt.zoomed {
+                transform: scale(1.4);
+            }
+
+            #receiptQR canvas {
+                width: 130px !important;
+                height: 130px !important;
+            }
+
+            .qr-wrapper-receipt.zoomed {
+                transform: scale(1.4);
+            }
+
+            .sku-staff-section {
+                padding: 16px 14px;
+            }
+
+            .sku-staff-section .row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .barcode-wrapper-small {
+                max-width: 100%;
+                margin-top: 6px;
+            }
+
+            .history-item {
+                font-size: 11px;
+                padding: 6px 12px;
+            }
+
+            .receipt-output .code-display {
+                font-size: 12px;
+            }
+        }
+
+        @media (min-width: 481px) and (max-width: 768px) {
+            .input-row {
+                gap: 12px;
+            }
+
+            .input-row .field.small {
+                flex: 0.5;
+            }
+
+            .input-row .field.large {
+                flex: 1;
+            }
+
+            .barcode-wrapper-receipt {
+                max-width: 340px;
+            }
+
+            .barcode-wrapper-receipt.zoomed {
+                transform: scale(1.5);
+            }
+
+            .qr-wrapper-receipt.zoomed {
+                transform: scale(1.5);
+            }
+        }
+
+        @media (min-width: 769px) {
+            .wrapper {
+                padding: 20px 20px 30px;
+            }
+
+            .barcode-wrapper-receipt.zoomed {
+                transform: scale(1.8);
+            }
+
+            .qr-wrapper-receipt.zoomed {
+                transform: scale(1.8);
+            }
+
+            .barcode-wrapper-small.zoomed {
+                transform: scale(1.8);
+            }
+        }
+
+        /* ===== DARK MODE UNTUK ELEMEN KHUSUS BARCODE ===== */
+        @media (prefers-color-scheme: dark) {
+            .input-section {
+                background: #1c1c1e;
+                border-color: rgba(255, 255, 255, 0.06);
+            }
+
+            .sku-staff-section {
+                background: #1c1c1e;
+                border-color: rgba(255, 255, 255, 0.06);
+            }
+
+            .field input {
+                background: #2c2c2e;
+                border-color: #3a3a3c;
+                color: #f5f5f7;
+            }
+
+            .field input:focus {
+                border-color: #ff2d55;
+                background: #1c1c1e;
+                box-shadow: 0 0 0 4px rgba(255, 45, 85, 0.12);
+            }
+
+            .field label {
+                color: #8e8e93;
+            }
+
+            .generate-btn {
+                background: linear-gradient(135deg, #ff2d55, #cc1f42);
+                box-shadow: 0 4px 16px rgba(255, 45, 85, 0.25);
+            }
+
+            .barcode-wrapper-receipt {
+                background: #ffffff;
+            }
+
+            #receiptBarcode {
+                background: #ffffff;
+            }
+
+            .qr-wrapper-receipt {
+                background: #ffffff;
+            }
+
+            #receiptQR canvas {
+                background: #ffffff !important;
+            }
+
+            .barcode-wrapper-small {
+                background: #ffffff;
+                border-color: #3a3a3c;
+            }
+
+            .barcode-wrapper-small svg {
+                background: #ffffff;
+            }
+
+            .receipt-output .code-display {
+                background: #2c2c2e;
+                color: #f5f5f7;
+            }
+
+            .receipt-output .code-label {
+                color: #8e8e93;
+            }
+
+            .history-section {
+                border-top-color: rgba(255, 255, 255, 0.06);
+            }
+
+            .history-item {
+                background: #2c2c2e;
+                color: #f5f5f7;
+                border-color: rgba(255, 255, 255, 0.04);
+            }
+
+            .history-item:active {
+                background: #3a3a3c;
+            }
+
+            .toast {
+                background: rgba(44, 44, 46, 0.95);
+                color: #f5f5f7;
+            }
+
+            .history-section .history-header .clear-btn {
+                color: #ff2d55;
+            }
+
+            .zoom-hint-receipt span {
+                background: #2c2c2e;
+                color: #8e8e93;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ===== HOME BAR ===== -->
+    <div class="home-bar">
+        <a href="https://parkson127.github.io/all/" class="home-btn">
+            🏠 Home
+        </a>
+        <span class="hint">← Back to dashboard</span>
+    </div>
+
+    <!-- ===== WRAPPER ===== -->
+    <div class="wrapper">
+
+        <!-- ===== INPUT SECTION ===== -->
+        <section class="input-section">
+
+            <div class="input-row">
+                <div class="field small">
+                    <label>Store</label>
+                    <input id="store" value="127" maxlength="3" inputmode="numeric" placeholder="Store">
+                </div>
+                <div class="field small">
+                    <label>POS</label>
+                    <input id="pos" maxlength="3" inputmode="numeric" placeholder="POS">
+                </div>
+                <div class="field large">
+                    <label>Receipt</label>
+                    <input id="receipt" inputmode="numeric" maxlength="9" placeholder="Receipt number">
+                </div>
+            </div>
+
+            <button class="generate-btn" id="generateBtn">
+                <span>⚡</span> Generate Barcode
+            </button>
+
+            <!-- ===== RECEIPT OUTPUT ===== -->
+            <div class="receipt-output" id="receiptOutput">
+                <span class="code-label">📋 Receipt Code</span>
+                <span class="code-display" id="codeDisplay">—</span>
+
+                <div class="receipt-barcode-row">
+                    <div class="barcode-wrapper-receipt" id="receiptWrapper" onclick="toggleZoom('receipt')">
+                        <svg id="receiptBarcode"></svg>
+                    </div>
+
+                    <div class="qr-wrapper-receipt" id="qrWrapper" onclick="toggleZoom('qr')">
+                        <div id="receiptQR"></div>
+                    </div>
+                </div>
+
+                <p class="zoom-hint-receipt"><span>👆 Tap to zoom • Tap again to reset</span></p>
+            </div>
+
+        </section>
+
+        <!-- ===== SKU & STAFF SECTION ===== -->
+        <section class="sku-staff-section">
+
+            <div class="row">
+                <div class="field">
+                    <label>SKU (8 digits) — Auto generate</label>
+                    <input id="skuInput" maxlength="8" inputmode="numeric" placeholder="Enter 8-digit SKU">
+                </div>
+                <div class="barcode-wrapper-small" id="skuBarcodeWrapper" onclick="toggleZoom('skuBarcode')">
+                    <svg id="skuBarcode"></svg>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="field">
+                    <label class="staff-label">Staff ID (17 digits) — Auto generate</label>
+                    <input id="staffIdInput" maxlength="17" inputmode="numeric" placeholder="Enter 17-digit Staff ID">
+                </div>
+                <div class="barcode-wrapper-small" id="staffBarcodeWrapper" onclick="toggleZoom('staffBarcode')">
+                    <svg id="staffBarcode"></svg>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- ===== HISTORY ===== -->
+        <section class="sku-staff-section" style="padding-top: 16px;">
+            <div class="history-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h4 style="font-size: 13px; font-weight: 600; color: #8e8e93;">📜 Recent</h4>
+                <button class="clear-btn" onclick="clearHistory()" style="font-size: 12px; color: #E30613; background: none; border: none; font-weight: 600; cursor: pointer; font-family: inherit;">Clear</button>
+            </div>
+            <div class="history-list" id="historyList"></div>
+        </section>
+
+    </div>
+
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ===== VARIABLES =====
+        let lastPreview = "";
+        let lastFinal = "";
+        let zoomState = {
+            receipt: false,
+            qr: false,
+            skuBarcode: false,
+            staffBarcode: false
+        };
+
+        // ===== DOM REFS =====
+        const receiptWrapper = document.getElementById('receiptWrapper');
+        const qrWrapper = document.getElementById('qrWrapper');
+        const skuBarcodeWrapper = document.getElementById('skuBarcodeWrapper');
+        const staffBarcodeWrapper = document.getElementById('staffBarcodeWrapper');
+        const codeDisplay = document.getElementById('codeDisplay');
+        const receiptOutput = document.getElementById('receiptOutput');
+
+        // ===== TOAST =====
+        function showToast(msg, duration = 1800) {
+            const t = document.getElementById('toast');
+            t.textContent = msg;
+            t.classList.add('show');
+            clearTimeout(t._hide);
+            t._hide = setTimeout(() => t.classList.remove('show'), duration);
+        }
+
+        // ===== PAD =====
+        function pad(v, l) {
+            return String(v || '').padStart(l, '0');
+        }
+
+        // ===== SAVE SVG AS PNG =====
+        function saveSvgAsPng(svgEl, fileName) {
+            const serializer = new XMLSerializer();
+            const source = serializer.serializeToString(svgEl);
+            const svgBlob = new Blob([source], { type: 'image/svg+xml;charset=utf-8' });
+            const url = URL.createObjectURL(svgBlob);
+
+            const img = new Image();
+            img.onload = function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0);
+                URL.revokeObjectURL(url);
+
+                const link = document.createElement('a');
+                link.href = canvas.toDataURL('image/png');
+                link.download = fileName;
+                link.click();
+            };
+            img.src = url;
+        }
+
+        // ===== TOGGLE ZOOM =====
+        function toggleZoom(type) {
+            let wrapper;
+            if (type === 'receipt') {
+                wrapper = receiptWrapper;
+            } else if (type === 'qr') {
+                wrapper = qrWrapper;
+            } else if (type === 'skuBarcode') {
+                wrapper = skuBarcodeWrapper;
+            } else if (type === 'staffBarcode') {
+                wrapper = staffBarcodeWrapper;
+            } else {
+                return;
+            }
+
+            zoomState[type] = !zoomState[type];
+
+            if (zoomState[type]) {
+                wrapper.classList.add('zoomed');
+                setTimeout(() => {
+                    wrapper.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 50);
+                showToast(`🔍 ${type} zoomed`, 800);
+            } else {
+                wrapper.classList.remove('zoomed');
+                showToast(`↩️ ${type} reset`, 800);
+            }
+        }
+
+        // ===== GENERATE RECEIPT BARCODE =====
+        function generateReceipt() {
+            const store = pad(document.getElementById('store').value, 3);
+            const pos = pad(document.getElementById('pos').value, 3);
+            const receipt = pad(document.getElementById('receipt').value, 9);
+
+            if (!store.trim() || !pos.trim() || !receipt.trim()) {
+                showToast('⚠️ Please fill Store, POS & Receipt', 1200);
+                return;
+            }
+
+            const code = `T000${store}-${pos}${receipt}`;
+
+            if (code === lastFinal) return;
+            lastFinal = code;
+            lastPreview = code;
+
+            zoomState.receipt = false;
+            zoomState.qr = false;
+            receiptWrapper.classList.remove('zoomed');
+            qrWrapper.classList.remove('zoomed');
+
+            receiptOutput.classList.add('active');
+            receiptWrapper.classList.add('show');
+
+            JsBarcode('#receiptBarcode', code, {
+                format: 'CODE128',
+                width: 4,
+                height: 120,
+                displayValue: true,
+                fontSize: 26,
+                textMargin: 10,
+                margin: 14,
+                background: '#ffffff',
+                lineColor: '#000000'
+            });
+
+            qrWrapper.classList.add('show');
+            const qrContainer = document.getElementById('receiptQR');
+            qrContainer.innerHTML = '';
+            new QRCode(qrContainer, {
+                text: code,
+                width: 150,
+                height: 150,
+                colorDark: '#000000',
+                colorLight: '#ffffff'
+            });
+
+            codeDisplay.textContent = code;
+            navigator.clipboard?.writeText(code);
+            saveHistory(code);
+            showToast(`✅ ${code}`, 1200);
+        }
+
+        // ===== AUTO GENERATE SKU BARCODE =====
+        function generateSkuBarcode() {
+            const sku = document.getElementById('skuInput').value.trim();
+
+            if (sku.length === 8 && /^\d+$/.test(sku)) {
+                zoomState.skuBarcode = false;
+                skuBarcodeWrapper.classList.remove('zoomed');
+                skuBarcodeWrapper.classList.add('show');
+
+                JsBarcode('#skuBarcode', sku, {
+                    format: 'CODE128',
+                    width: 3,
+                    height: 70,
+                    displayValue: true,
+                    fontSize: 16,
+                    textMargin: 6,
+                    margin: 10,
+                    background: '#ffffff',
+                    lineColor: '#000000'
+                });
+                navigator.clipboard?.writeText(sku);
+                showToast(`✅ SKU: ${sku}`, 1200);
+            } else {
+                skuBarcodeWrapper.classList.remove('show');
+                document.getElementById('skuBarcode').innerHTML = '';
+            }
+        }
+
+        // ===== AUTO GENERATE STAFF BARCODE =====
+        function generateStaffBarcode() {
+            const staffId = document.getElementById('staffIdInput').value.trim();
+
+            if (staffId.length === 17 && /^\d+$/.test(staffId)) {
+                zoomState.staffBarcode = false;
+                staffBarcodeWrapper.classList.remove('zoomed');
+                staffBarcodeWrapper.classList.add('show');
+
+                JsBarcode('#staffBarcode', staffId, {
+                    format: 'CODE128',
+                    width: 3,
+                    height: 70,
+                    displayValue: true,
+                    fontSize: 16,
+                    textMargin: 6,
+                    margin: 10,
+                    background: '#ffffff',
+                    lineColor: '#000000'
+                });
+                navigator.clipboard?.writeText(staffId);
+                showToast(`✅ Staff: ${staffId}`, 1200);
+            } else {
+                staffBarcodeWrapper.classList.remove('show');
+                document.getElementById('staffBarcode').innerHTML = '';
+            }
+        }
+
+        // ===== HISTORY =====
+        function saveHistory(code) {
+            let h = JSON.parse(localStorage.getItem('h') || '[]');
+            h = h.filter(x => x !== code);
+            h.unshift(code);
+            h = h.slice(0, 12);
+            localStorage.setItem('h', JSON.stringify(h));
+            renderHistory();
+        }
+
+        function renderHistory() {
+            const h = JSON.parse(localStorage.getItem('h') || '[]');
+            const list = document.getElementById('historyList');
+            list.innerHTML = '';
+
+            h.forEach(code => {
+                const div = document.createElement('div');
+                div.className = 'history-item';
+                div.textContent = code;
+                div.onclick = () => {
+                    navigator.clipboard.writeText(code);
+                    showToast(`📋 ${code}`, 1000);
+
+                    const parts = code.split('-');
+                    const storePart = parts[0].replace('T000', '');
+                    const posReceipt = parts[1] || '';
+
+                    document.getElementById('store').value = storePart.slice(0, 3);
+                    document.getElementById('pos').value = posReceipt.slice(0, 3);
+                    document.getElementById('receipt').value = posReceipt.slice(3);
+
+                    generateReceipt();
+                };
+                list.appendChild(div);
+            });
+        }
+
+        function clearHistory() {
+            localStorage.removeItem('h');
+            renderHistory();
+            showToast('🗑️ History cleared', 1000);
+        }
+
+        // ===== INPUT EVENTS =====
+        document.getElementById('receipt').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+        });
+
+        document.getElementById('store').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length >= 3) {
+                document.getElementById('pos').focus();
+            }
+        });
+
+        document.getElementById('pos').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+            if (this.value.length >= 3) {
+                document.getElementById('receipt').focus();
+            }
+        });
+
+        document.getElementById('skuInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+            generateSkuBarcode();
+        });
+
+        document.getElementById('staffIdInput').addEventListener('input', function(e) {
+            this.value = this.value.replace(/\D/g, '');
+            generateStaffBarcode();
+        });
+
+        document.getElementById('receipt').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                generateReceipt();
+                setTimeout(() => {
+                    this.focus();
+                    this.select();
+                }, 50);
+            }
+        });
+
+        document.getElementById('generateBtn').addEventListener('click', function(e) {
+            e.preventDefault();
+            generateReceipt();
+            setTimeout(() => {
+                document.getElementById('receipt').focus();
+                document.getElementById('receipt').select();
+            }, 100);
+        });
+
+        // ===== INIT =====
+        renderHistory();
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const receipt = document.getElementById('receipt');
+            if (receipt.value.trim().length > 0) {
+                setTimeout(generateReceipt, 300);
+            }
+
+            const skuInput = document.getElementById('skuInput');
+            if (skuInput.value.trim().length === 8) {
+                generateSkuBarcode();
+            }
+
+            const staffInput = document.getElementById('staffIdInput');
+            if (staffInput.value.trim().length === 17) {
+                generateStaffBarcode();
+            }
+        });
+    </script>
+
+</body>
+</html>
