@@ -1,0 +1,1653 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parkson — POS Extractor Pro</title>
+
+    <!-- ===== EXTERNAL LIBS ===== -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
+    </script>
+
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <!-- Google Font: Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet" />
+
+    <!-- ===== SHARED THEME (Gold Theme + Floating Home) ===== -->
+    <link rel="stylesheet" href="https://parkson127.github.io/common.css" />
+    <link rel="stylesheet" href="https://parkson127.github.io/ui1.css" />
+
+    <style>
+        /* ============================================================
+           LAYOUT KHUSUS UNTUK EXTRACTOR (guna variable dari ui1.css)
+           ============================================================ */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f4f6fa;
+            color: var(--text-primary, #1a1a2e);
+            padding: 24px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .app-wrapper {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        /* Header ringkas guna gold gradient */
+        .app-header-simple {
+            background: var(--gradient-gold);
+            padding: 20px 28px;
+            border-radius: 20px;
+            margin-bottom: 24px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 20px var(--shadow-gold);
+            border: 1px solid rgba(255, 215, 0, 0.2);
+        }
+
+        .app-header-simple .logo-area {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .app-header-simple .logo-icon {
+            width: 44px;
+            height: 44px;
+            background: #1a1a2e;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--primary);
+            font-size: 1.4rem;
+        }
+
+        .app-header-simple h1 {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: #1a1a2e;
+        }
+
+        .app-header-simple h1 .gold {
+            color: #b8860b;
+        }
+
+        .app-header-simple .badge-group {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .app-header-simple .badge-group .badge-gold {
+            font-size: 0.7rem;
+            padding: 4px 16px;
+        }
+
+        /* Container utama */
+        .main-card {
+            background: #ffffff;
+            border-radius: 24px;
+            padding: 24px 28px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.04);
+            border: 1px solid #edeff2;
+        }
+
+        /* Upload Grid */
+        .upload-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 16px 0;
+        }
+
+        .upload-box {
+            border: 2px dashed #dce0e6;
+            padding: 20px 16px;
+            border-radius: 16px;
+            text-align: center;
+            background: #fafbfc;
+            transition: 0.25s;
+        }
+
+        .upload-box:hover {
+            border-color: var(--primary);
+            background: #fcfbf7;
+        }
+
+        .upload-box.optional-box {
+            border-color: #e8d5a5;
+            background: #fefcf7;
+        }
+
+        .upload-box.optional-box:hover {
+            border-color: var(--primary);
+            background: #fdf9ed;
+        }
+
+        .upload-box .icon-big {
+            font-size: 2.2rem;
+            margin-bottom: 6px;
+        }
+
+        .upload-box h3 {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 14px;
+            border-radius: 40px;
+            font-size: 0.6rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .badge.required {
+            background: #b71c1c;
+            color: #fff;
+        }
+
+        .badge.optional {
+            background: var(--primary);
+            color: #1a1a2e;
+        }
+
+        .upload-box input[type="file"] {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            width: 100%;
+        }
+
+        .hint-text {
+            font-size: 0.7rem;
+            color: #8e8e93;
+            margin: 4px 0 8px;
+        }
+
+        /* Paste */
+        .paste-area textarea {
+            width: 100%;
+            height: 80px;
+            padding: 12px 16px;
+            border: 2px solid #e0e4ea;
+            border-radius: 12px;
+            font-family: 'Poppins', monospace;
+            font-size: 0.8rem;
+            resize: vertical;
+            background: #fafbfc;
+            transition: 0.2s;
+        }
+
+        .paste-area textarea:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.12);
+            background: #fff;
+        }
+
+        .paste-area label {
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: block;
+            margin-bottom: 6px;
+            color: var(--text-primary);
+        }
+
+        /* Advanced */
+        .advanced-toggle {
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-weight: 600;
+            font-size: 0.85rem;
+            display: inline-block;
+            padding: 8px 0 4px;
+        }
+
+        .advanced-toggle:hover {
+            color: var(--primary-dark);
+        }
+
+        .advanced-content {
+            display: none;
+            padding: 18px 20px;
+            background: #f8f9fc;
+            border-radius: 14px;
+            margin: 8px 0 16px;
+            border: 1px solid #eceef3;
+        }
+
+        .advanced-content.show {
+            display: block;
+        }
+
+        .field-row {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .field-row label {
+            font-weight: 600;
+            min-width: 130px;
+            font-size: 0.85rem;
+            color: var(--text-primary);
+        }
+
+        .field-row input {
+            flex: 1;
+            padding: 8px 14px;
+            border: 1.5px solid #dce0e9;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            min-width: 150px;
+            font-family: 'Poppins', sans-serif;
+            background: white;
+            transition: 0.2s;
+        }
+
+        .field-row input:focus {
+            border-color: var(--primary);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.08);
+        }
+
+        .text-muted {
+            font-size: 0.8rem;
+            color: #8e8e93;
+        }
+
+        /* Action Bar */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin: 18px 0 12px;
+        }
+
+        /* Stats */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 14px;
+            margin: 16px 0;
+        }
+
+        .stat-item {
+            background: #f8f9fc;
+            padding: 14px 10px;
+            border-radius: 14px;
+            text-align: center;
+            border: 1px solid #eceef3;
+            transition: 0.2s;
+        }
+
+        .stat-item:hover {
+            border-color: var(--primary);
+        }
+
+        .stat-item .value {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--text-primary);
+        }
+
+        .stat-item .value.gold {
+            color: var(--primary-dark);
+        }
+
+        .stat-item .label {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            color: #8e8e93;
+            font-weight: 600;
+        }
+
+        /* Progress */
+        .progress-wrap {
+            display: none;
+            margin: 16px 0;
+        }
+
+        .progress-bar-bg {
+            height: 28px;
+            background: #eceef3;
+            border-radius: 40px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: var(--gradient-gold);
+            border-radius: 40px;
+            transition: width 0.4s ease;
+            width: 0%;
+            text-align: center;
+            color: #1a1a2e;
+            font-size: 0.75rem;
+            line-height: 28px;
+            font-weight: 700;
+        }
+
+        .progress-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 4px;
+            font-size: 0.75rem;
+            color: #8e8e93;
+        }
+
+        /* Table Preview */
+        .table-wrap {
+            margin-top: 16px;
+            overflow: auto;
+            border: 1px solid #eceef3;
+            border-radius: 14px;
+            display: none;
+            max-height: 480px;
+        }
+
+        .table-wrap table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+
+        .table-wrap th {
+            background: var(--text-primary);
+            color: #fff;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .table-wrap td {
+            padding: 8px 14px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .table-wrap tr:hover td {
+            background: #fafbfc;
+        }
+
+        /* Dashboard Panel */
+        .dashboard-panel {
+            background: #f8f9fc;
+            padding: 18px 22px;
+            border-radius: 16px;
+            margin: 14px 0;
+            border: 1px solid #eceef3;
+            display: none;
+        }
+
+        .dashboard-panel h2 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .dashboard-panel h2 i {
+            color: var(--primary);
+        }
+
+        .dashboard-panel table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.8rem;
+        }
+
+        .dashboard-panel th {
+            background: var(--text-primary);
+            color: #fff;
+            padding: 8px 12px;
+            text-align: left;
+        }
+
+        .dashboard-panel td {
+            padding: 6px 12px;
+            border-bottom: 1px solid #eceef3;
+        }
+
+        /* Ignored */
+        .ignored-box {
+            background: #fff8e1;
+            padding: 12px 18px;
+            border-radius: 12px;
+            margin: 12px 0;
+            border-left: 5px solid #ffd54f;
+            display: none;
+        }
+
+        .ignored-content {
+            display: none;
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 6px;
+            font-size: 0.8rem;
+        }
+
+        .ignored-content.show {
+            display: block;
+        }
+
+        .ignored-toggle {
+            cursor: pointer;
+            color: #e65100;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .ignored-toggle:hover {
+            text-decoration: underline;
+        }
+
+        /* Staff preview */
+        .staff-preview {
+            margin-top: 8px;
+            padding: 10px 14px;
+            background: #f8f9fc;
+            border-radius: 10px;
+            font-size: 0.8rem;
+            max-height: 120px;
+            overflow-y: auto;
+            display: none;
+            text-align: left;
+            border: 1px solid #eceef3;
+        }
+
+        .staff-count {
+            display: none;
+            font-weight: 700;
+            color: var(--primary-dark);
+            margin-top: 6px;
+            font-size: 0.85rem;
+        }
+
+        /* Status mini */
+        .status-mini {
+            font-size: 0.8rem;
+            padding: 4px 0;
+            color: #8e8e93;
+            margin-top: 6px;
+        }
+
+        .status-mini.success {
+            color: #1b5e20;
+        }
+        .status-mini.error {
+            color: #b71c1c;
+        }
+        .status-mini.info {
+            color: var(--primary-dark);
+        }
+
+        /* Message box */
+        .msg-box {
+            padding: 12px 18px;
+            border-radius: 14px;
+            margin: 12px 0;
+            display: none;
+            font-weight: 500;
+        }
+
+        .msg-box.success {
+            background: #e8f5e9;
+            color: #1b5e20;
+            border-left: 5px solid #43a047;
+        }
+
+        .msg-box.error {
+            background: #ffebee;
+            color: #b71c1c;
+            border-left: 5px solid #ef5350;
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px solid #eceef3;
+            font-size: 0.8rem;
+            color: #adb5bd;
+        }
+
+        .app-footer .gold {
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            body {
+                padding: 12px;
+            }
+            .upload-grid {
+                grid-template-columns: 1fr;
+            }
+            .app-header-simple {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 12px;
+                padding: 16px 20px;
+            }
+            .app-header-simple h1 {
+                font-size: 1.3rem;
+            }
+            .action-bar .btn {
+                flex: 1 1 100%;
+                justify-content: center;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .field-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .field-row label {
+                min-width: auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+            .app-header-simple .logo-icon {
+                width: 36px;
+                height: 36px;
+                font-size: 1.2rem;
+            }
+            .app-header-simple h1 {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+
+        <!-- ==========================================================
+        HEADER (GUNA GOLD GRADIENT, TANPA BIRU TEBAL)
+        ========================================================== -->
+        <header class="app-header-simple">
+            <div class="logo-area">
+                <div class="logo-icon">
+                    <i class="fas fa-store-alt"></i>
+                </div>
+                <h1>Parkson <span class="gold">POS</span> Extractor</h1>
+            </div>
+            <div class="badge-group">
+                <span class="badge-gold"><i class="fas fa-crown"></i> Enterprise</span>
+                <span class="badge-gold"><i class="fas fa-code-branch"></i> v3.0</span>
+                <span class="badge-gold"><i class="fas fa-shield-alt"></i> Gold</span>
+            </div>
+        </header>
+
+        <!-- ==========================================================
+        KANDUNGAN UTAMA
+        ========================================================== -->
+        <div class="main-card">
+
+            <!-- Message -->
+            <div id="errorMsg" class="msg-box error" style="display:none;"></div>
+            <div id="successMsg" class="msg-box success" style="display:none;"></div>
+
+            <!-- Upload -->
+            <div class="upload-grid">
+                <div class="upload-box">
+                    <div class="icon-big">📁</div>
+                    <h3>Transaction <span class="badge required">WAJIB</span></h3>
+                    <p class="hint-text">Upload .txt / .csv / .log (multiple)</p>
+                    <input type="file" id="fileInput" accept="*/*" multiple>
+                    <div id="transStatus" class="status-mini" style="display:none;">Loading...</div>
+                </div>
+
+                <div class="upload-box optional-box">
+                    <div class="icon-big">📄</div>
+                    <h3>Cashier Listing <span class="badge optional">OPTIONAL</span></h3>
+                    <p class="hint-text">Upload TXT / Excel for staff matching</p>
+                    <input type="file" id="cashierInput" accept=".txt,.csv,.xlsx,.xls">
+                    <div id="cashierStatus" class="status-mini" style="display:none;">Loading...</div>
+                    <div id="staffCount" class="staff-count">✅ Staff loaded: <span id="staffTotal">0</span></div>
+                    <div id="staffPreview" class="staff-preview"></div>
+                </div>
+            </div>
+
+            <!-- Paste -->
+            <div class="paste-area">
+                <label for="pasteInput"><i class="fas fa-paste" style="color:var(--primary);"></i> Paste Data</label>
+                <textarea id="pasteInput" placeholder="Paste transaction data here..."></textarea>
+            </div>
+
+            <!-- Advanced -->
+            <div class="advanced-toggle" onclick="toggleAdvanced()">
+                ⚙️ Advanced Settings <span class="toggle-arrow">▼</span>
+            </div>
+            <div class="advanced-content" id="advancedContent">
+                <div class="field-row">
+                    <label>Column Widths</label>
+                    <input type="text" id="columnWidths" value="5,6,3,10,6,6,6,40,14,14,16,210,16,138">
+                </div>
+                <div class="field-row">
+                    <label>Extract Columns</label>
+                    <input type="text" id="extractColumns" value="0,1,2,3,4,6,8,10,12">
+                </div>
+                <div class="field-row">
+                    <label>Headers</label>
+                    <input type="text" id="headerNames" value="#,storecode,date,pos,receipt,time,staff_id,staff_name,total_rm,bonuslink,parksoncard">
+                </div>
+                <div class="field-row">
+                    <span class="text-muted">Total width: <strong id="totalWidthDisplay">490</strong></span>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="action-bar">
+                <button class="btn-primary" onclick="processAll()"><i class="fas fa-play"></i> Process All</button>
+                <button class="btn-primary" onclick="exportExcel()" style="background:var(--primary-dark);"><i class="fas fa-file-excel"></i> Export Excel</button>
+                <button class="btn-secondary" onclick="showDashboard()"><i class="fas fa-chart-bar"></i> Dashboard</button>
+                <button class="btn-danger" onclick="clearAll()"><i class="fas fa-trash"></i> Clear</button>
+                <button class="btn-secondary" onclick="loadSample()"><i class="fas fa-file-import"></i> Sample</button>
+            </div>
+
+            <!-- Progress -->
+            <div id="progressContainer" class="progress-wrap">
+                <div class="progress-bar-bg">
+                    <div class="progress-fill" id="progressFill">0%</div>
+                </div>
+                <div class="progress-meta">
+                    <span id="progressMsg">Starting...</span>
+                    <span id="progressETA">ETA: --</span>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="stats-grid" id="stats" style="display:none;">
+                <div class="stat-item">
+                    <div class="value" id="rowCount">0</div>
+                    <div class="label">Transactions</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value gold" id="staffMatchedCount">0</div>
+                    <div class="label">Staff Matched</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="dateCount">0</div>
+                    <div class="label">Dates</div>
+                </div>
+                <div class="stat-item">
+                    <div class="value" id="ignoredCount" style="color:#e65100;">0</div>
+                    <div class="label">Ignored Lines</div>
+                </div>
+            </div>
+
+            <!-- Ignored -->
+            <div id="ignoredInfo" class="ignored-box">
+                <div class="ignored-header">
+                    <strong>⚠️ Lines Ignored: <span id="ignoredCountDisplay">0</span></strong>
+                    <span class="ignored-toggle" onclick="toggleIgnored()">Toggle View</span>
+                </div>
+                <div class="ignored-content" id="ignoredContent">
+                    <div id="ignoredLines"></div>
+                </div>
+            </div>
+
+            <!-- Dashboard -->
+            <div id="dashboardContainer" class="dashboard-panel">
+                <h2><i class="fas fa-trophy"></i> Staff Dashboard</h2>
+                <div id="dashboardContent"></div>
+            </div>
+
+            <!-- Preview Table -->
+            <div class="table-wrap" id="previewContainer">
+                <table id="resultTable">
+                    <thead id="tableHead"></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+        </div>
+
+        <!-- ==========================================================
+        FOOTER
+        ========================================================== -->
+        <footer class="app-footer">
+            <span>© 2026 <span class="gold">Parkson</span> POS Extractor — Gold Edition</span>
+            <br><span style="font-size:0.7rem;">"Kecemerlangan perkhidmatan bermula dari data yang tepat."</span>
+        </footer>
+
+    </div>
+
+    <!-- ==========================================================
+    FLOATING HOME BUTTON (BUNDLE DARI common.js)
+    ========================================================== -->
+    <script src="https://parkson127.github.io/common.js"></script>
+
+    <!-- ==========================================================
+    JAVASCRIPT — SAMA SEPENUHNYA DENGAN ORIGINAL (6 SHEETS)
+    ========================================================== -->
+    <script>
+        // ============================================================
+        // PAW EXTRACTOR - FULL SCRIPT (dengan 6 sheets export)
+        // ============================================================
+
+        // SEMUA CHECKBOX WAJIB ON - hidden from UI
+        var IGNORE_FIRST = true;
+        var IGNORE_LAST = true;
+        var SORT_BY_DATE = true;
+        var AUTO_MATCH = true;
+
+        var csvData = [];
+        var headers = [];
+        var extractIndices = [];
+        var allRawData = [];
+        var ignoredLines = [];
+        var staffMap = {};
+        var matchedCount = 0;
+        var isProcessing = false;
+        var transData = '';
+
+        // ============================================================
+        // HELPERS
+        // ============================================================
+
+        function getEl(id) { var el = document.getElementById(id); if (!el) { console.warn('Element not found:', id); return null; } return el; }
+
+        function showError(msg) { var el = getEl('errorMsg'); if (!el) return;
+            el.textContent = '❌ ' + msg;
+            el.style.display = 'block';
+            setTimeout(function() { el.style.display = 'none'; }, 5000); }
+
+        function showSuccess(msg) { var el = getEl('successMsg'); if (!el) return;
+            el.textContent = '✅ ' + msg;
+            el.style.display = 'block';
+            setTimeout(function() { el.style.display = 'none'; }, 4000); }
+
+        function roundPct(val) { return Math.round(val * 100) / 100; }
+
+        function escapeHtml(str) { if (!str) return ''; var div = document.createElement('div');
+            div.textContent = str; return div.innerHTML; }
+
+        function toggleAdvanced() { var el = getEl('advancedContent'); if (el) el.classList.toggle('show'); }
+
+        function toggleIgnored() { var el = getEl('ignoredContent'); if (el) el.classList.toggle('show'); }
+
+        function updateProgress(pct, msg, eta) {
+            var container = getEl('progressContainer');
+            if (!container) return;
+            container.style.display = 'block';
+            var fill = getEl('progressFill');
+            if (fill) { fill.style.width = pct + '%';
+                fill.textContent = pct + '%'; }
+            var pm = getEl('progressMsg');
+            if (pm) pm.textContent = msg || 'Processing...';
+            var pe = getEl('progressETA');
+            if (pe) pe.textContent = eta ? 'ETA: ' + eta : 'ETA: --';
+        }
+
+        // ============================================================
+        // COLUMN WIDTHS
+        // ============================================================
+
+        var cw = getEl('columnWidths');
+        if (cw) {
+            cw.addEventListener('input', function() {
+                var w = this.value.split(',').filter(function(s) { return s.trim() !== ''; }).map(Number);
+                var total = w.reduce(function(a, b) { return a + b; }, 0);
+                var td = getEl('totalWidthDisplay');
+                if (td) td.textContent = total || 0;
+            });
+        }
+
+        // ============================================================
+        // CASHIER LISTING UPLOAD
+        // ============================================================
+
+        var ci = getEl('cashierInput');
+        if (ci) {
+            ci.addEventListener('change', function(e) {
+                var file = this.files[0];
+                if (!file) return;
+                var status = getEl('cashierStatus');
+                if (status) { status.style.display = 'block';
+                    status.className = 'status-mini info';
+                    status.textContent = '⏳ Reading ' + file.name + '...'; }
+                var ext = file.name.split('.').pop().toLowerCase();
+
+                function processStaff(text) {
+                    var result = extractStaffExcel1(text);
+                    staffMap = result;
+                    var count = Object.keys(staffMap).length;
+                    var st = getEl('staffTotal');
+                    if (st) st.textContent = count;
+                    var sc = getEl('staffCount');
+                    if (sc) sc.style.display = 'block';
+                    var preview = getEl('staffPreview');
+                    if (preview && count > 0) {
+                        preview.style.display = 'block';
+                        var html = '<strong>👥 Staff (' + count + '):</strong><br>';
+                        var sorted = Object.keys(staffMap).sort();
+                        for (var i = 0; i < Math.min(sorted.length, 15); i++) {
+                            html += sorted[i] + ' → ' + staffMap[sorted[i]] + '<br>';
+                        }
+                        if (sorted.length > 15) html += '... and ' + (sorted.length - 15) + ' more';
+                        preview.innerHTML = html;
+                    }
+                    if (status) { status.className = 'status-mini success';
+                        status.textContent = '✅ Loaded ' + count + ' staff!'; }
+                    showSuccess('Cashier listing loaded: ' + count + ' staff');
+                }
+
+                if (ext === 'txt' || ext === 'csv') {
+                    var reader = new FileReader();
+                    reader.onload = function(ev) { processStaff(ev.target.result); };
+                    reader.readAsText(file);
+                } else if (ext === 'xlsx' || ext === 'xls') {
+                    var reader2 = new FileReader();
+                    reader2.onload = function(ev) {
+                        try {
+                            var data = new Uint8Array(ev.target.result);
+                            var workbook = XLSX.read(data, { type: 'array' });
+                            var sheet = workbook.Sheets[workbook.SheetNames[0]];
+                            var json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+                            var lines = [];
+                            for (var r = 0; r < json.length; r++) {
+                                var row = json[r];
+                                var line = '';
+                                for (var c = 0; c < row.length; c++) {
+                                    if (row[c]) line += row[c] + '\t';
+                                }
+                                if (line.trim()) lines.push(line.trim());
+                            }
+                            processStaff(lines.join('\n'));
+                        } catch (err) {
+                            if (status) { status.className = 'status-mini error';
+                                status.textContent = '❌ ' + err.message; }
+                            showError('Error reading Excel: ' + err.message);
+                        }
+                    };
+                    reader2.readAsArrayBuffer(file);
+                } else {
+                    if (status) { status.className = 'status-mini error';
+                        status.textContent = '❌ Unsupported format. Use TXT or Excel.'; }
+                    showError('Unsupported format. Use TXT or Excel.');
+                }
+            });
+        }
+
+        // ============================================================
+        // EXCEL1 EXTRACT STAFF
+        // ============================================================
+
+        function extractStaffExcel1(text) {
+            var result = {};
+            var statusList = ['SUPERVISOR', 'CASHIER', 'MANAGER', 'CHIEF_CSHR', 'TRAINEE', 'SENIOR', 'STAFF', 'CLERK'];
+            var lines = text.split('\n');
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line) continue;
+                if (line.match(/^Cashier ID|^CASHIER ID|^STAFF ID|^ID|^Name|^NAME/i)) continue;
+                var parts = line.split(/\t|\s{2,}/);
+                var cleanParts = [];
+                for (var p = 0; p < parts.length; p++) { if (parts[p].trim()) cleanParts.push(parts[p].trim()); }
+                if (cleanParts.length < 2) continue;
+                var id = cleanParts[0];
+                if (!id.match(/^\d{6}$/)) continue;
+                if (result[id]) continue;
+                var firstWord = cleanParts[1] || '';
+                if (firstWord.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) continue;
+                if (firstWord.match(/^(Yes|No)$/i)) continue;
+                if (firstWord.match(/^\d+$/)) continue;
+                if (firstWord.toUpperCase() === 'CASHIER') continue;
+                if (firstWord.toUpperCase() === 'MANAGER') continue;
+                if (firstWord.toUpperCase() === 'SUPERVISOR') continue;
+                var foundStatus = null;
+                var statusIndex = -1;
+                var after = line.substring(id.length).trim();
+                for (var s = 0; s < statusList.length; s++) {
+                    var status = statusList[s];
+                    var pos = after.toUpperCase().indexOf(status);
+                    if (pos >= 0 && (statusIndex === -1 || pos < statusIndex)) { statusIndex = pos;
+                        foundStatus = status; }
+                }
+                if (foundStatus) {
+                    var namePart = after.substring(0, statusIndex).trim();
+                    namePart = namePart.replace(/\d{6}/g, '').trim();
+                    namePart = namePart.replace(/\d{1,2}\/\d{1,2}\/\d{2,4}/g, '').trim();
+                    namePart = namePart.replace(/\d{1,2}:\d{2}:\d{2}/g, '').trim();
+                    namePart = namePart.replace(/\b(Yes|No)\b/gi, '').trim();
+                    namePart = namePart.replace(/\s+/g, ' ');
+                    for (var s2 = 0; s2 < statusList.length; s2++) {
+                        namePart = namePart.replace(new RegExp('\\b' + statusList[s2] + '\\b', 'gi'), '').trim();
+                    }
+                    if (!namePart || namePart.toUpperCase() === 'CASHIER' || namePart.toUpperCase() === 'MANAGER' ||
+                        namePart.toUpperCase() === 'SUPERVISOR') continue;
+                    if (namePart && namePart.length > 0 && namePart.match(/[A-Za-z\.\'\""\(\)\-]/)) {
+                        result[id] = namePart;
+                    }
+                }
+            }
+            return result;
+        }
+
+        // ============================================================
+        // TRANSACTION UPLOAD
+        // ============================================================
+
+        var fi = getEl('fileInput');
+        if (fi) {
+            fi.addEventListener('change', function(e) {
+                var files = this.files;
+                if (files.length === 0) return;
+                var status = getEl('transStatus');
+                if (status) { status.style.display = 'block';
+                    status.className = 'status-mini info';
+                    status.textContent = '⏳ Loading ' + files.length + ' files...'; }
+                var combined = '';
+                var loaded = 0;
+                for (var i = 0; i < files.length; i++) {
+                    var reader = new FileReader();
+                    reader.onload = function(ev) {
+                        combined += ev.target.result + '\n';
+                        loaded++;
+                        if (loaded === files.length) {
+                            transData = combined;
+                            if (status) { status.className = 'status-mini success';
+                                status.textContent = '✅ ' + files.length + ' files loaded (' + combined.split('\n')
+                                    .length + ' lines)'; }
+                            var fi2 = getEl('fileInfo');
+                            if (fi2) fi2.textContent = files.length + ' files | ' + combined.split('\n').length +
+                                ' lines';
+                        }
+                    };
+                    reader.readAsText(files[i]);
+                }
+            });
+        }
+
+        // ============================================================
+        // PASTE DATA
+        // ============================================================
+
+        var pasteInput = getEl('pasteInput');
+        if (pasteInput) {
+            pasteInput.addEventListener('input', function() {
+                if (this.value.trim()) {
+                    transData = this.value;
+                    var fi = getEl('fileInfo');
+                    if (fi) fi.textContent = 'Pasted: ' + this.value.split('\n').length + ' lines';
+                }
+            });
+        }
+
+        // ============================================================
+        // PROCESS ALL
+        // ============================================================
+
+        function processAll() {
+            if (isProcessing) return;
+            isProcessing = true;
+            var text = transData || '';
+            if (!text.trim()) {
+                showError('Please upload transaction files or paste data first!');
+                isProcessing = false;
+                return;
+            }
+            var startTime = Date.now();
+            var totalSteps = 5;
+            var currentStep = 0;
+            updateProgress(0, 'Starting...', '--');
+
+            setTimeout(function() {
+                try {
+                    currentStep++;
+                    var pct = Math.round((currentStep / totalSteps) * 100);
+                    updateProgress(pct, 'Splitting data...', 'estimating...');
+                    var result = splitDataInternal(text);
+                    if (!result) { isProcessing = false; return; }
+                    currentStep++;
+                    pct = Math.round((currentStep / totalSteps) * 100);
+                    updateProgress(pct, 'Matching staff names...', 'estimating...');
+                    if (Object.keys(staffMap).length > 0 && AUTO_MATCH) {
+                        matchStaffNames();
+                    }
+                    currentStep++;
+                    pct = Math.round((currentStep / totalSteps) * 100);
+                    updateProgress(pct, 'Updating display...', 'estimating...');
+                    displayTable();
+                    var pc = getEl('previewContainer');
+                    if (pc) pc.style.display = 'block';
+                    var stats = getEl('stats');
+                    if (stats) stats.style.display = 'grid';
+                    currentStep++;
+                    pct = Math.round((currentStep / totalSteps) * 100);
+                    var elapsed = Math.round((Date.now() - startTime) / 1000);
+                    updateProgress(pct, '✅ Complete!', elapsed + 's');
+                    var rc = getEl('rowCount');
+                    if (rc) rc.textContent = csvData.length;
+                    var smc = getEl('staffMatchedCount');
+                    if (smc) smc.textContent = matchedCount;
+                    var dates = {};
+                    for (var i = 0; i < allRawData.length; i++) { if (allRawData[i].date) dates[allRawData[i].date] =
+                            true; }
+                    var dc = getEl('dateCount');
+                    if (dc) dc.textContent = Object.keys(dates).length;
+                    var msg = '✅ Extracted ' + csvData.length + ' rows';
+                    if (matchedCount > 0) msg += ' | ' + matchedCount + ' staff matched';
+                    showSuccess(msg);
+                    isProcessing = false;
+                } catch (e) {
+                    showError('Error: ' + e.message);
+                    console.error(e);
+                    isProcessing = false;
+                }
+            }, 100);
+        }
+
+        // ============================================================
+        // SPLIT DATA INTERNAL
+        // ============================================================
+
+        function splitDataInternal(text) {
+            var widthStr = getEl('columnWidths');
+            if (!widthStr) return false;
+            var widths = widthStr.value.split(',').filter(function(w) { return w.trim() !== ''; }).map(Number);
+            if (widths.length === 0 || widths.some(isNaN)) { showError('Invalid column widths!'); return false; }
+            var ec = getEl('extractColumns');
+            if (!ec) return false;
+            var extractIndices2 = ec.value.split(',').filter(function(w) { return w.trim() !== ''; }).map(Number);
+            if (extractIndices2.length === 0) { showError('Invalid extract columns!'); return false; }
+            extractIndices = extractIndices2;
+            var hn = getEl('headerNames');
+            if (hn) { headers = hn.value.split(',').filter(function(w) { return w.trim() !== ''; }).map(function(w) { return w
+                        .trim(); }); }
+            if (headers.length !== 11) { headers = ['#', 'storecode', 'date', 'pos', 'receipt', 'time', 'staff_id',
+                    'staff_name', 'total_rm', 'bonuslink', 'parksoncard'
+                ]; }
+            var lines = text.split('\n').filter(function(l) { return l.trim() !== ''; });
+            ignoredLines = [];
+
+            var startIdx = 0;
+            if (IGNORE_FIRST && lines.length > 0) {
+                if (isHeaderLine(lines[0])) { ignoredLines.push('Line 1: ' + lines[0].substring(0, 50) + '... [HEADER]');
+                    startIdx = 1; }
+            }
+
+            var endIdx = lines.length;
+            if (IGNORE_LAST && lines.length > 0) {
+                if (isFooterLine(lines[lines.length - 1])) { ignoredLines.push('Line ' + lines.length + ': ' + lines[lines
+                        .length - 1].substring(0, 50) + '... [FOOTER]');
+                    endIdx = lines.length - 1; }
+            }
+
+            var dataLines = lines.slice(startIdx, endIdx);
+            var filtered = [];
+            for (var i = 0; i < dataLines.length; i++) {
+                if (isHeaderLine(dataLines[i]) || isFooterLine(dataLines[i])) {
+                    ignoredLines.push('Line ' + (startIdx + i + 1) + ': ' + dataLines[i].substring(0, 50) + '... [IGNORED]');
+                } else { filtered.push(dataLines[i]); }
+            }
+            dataLines = filtered;
+            var ii = getEl('ignoredInfo');
+            var il = getEl('ignoredLines');
+            var ic = getEl('ignoredCount');
+            var icd = getEl('ignoredCountDisplay');
+            if (ignoredLines.length > 0) {
+                if (ii) ii.style.display = 'block';
+                if (il) il.innerHTML = ignoredLines.map(function(l) { return '<div style="padding:2px 0;">🚫 ' + l +
+                        '</div>'; }).join('');
+                if (ic) ic.textContent = ignoredLines.length;
+                if (icd) icd.textContent = ignoredLines.length;
+            } else { if (ii) ii.style.display = 'none'; if (ic) ic.textContent = '0'; if (icd) icd.textContent = '0'; }
+            if (dataLines.length === 0) { showError('No data found after removing header/footer!'); return false; }
+            var totalWidth = widths.reduce(function(a, b) { return a + b; }, 0);
+            var validLines = dataLines.filter(function(l) { return l.length === totalWidth; });
+            if (validLines.length === 0) { showError('⚠️ No lines match width (' + totalWidth +
+                    '). Check Column Widths.'); return false; }
+            csvData = [];
+            allRawData = [];
+            var rowNum = 0;
+            for (var li = 0; li < validLines.length; li++) {
+                var line = validLines[li];
+                var cols = [];
+                var pos = 0;
+                for (var w = 0; w < widths.length; w++) {
+                    cols.push(line.substr(pos, widths[w]).trim());
+                    pos += widths[w];
+                }
+                var extracted = extractIndices.map(function(idx) { return idx < cols.length ? cols[idx] : ''; });
+                rowNum++;
+                var storecode = extracted[0] || '';
+                var dateRaw = extracted[1] || '';
+                var dateFormatted = formatDate(dateRaw);
+                var posVal = extracted[2] || '';
+                var receipt = extracted[3] || '';
+                var timeRaw = extracted[4] || '';
+                var timeFormatted = formatTime(timeRaw);
+                var staffId = extracted[5] || '';
+                var totalRmRaw = extracted[6] || '';
+                var bonuslink = extracted[7] || '';
+                var parksoncard = extracted[8] || '';
+                var totalRm = convertAmount(totalRmRaw);
+                var row = [rowNum, storecode, dateFormatted, posVal, receipt, timeFormatted, staffId, '', totalRm,
+                    bonuslink, parksoncard
+                ];
+                csvData.push(row);
+                allRawData.push({
+                    storecode: storecode,
+                    date: dateFormatted,
+                    pos: posVal,
+                    receipt: receipt,
+                    time: timeFormatted,
+                    staffId: staffId,
+                    staffName: '',
+                    totalRm: totalRm,
+                    bonuslink: bonuslink,
+                    parksoncard: parksoncard,
+                    hasBonus: bonuslink && bonuslink.length > 0,
+                    hasParkson: parksoncard && parksoncard.length > 0
+                });
+            }
+            if (SORT_BY_DATE) {
+                var combined2 = csvData.map(function(r, idx) { return { row: r, date: r[2] }; });
+                combined2.sort(function(a, b) { return parseDate(a.date) - parseDate(b.date); });
+                csvData = combined2.map(function(item) { return item.row; });
+                allRawData.sort(function(a, b) { return parseDate(a.date) - parseDate(b.date); });
+            }
+            return true;
+        }
+
+        // ============================================================
+        // MATCH STAFF NAMES
+        // ============================================================
+
+        function matchStaffNames() {
+            matchedCount = 0;
+            var staffKeys = Object.keys(staffMap);
+            if (staffKeys.length === 0) return;
+            for (var i = 0; i < allRawData.length; i++) {
+                var staffId = allRawData[i].staffId;
+                var name = null;
+                if (staffId) name = staffMap[staffId];
+                if (!name && staffId) { var padded = String(staffId).trim(); while (padded.length < 6) padded = '0' +
+                        padded;
+                    name = staffMap[padded]; if (name) staffId = padded; }
+                if (!name && staffId && staffId.length === 6) { var trimmed = String(parseInt(staffId));
+                    name = staffMap[trimmed]; }
+                if (name) { allRawData[i].staffName = name;
+                    csvData[i][7] = name;
+                    matchedCount++; } else { allRawData[i].staffName = '';
+                    csvData[i][7] = ''; }
+            }
+            var smc = getEl('staffMatchedCount');
+            if (smc) smc.textContent = matchedCount;
+        }
+
+        // ============================================================
+        // UTILITY FUNCTIONS
+        // ============================================================
+
+        function convertAmount(a) {
+            if (!a) return '';
+            var m = a.match(/(\d+)\.(\d{2})([+-])/);
+            if (m) { var num = parseInt(m[1]); var dec = m[2]; var sign = m[3] === '-' ? '-' : ''; return 'RM' + sign +
+                    num + '.' + dec; }
+            return a;
+        }
+
+        function formatTime(t) { if (!t || t.length < 6) return t; return t.substr(0, 2) + ':' + t.substr(2, 2) + ':' +
+                t.substr(4, 2); }
+
+        function formatDate(d) { if (!d || d.length < 6) return d; return d.substr(0, 2) + '-' + d.substr(2, 2) + '-20' +
+                d.substr(4, 2); }
+
+        function parseDate(d) { if (!d) return new Date(0); var parts = d.split('-'); if (parts.length !== 3) return new Date(
+                0); return new Date(parseInt(parts[2]), parseInt(parts[1]) - 1, parseInt(parts[0])); }
+
+        function isHeaderLine(l) { var t = l.trim(); if (!t) return false; if (t[0] === 'H') return true; if (t.match(
+                /^\d{6}/) && t.length < 20) return true; if (t.length < 30 && t.match(/[A-Za-z]/)) return true; return false; }
+
+        function isFooterLine(l) { var t = l.trim(); if (!t) return false; if (t[0] === 'F') return true; if (t.toUpperCase()
+                .indexOf('TOTAL') === 0) return true; if (t.length < 20 && t.match(/^[A-Za-z0-9]+$/)) return true; return false; }
+
+        // ============================================================
+        // DISPLAY TABLE
+        // ============================================================
+
+        function displayTable() {
+            var thead = getEl('tableHead');
+            var tbody = getEl('tableBody');
+            if (!thead || !tbody) return;
+            var groups = {};
+            for (var i = 0; i < csvData.length; i++) { var row = csvData[i]; var date = row[2] || 'Unknown'; if (!groups[
+                    date]) groups[date] = [];
+                groups[date].push(row); }
+            var h = '<tr>';
+            for (var hi = 0; hi < headers.length; hi++) { h += '<th>' + headers[hi] + '</th>'; }
+            h += '</tr>';
+            thead.innerHTML = h;
+            var b = '';
+            var dateKeys = Object.keys(groups).sort(function(a, b2) { return parseDate(a) - parseDate(b2); });
+            var displayed = 0;
+            for (var g = 0; g < dateKeys.length && displayed < 100; g++) {
+                var date = dateKeys[g];
+                var rows = groups[date];
+                b += '<tr><td colspan="' + headers.length +
+                    '" style="background:#fff3cd;font-weight:bold;padding:6px;">📅 ' + date + ' (' + rows.length +
+                    ')</td></tr>';
+                for (var r = 0; r < rows.length && displayed < 100; r++) {
+                    var row = rows[r];
+                    b += '<tr>';
+                    for (var c = 0; c < row.length; c++) {
+                        var val = row[c];
+                        if (c === 7 && val) { b += '<td><span style="background:#d4edda;padding:1px 6px;border-radius:8px;font-size:10px;">✅ ' +
+                                escapeHtml(val) + '</span></td>'; } else if (c === 9 && val) { b +=
+                                '<td><span style="background:#ffc107;padding:1px 6px;border-radius:8px;font-size:10px;">🎯 ' +
+                                escapeHtml(val) + '</span></td>'; } else if (c === 10 && val) { b +=
+                                '<td><span style="background:#17a2b8;color:white;padding:1px 6px;border-radius:8px;font-size:10px;">🏷️ ' +
+                                escapeHtml(val) + '</span></td>'; } else { b += '<td title="' + escapeHtml(val) +
+                                '">' + escapeHtml(val) + '</td>'; }
+                    }
+                    b += '</tr>';
+                    displayed++;
+                }
+            }
+            if (csvData.length > 100) { b += '<tr><td colspan="' + headers.length +
+                    '" style="text-align:center;color:#666;padding:10px;">... and ' + (csvData.length - 100) +
+                    ' more</td></tr>'; }
+            tbody.innerHTML = b;
+        }
+
+        // ============================================================
+        // DASHBOARD
+        // ============================================================
+
+        function showDashboard() {
+            if (csvData.length === 0) { showError('Please process data first!'); return; }
+            var staffData = {};
+            for (var i = 0; i < allRawData.length; i++) {
+                var d = allRawData[i];
+                var sid = d.staffId || 'Unknown';
+                if (!staffData[sid]) { staffData[sid] = { total: 0, bonus: 0, parkson: 0, both: 0, name: d.staffName ||
+                        '' }; }
+                staffData[sid].total++;
+                if (d.hasBonus) staffData[sid].bonus++;
+                if (d.hasParkson) staffData[sid].parkson++;
+                if (d.hasBonus && d.hasParkson) staffData[sid].both++;
+                if (d.staffName) staffData[sid].name = d.staffName;
+            }
+            var html = '<p><strong>Total Staff:</strong> ' + Object.keys(staffData).length +
+                ' | <strong>Transactions:</strong> ' + allRawData.length + '</p>';
+            html +=
+                '<table><tr><th>#</th><th>Staff ID</th><th>Name</th><th>Total</th><th>Bonuslink</th><th>Parkson</th><th>Both</th><th>% Parkson</th></tr>';
+            var sorted = Object.keys(staffData).sort(function(a, b) { return staffData[b].total - staffData[a].total; });
+            var rank = 0;
+            for (var s = 0; s < sorted.length; s++) {
+                var d2 = staffData[sorted[s]];
+                rank++;
+                var pct = d2.total > 0 ? roundPct((d2.parkson / d2.total) * 100) : 0;
+                html += '<tr><td>' + rank + '</td><td>' + sorted[s] + '</td><td>' + escapeHtml(d2.name) + '</td><td>' +
+                    d2.total + '</td><td>' + d2.bonus + '</td><td>' + d2.parkson + '</td><td>' + d2.both +
+                    '</td><td>' + pct + '%</td></tr>';
+            }
+            html += '</table>';
+            var totalBonus = 0,
+                totalParkson = 0,
+                totalBoth = 0;
+            for (var s2 = 0; s2 < sorted.length; s2++) {
+                var d3 = staffData[sorted[s2]];
+                totalBonus += d3.bonus;
+                totalParkson += d3.parkson;
+                totalBoth += d3.both;
+            }
+            var overallPct = allRawData.length > 0 ? roundPct((totalParkson / allRawData.length) * 100) : 0;
+            html += '<div style="margin-top:10px;padding:8px;background:#e9ecef;border-radius:6px;font-weight:bold;">';
+            html += '📊 Total: ' + allRawData.length + ' | Bonuslink: ' + totalBonus + ' | Parkson: ' + totalParkson +
+                ' | Both: ' + totalBoth + ' | % Parkson: ' + overallPct + '%';
+            html += '</div>';
+            var dc = getEl('dashboardContent');
+            if (dc) dc.innerHTML = html;
+            var dc2 = getEl('dashboardContainer');
+            if (dc2) dc2.style.display = 'block';
+            showSuccess('📊 Dashboard generated!');
+        }
+
+        // ============================================================
+        // EXPORT EXCEL — 6 SHEETS (SAMA SEPERTI ORIGINAL)
+        // ============================================================
+
+        function exportExcel() {
+            if (csvData.length === 0) { showError('No data to export! Process first.'); return; }
+            if (Object.keys(staffMap).length > 0) matchStaffNames();
+
+            try {
+                var filteredData = allRawData.filter(function(d) { return d.pos !== '001'; });
+
+                var wb = XLSX.utils.book_new();
+
+                // ========== SHEET 1: Staff Dashboard ==========
+                var staffData = {};
+                for (var i = 0; i < filteredData.length; i++) {
+                    var d = filteredData[i];
+                    var sid = d.staffId || 'Unknown';
+                    if (!staffData[sid]) { staffData[sid] = { total: 0, parkson: 0, bonus: 0, both: 0, name: d.staffName || '' }; }
+                    staffData[sid].total++;
+                    if (d.hasParkson) staffData[sid].parkson++;
+                    if (d.hasBonus) staffData[sid].bonus++;
+                    if (d.hasBonus && d.hasParkson) staffData[sid].both++;
+                    if (d.staffName) staffData[sid].name = d.staffName;
+                }
+                var staffRows = [
+                    ['#', 'Staff ID', 'Staff Name', 'Total', 'Parkson', 'Bonuslink', 'Both', '% Parkson', '% Bonuslink']
+                ];
+                var sorted = Object.keys(staffData).sort(function(a, b) { return staffData[b].total - staffData[a].total; });
+                var rank = 0;
+                for (var s = 0; s < sorted.length; s++) {
+                    var d2 = staffData[sorted[s]];
+                    rank++;
+                    var pctParkson = d2.total > 0 ? roundPct((d2.parkson / d2.total) * 100) : 0;
+                    var pctBonus = d2.total > 0 ? roundPct((d2.bonus / d2.total) * 100) : 0;
+                    staffRows.push([rank, sorted[s], d2.name, d2.total, d2.parkson, d2.bonus, d2.both, pctParkson + '%', pctBonus + '%']);
+                }
+                var totalParkson = 0,
+                    totalBonus = 0,
+                    totalBoth = 0;
+                for (var s2 = 0; s2 < sorted.length; s2++) {
+                    var d3 = staffData[sorted[s2]];
+                    totalParkson += d3.parkson;
+                    totalBonus += d3.bonus;
+                    totalBoth += d3.both;
+                }
+                var overallPctParkson = filteredData.length > 0 ? roundPct((totalParkson / filteredData.length) * 100) : 0;
+                var overallPctBonus = filteredData.length > 0 ? roundPct((totalBonus / filteredData.length) * 100) : 0;
+                staffRows.push(['TOTAL', '', '', filteredData.length, totalParkson, totalBonus, totalBoth, overallPctParkson + '%', overallPctBonus + '%']);
+                var ws1 = XLSX.utils.aoa_to_sheet(staffRows);
+                ws1['!cols'] = [{ wch: 6 }, { wch: 15 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
+                XLSX.utils.book_append_sheet(wb, ws1, 'Staff Dashboard');
+
+                // ========== SHEET 2: SWAP Parkson ==========
+                var posData = {};
+                for (var i2 = 0; i2 < filteredData.length; i2++) {
+                    var d4 = filteredData[i2];
+                    var pos = d4.pos || 'Unknown';
+                    if (!posData[pos]) { posData[pos] = { total: 0, swap: 0, noSwap: 0, dates: [] }; }
+                    posData[pos].total++;
+                    if (d4.hasParkson) posData[pos].swap++;
+                    else posData[pos].noSwap++;
+                    if (d4.date && posData[pos].dates.indexOf(d4.date) === -1) posData[pos].dates.push(d4.date);
+                }
+                var posKeys = Object.keys(posData);
+                var swapRows = [['RANK', 'POS', 'RANGE DATE', 'TOTAL (SWAP PC)']];
+                var swapList = [];
+                for (var p = 0; p < posKeys.length; p++) {
+                    var d5 = posData[posKeys[p]];
+                    if (d5.swap > 0) {
+                        var range = d5.dates.length > 0 ? d5.dates.sort()[0] + ' - ' + d5.dates.sort()[d5.dates.length - 1] : '';
+                        swapList.push({ pos: posKeys[p], count: d5.swap, range: range });
+                    }
+                }
+                swapList.sort(function(a, b) { return b.count - a.count; });
+                var rank2 = 0;
+                for (var s3 = 0; s3 < swapList.length; s3++) { rank2++;
+                    swapRows.push([rank2, swapList[s3].pos, swapList[s3].range, swapList[s3].count]); }
+                var totalSwap = 0;
+                for (var s4 = 0; s4 < swapList.length; s4++) totalSwap += swapList[s4].count;
+                swapRows.push(['TOTAL', '', '', totalSwap]);
+                var ws2 = XLSX.utils.aoa_to_sheet(swapRows);
+                ws2['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 12 }];
+                XLSX.utils.book_append_sheet(wb, ws2, 'SWAP Parkson');
+
+                // ========== SHEET 3: NOT SWAP ==========
+                var noSwapRows = [['RANK', 'POS', 'RANGE DATE', 'TOTAL (NOT SWAP PC)']];
+                var noSwapList = [];
+                for (var p2 = 0; p2 < posKeys.length; p2++) {
+                    var d6 = posData[posKeys[p2]];
+                    if (d6.noSwap > 0) {
+                        var range2 = d6.dates.length > 0 ? d6.dates.sort()[0] + ' - ' + d6.dates.sort()[d6.dates.length - 1] : '';
+                        noSwapList.push({ pos: posKeys[p2], count: d6.noSwap, range: range2 });
+                    }
+                }
+                noSwapList.sort(function(a, b) { return b.count - a.count; });
+                var rank3 = 0;
+                for (var s5 = 0; s5 < noSwapList.length; s5++) { rank3++;
+                    noSwapRows.push([rank3, noSwapList[s5].pos, noSwapList[s5].range, noSwapList[s5].count]); }
+                var totalNoSwap = 0;
+                for (var s6 = 0; s6 < noSwapList.length; s6++) totalNoSwap += noSwapList[s6].count;
+                noSwapRows.push(['TOTAL', '', '', totalNoSwap]);
+                var ws3 = XLSX.utils.aoa_to_sheet(noSwapRows);
+                ws3['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 12 }];
+                XLSX.utils.book_append_sheet(wb, ws3, 'NOT SWAP Parkson');
+
+                // ========== SHEET 4: POS Tabulation ==========
+                var tabRows = [
+                    ['RANK', 'POS', 'RANGE DATE', 'TOTAL', 'PARKSON', 'BONUSLINK', 'BOTH', '% PARKSON', '% BONUSLINK']
+                ];
+                var tabList = [];
+                for (var p3 = 0; p3 < posKeys.length; p3++) {
+                    var d7 = posData[posKeys[p3]];
+                    var range3 = d7.dates.length > 0 ? d7.dates.sort()[0] + ' - ' + d7.dates.sort()[d7.dates.length - 1] : '';
+                    var parksonCount = d7.swap;
+                    var bonusCount = 0;
+                    for (var i3 = 0; i3 < filteredData.length; i3++) {
+                        if (filteredData[i3].pos === posKeys[p3] && filteredData[i3].hasBonus) bonusCount++;
+                    }
+                    var bothCount = 0;
+                    for (var i4 = 0; i4 < filteredData.length; i4++) {
+                        if (filteredData[i4].pos === posKeys[p3] && filteredData[i4].hasBonus && filteredData[i4].hasParkson) bothCount++;
+                    }
+                    var pctParksonPos = d7.total > 0 ? roundPct((parksonCount / d7.total) * 100) : 0;
+                    var pctBonusPos = d7.total > 0 ? roundPct((bonusCount / d7.total) * 100) : 0;
+                    tabList.push({
+                        pos: posKeys[p3],
+                        total: d7.total,
+                        parkson: parksonCount,
+                        bonus: bonusCount,
+                        both: bothCount,
+                        pctParkson: pctParksonPos,
+                        pctBonus: pctBonusPos,
+                        range: range3
+                    });
+                }
+                tabList.sort(function(a, b) { return b.total - a.total; });
+                var rank4 = 0;
+                for (var s7 = 0; s7 < tabList.length; s7++) {
+                    rank4++;
+                    tabRows.push([rank4, tabList[s7].pos, tabList[s7].range, tabList[s7].total, tabList[s7].parkson, tabList[s7].bonus, tabList[s7].both, tabList[s7].pctParkson + '%', tabList[s7].pctBonus + '%']);
+                }
+                var totalAll = 0,
+                    totalParksonAll2 = 0,
+                    totalBonusAll = 0,
+                    totalBothAll = 0;
+                for (var s8 = 0; s8 < tabList.length; s8++) {
+                    totalAll += tabList[s8].total;
+                    totalParksonAll2 += tabList[s8].parkson;
+                    totalBonusAll += tabList[s8].bonus;
+                    totalBothAll += tabList[s8].both;
+                }
+                var overallPctParksonPos = totalAll > 0 ? roundPct((totalParksonAll2 / totalAll) * 100) : 0;
+                var overallPctBonusPos = totalAll > 0 ? roundPct((totalBonusAll / totalAll) * 100) : 0;
+                tabRows.push(['TOTAL', '', '', totalAll, totalParksonAll2, totalBonusAll, totalBothAll, overallPctParksonPos + '%', overallPctBonusPos + '%']);
+                var ws4 = XLSX.utils.aoa_to_sheet(tabRows);
+                ws4['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
+                XLSX.utils.book_append_sheet(wb, ws4, 'POS Tabulation');
+
+                // ========== SHEET 5: Raw Data (INCLUDE SEMUA POS) ==========
+                var rawRows = [headers];
+                for (var r = 0; r < csvData.length; r++) {
+                    rawRows.push(csvData[r]);
+                }
+                var ws5 = XLSX.utils.aoa_to_sheet(rawRows);
+                ws5['!cols'] = headers.map(function(h, idx) {
+                    var col = { wch: 14 };
+                    if (idx === 10) { col.numFmt = '@'; }
+                    return col;
+                });
+                XLSX.utils.book_append_sheet(wb, ws5, 'Raw Data');
+
+                // ========== SHEET 6: POS by Cashier by Date ==========
+                var posCashierDate = {};
+                for (var i5 = 0; i5 < filteredData.length; i5++) {
+                    var d8 = filteredData[i5];
+                    var key = d8.date + '|' + d8.pos + '|' + d8.staffId;
+                    if (!posCashierDate[key]) {
+                        posCashierDate[key] = {
+                            date: d8.date,
+                            pos: d8.pos,
+                            staffId: d8.staffId,
+                            staffName: d8.staffName || '',
+                            total: 0,
+                            swap: 0,
+                            noSwap: 0,
+                            bonus: 0
+                        };
+                    }
+                    posCashierDate[key].total++;
+                    if (d8.hasParkson) posCashierDate[key].swap++;
+                    else posCashierDate[key].noSwap++;
+                    if (d8.hasBonus) posCashierDate[key].bonus++;
+                    if (d8.staffName) posCashierDate[key].staffName = d8.staffName;
+                }
+                var pcdRows = [
+                    ['DATE', 'POS', 'STAFF ID', 'STAFF NAME', 'TOTAL TRANS', 'SWAP (PC)', 'NOT SWAP (PC)', 'BONUSLINK', '% SWAP (PC)', '% BONUSLINK']
+                ];
+                var pcdList = Object.keys(posCashierDate).map(function(k) { return posCashierDate[k]; });
+                pcdList.sort(function(a, b) {
+                    var dateCompare = a.date.localeCompare(b.date);
+                    if (dateCompare !== 0) return dateCompare;
+                    var posCompare = a.pos.localeCompare(b.pos);
+                    if (posCompare !== 0) return posCompare;
+                    return a.staffId.localeCompare(b.staffId);
+                });
+                for (var s9 = 0; s9 < pcdList.length; s9++) {
+                    var d9 = pcdList[s9];
+                    var pctSwapPcd = d9.total > 0 ? roundPct((d9.swap / d9.total) * 100) : 0;
+                    var pctBonusPcd = d9.total > 0 ? roundPct((d9.bonus / d9.total) * 100) : 0;
+                    pcdRows.push([d9.date, d9.pos, d9.staffId, d9.staffName, d9.total, d9.swap, d9.noSwap, d9.bonus, pctSwapPcd + '%', pctBonusPcd + '%']);
+                }
+                var totalTransPcd = 0,
+                    totalSwapPcd = 0,
+                    totalNoSwapPcd = 0,
+                    totalBonusPcd = 0;
+                for (var s10 = 0; s10 < pcdList.length; s10++) {
+                    totalTransPcd += pcdList[s10].total;
+                    totalSwapPcd += pcdList[s10].swap;
+                    totalNoSwapPcd += pcdList[s10].noSwap;
+                    totalBonusPcd += pcdList[s10].bonus;
+                }
+                var overallPctSwapPcd = totalTransPcd > 0 ? roundPct((totalSwapPcd / totalTransPcd) * 100) : 0;
+                var overallPctBonusPcd = totalTransPcd > 0 ? roundPct((totalBonusPcd / totalTransPcd) * 100) : 0;
+                pcdRows.push(['TOTAL', '', '', '', totalTransPcd, totalSwapPcd, totalNoSwapPcd, totalBonusPcd, overallPctSwapPcd + '%', overallPctBonusPcd + '%']);
+                var ws6 = XLSX.utils.aoa_to_sheet(pcdRows);
+                ws6['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
+                XLSX.utils.book_append_sheet(wb, ws6, 'POS by Cashier by Date');
+
+                var now = new Date();
+                var dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+                var filename = 'Parkson_POS_Report_' + dateStr + '.xlsx';
+
+                XLSX.writeFile(wb, filename);
+                showSuccess('📊 Excel exported: ' + filename + ' (6 sheets)');
+
+            } catch (e) {
+                showError('Export error: ' + e.message);
+                console.error(e);
+            }
+        }
+
+        // ============================================================
+        // CLEAR ALL
+        // ============================================================
+
+        function clearAll() {
+            transData = '';
+            csvData = [];
+            allRawData = [];
+            staffMap = {};
+            matchedCount = 0;
+            ignoredLines = [];
+            var fi = getEl('fileInput');
+            if (fi) fi.value = '';
+            var ci = getEl('cashierInput');
+            if (ci) ci.value = '';
+            var pi = getEl('pasteInput');
+            if (pi) pi.value = '';
+            var pc = getEl('previewContainer');
+            if (pc) pc.style.display = 'none';
+            var dc = getEl('dashboardContainer');
+            if (dc) dc.style.display = 'none';
+            var stats = getEl('stats');
+            if (stats) stats.style.display = 'none';
+            var sc = getEl('staffCount');
+            if (sc) sc.style.display = 'none';
+            var sp = getEl('staffPreview');
+            if (sp) sp.style.display = 'none';
+            var cs = getEl('cashierStatus');
+            if (cs) cs.style.display = 'none';
+            var ts = getEl('transStatus');
+            if (ts) ts.style.display = 'none';
+            var pg = getEl('progressContainer');
+            if (pg) pg.style.display = 'none';
+            var ii = getEl('ignoredInfo');
+            if (ii) ii.style.display = 'none';
+            var fii = getEl('fileInfo');
+            if (fii) fii.textContent = '';
+            showSuccess('Cleared!');
+        }
+
+        // ============================================================
+        // SAMPLE DATA
+        // ============================================================
+
+        function loadSample() {
+            var sample =
+                'H21072612722072612:05:23  V002\n00127210726101000042787610392810401625800500111100000000020000000634.00+00000000010000000605.00+00000         6018840020120750000000.00+00000302.00+00000303.00+000000.00+00000605.00+                                                    00000000.00+00000000.00+                               0000000000.00+PMY LS6.2 20141230  00000605.00+0201000002131051                 430871    2                 0000000000.00+00000000.00+                                                                    \n00127210726101000042787710544410554025800500111100000000030000000673.00+00000000010000000039.00+00000         6018840016815264000000.00+00000019.00+00000000.00+000000.00+00000019.00+                                                    00000000.00+00000000.00+                               0000000000.00+PMY LS6.2 20141230  00000039.00+0201000000371930                 430872    2                 0000000000.00+00000000.00+                                                                    \nF000596';
+            transData = sample;
+            var pi = getEl('pasteInput');
+            if (pi) pi.value = sample;
+            var fi = getEl('fileInfo');
+            if (fi) fi.textContent = 'Sample: 3 transactions';
+            var ts = getEl('transStatus');
+            if (ts) { ts.style.display = 'block';
+                ts.className = 'status-mini success';
+                ts.textContent = '✅ Sample data loaded (3 transactions)'; }
+            showSuccess('Sample loaded! Click Process All.');
+        }
+
+        // ============================================================
+        // INIT
+        // ============================================================
+
+        console.log('✅ Parkson POS Extractor (Gold Theme) loaded.');
+        console.log('🏠 Home button floating at bottom-right via common.js');
+        console.log('📊 Export Excel: 6 sheets (Staff Dashboard, SWAP Parkson, NOT SWAP Parkson, POS Tabulation, Raw Data, POS by Cashier by Date)');
+    </script>
+
+</body>
+</html>
