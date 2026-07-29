@@ -28,3 +28,33 @@ function addFloatingHome() {
 
 // Jalankan selepas DOM siap
 document.addEventListener('DOMContentLoaded', addFloatingHome);
+
+// ============================================================
+// 📊 GOOGLE ANALYTICS 4 (GA4) - Auto Tracking
+// ============================================================
+(function() {
+    var measurementId = 'G-HP0GYX89TR';  // <-- ID ANDA
+
+    // Muatkan script gtag.js
+    var script = document.createElement('script');
+    script.async = true;
+    script.src = 'https://www.googletagmanager.com/gtag/js?id=' + measurementId;
+    document.head.appendChild(script);
+
+    // Init dataLayer & fungsi gtag
+    window.dataLayer = window.dataLayer || [];
+    function gtag() {
+        dataLayer.push(arguments);
+    }
+    window.gtag = gtag;
+
+    // Hantar data pertama
+    gtag('js', new Date());
+    gtag('config', measurementId, {
+        page_title: document.title,
+        page_location: window.location.href,
+        page_path: window.location.pathname
+    });
+
+    console.log('✅ GA4 Tracking active: ' + measurementId);
+})();
