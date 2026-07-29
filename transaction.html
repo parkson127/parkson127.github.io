@@ -23,6 +23,65 @@
         .cat-header h1{color:#d35400;border-bottom:none;padding-bottom:0;font-size:1.6rem;text-shadow:2px 2px 0 #f39c12;flex:1}
         .cat-header .sub{font-size:0.8rem;color:#7f6000;opacity:0.7;font-style:italic}
         
+        /* ===== SUDOKU 9x9 MINI ===== */
+        .sudoku-container{position:relative;display:inline-block;margin-left:auto;cursor:pointer;user-select:none}
+        .sudoku-container .sudoku-toggle{font-size:12px;color:#7f6000;background:rgba(255,183,77,.2);padding:4px 10px;border-radius:12px;border:1px solid rgba(255,183,77,.3);display:flex;align-items:center;gap:6px;transition:all .3s}
+        .sudoku-container .sudoku-toggle:hover{background:rgba(255,183,77,.4);transform:scale(1.05)}
+        .sudoku-container .sudoku-toggle .cat-paw{font-size:16px;animation:catIdle 2s infinite ease-in-out;display:inline-block}
+        
+        .sudoku-panel{display:none;position:absolute;top:40px;right:0;background:rgba(255,255,255,.98);border:2px solid #f39c12;border-radius:12px;padding:12px 12px 15px 12px;box-shadow:0 8px 32px rgba(0,0,0,.2);z-index:100;min-width:340px;backdrop-filter:blur(8px)}
+        .sudoku-panel.show{display:block;animation:slideDown .3s ease-out}
+        @keyframes slideDown{0%{opacity:0;transform:translateY(-10px) scale(.95)}100%{opacity:1;transform:translateY(0) scale(1)}}
+        
+        .sudoku-panel .sudoku-title{font-size:12px;font-weight:700;color:#d35400;text-align:center;margin-bottom:4px;display:flex;justify-content:space-between;align-items:center}
+        .sudoku-panel .sudoku-title span{font-size:13px}
+        .sudoku-panel .sudoku-close{background:none;border:none;font-size:16px;cursor:pointer;color:#999;padding:0 4px}
+        .sudoku-panel .sudoku-close:hover{color:#dc3545}
+        
+        .sudoku-grid{display:grid;grid-template-columns:repeat(9,1fr);gap:1px;margin:4px auto;width:306px;border:2px solid #333;padding:1px;background:#333;border-radius:4px}
+        .sudoku-grid .sudoku-row{display:contents}
+        .sudoku-cell{width:32px;height:32px;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;border-radius:1px;background:#fff;border:1px solid #ddd;cursor:pointer;transition:all .15s;color:#333;position:relative}
+        .sudoku-cell:hover{background:#e3f2fd;transform:scale(1.05);z-index:2}
+        .sudoku-cell.empty{color:#999;font-weight:400;background:#fafafa}
+        .sudoku-cell.filled{background:#fff;color:#d35400;border-color:#f39c12}
+        .sudoku-cell.given{background:#e9ecef;color:#495057;cursor:default;border-color:#ced4da}
+        .sudoku-cell.given:hover{transform:none;background:#e9ecef}
+        .sudoku-cell.selected{background:#ffd93d!important;border-color:#f39c12!important;transform:scale(1.08);z-index:3;box-shadow:0 0 12px rgba(243,156,18,.4)}
+        .sudoku-cell.correct{animation:pulseGreen .5s}
+        .sudoku-cell.wrong{animation:shake .4s;background:#ff6b6b!important}
+        .sudoku-cell .cell-note{font-size:7px;color:#999;position:absolute;top:1px;left:2px;line-height:1}
+        
+        /* Border tebal untuk sub-grid 3x3 */
+        .sudoku-cell.border-right{border-right:2px solid #333}
+        .sudoku-cell.border-bottom{border-bottom:2px solid #333}
+        .sudoku-cell.border-left{border-left:2px solid #333}
+        .sudoku-cell.border-top{border-top:2px solid #333}
+        
+        @keyframes pulseGreen{0%,100%{background:#d4edda}50%{background:#28a745;color:#fff}}
+        @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-5px)}40%{transform:translateX(5px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+        
+        .sudoku-numbers{display:flex;gap:3px;justify-content:center;margin:5px 0 3px 0;flex-wrap:wrap}
+        .sudoku-numbers .num-btn{width:26px;height:26px;border-radius:50%;border:1px solid #dee2e6;background:#f8f9fa;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;color:#333;display:flex;align-items:center;justify-content:center}
+        .sudoku-numbers .num-btn:hover{background:#f39c12;color:#fff;transform:scale(1.1);border-color:#f39c12}
+        .sudoku-numbers .num-btn.active{background:#d35400;color:#fff;border-color:#d35400}
+        .sudoku-numbers .num-btn.used{opacity:.3;cursor:not-allowed}
+        
+        .sudoku-status{font-size:10px;color:#666;text-align:center;margin-top:4px;display:flex;justify-content:space-between;align-items:center;gap:6px;flex-wrap:wrap}
+        .sudoku-status .sudoku-hint{color:#f39c12;font-weight:700;cursor:pointer;font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(243,156,18,.1)}
+        .sudoku-status .sudoku-hint:hover{background:rgba(243,156,18,.2)}
+        .sudoku-status .sudoku-score{color:#28a745;font-weight:700}
+        .sudoku-status .sudoku-undo{color:#6c757d;cursor:pointer;font-size:10px;padding:2px 8px;border-radius:10px;background:#f8f9fa}
+        .sudoku-status .sudoku-undo:hover{background:#e9ecef}
+        .sudoku-status .sudoku-reset{color:#dc3545;cursor:pointer;font-size:10px;padding:2px 8px;border-radius:10px;background:rgba(220,53,69,.1)}
+        .sudoku-status .sudoku-reset:hover{background:rgba(220,53,69,.2)}
+        
+        .sudoku-cat{font-size:24px;text-align:center;margin-top:3px;animation:catIdle 2s infinite ease-in-out;display:block}
+        
+        .cat-header .header-right{display:flex;align-items:center;gap:10px;margin-left:auto}
+        
+        @media(max-width:768px){.sudoku-panel{left:50%;transform:translateX(-50%);right:auto;top:45px;min-width:300px}.sudoku-panel.show{transform:translateX(-50%) scale(1)}.sudoku-grid{width:270px}.sudoku-cell{width:28px;height:28px;font-size:12px}}
+        @media(max-width:480px){.sudoku-panel{min-width:280px}.sudoku-grid{width:243px}.sudoku-cell{width:25px;height:25px;font-size:11px}}
+        
         .cat-container{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:10px;background:rgba(255,183,77,.15);border-radius:12px;border:2px dashed rgba(255,183,77,.3);min-height:80px;position:relative;overflow:hidden;flex-wrap:wrap;gap:10px}
         .cat-container .cat-left{font-size:50px;transition:all .8s cubic-bezier(.34,1.56,.64,1);display:inline-block;cursor:pointer;position:relative;animation:catIdle 2s infinite ease-in-out;text-align:center}
         .cat-container .cat-left .action-text{font-size:12px;color:#d35400;font-weight:700;display:block;text-align:center;margin-top:2px}
@@ -146,11 +205,52 @@
     <div class="paw-bg">🐾</div>
 
     <div class="container">
-        <!-- Cat Header -->
+        <!-- Cat Header with Sudoku -->
         <div class="cat-header">
             <span class="cat-icon" onclick="playMeow()">🐱</span>
             <h1>🏖️ PAW Extractor <span style="font-size:0.6rem;color:#f39c12;">~ meow!</span></h1>
             <span class="sub">🌊🐾 healing di pantai</span>
+            
+            <div class="header-right">
+                <div class="sudoku-container">
+                    <div class="sudoku-toggle" onclick="toggleSudoku()">
+                        <span class="cat-paw">🐾</span>
+                        <span>🧩 Sudoku</span>
+                        <span style="font-size:10px;color:#999;">▼</span>
+                    </div>
+                    
+                    <div class="sudoku-panel" id="sudokuPanel">
+                        <div class="sudoku-title">
+                            <span>🧩 Sudoku 9x9</span>
+                            <span style="font-size:10px;font-weight:400;color:#999;">🐱 main</span>
+                            <button class="sudoku-close" onclick="toggleSudoku()">✕</button>
+                        </div>
+                        
+                        <div class="sudoku-grid" id="sudokuGrid"></div>
+                        
+                        <div class="sudoku-numbers" id="sudokuNumbers">
+                            <button class="num-btn" data-num="1">1</button>
+                            <button class="num-btn" data-num="2">2</button>
+                            <button class="num-btn" data-num="3">3</button>
+                            <button class="num-btn" data-num="4">4</button>
+                            <button class="num-btn" data-num="5">5</button>
+                            <button class="num-btn" data-num="6">6</button>
+                            <button class="num-btn" data-num="7">7</button>
+                            <button class="num-btn" data-num="8">8</button>
+                            <button class="num-btn" data-num="9">9</button>
+                        </div>
+                        
+                        <div class="sudoku-status">
+                            <span>⭐ <span class="sudoku-score" id="sudokuScore">0</span>/81</span>
+                            <span class="sudoku-hint" onclick="sudokuHint()">💡 Hint</span>
+                            <span class="sudoku-undo" onclick="sudokuUndo()">↩️ Undo</span>
+                            <span class="sudoku-reset" onclick="resetSudoku()">🔄 New</span>
+                        </div>
+                        
+                        <span class="sudoku-cat" id="sudokuCat">😺</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Cat Adventure Bar -->
@@ -182,7 +282,7 @@
                 <span class="upload-cat-indicator">🐱</span>
                 <label>📁 Transaction <span class="badge badge-required">WAJIB</span></label>
                 <input type="file" id="fileInput" accept="*/*" multiple>
-                <div class="hint">e.g. 1 month Bi File Export (TX File) and Select <strong>ALL</strong> file.</div>
+                <div class="hint">Upload <strong>SEMUA</strong> jenis file (txt, csv, log, dat, pdf, xlsx, dll)</div>
                 <div id="transStatus" class="status-box info" style="display:none;font-size:12px;">⏳ Loading...</div>
             </div>
 
@@ -204,7 +304,7 @@
                     <div class="cashier-method">
                         <span class="badge-method badge-paste">📝 PASTE</span>
                         <span class="method-label">Cashier ID &amp; Name</span>
-                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;NOREFY HAFSHAH&#10;789012&#9;NUR FATIHAH SABRINA"></textarea>
+                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;Norefy Hafshah&#10;789012&#9;Nur Fatihah Sabrina"></textarea>
                         <button class="btn-primary btn-sm" onclick="processCashierPaste()" style="margin-top:3px;font-size:11px;padding:3px 10px;">✅ Load Names</button>
                         <div id="cashierPasteStatus" class="cashier-status-small"></div>
                     </div>
@@ -302,6 +402,353 @@
     </div>
 
     <script>
+        // ============================================================
+        // SUDOKU 9x9 MINI GAME
+        // ============================================================
+        
+        var sudokuGrid = [];
+        var sudokuSolution = [];
+        var sudokuGiven = [];
+        var selectedCell = null;
+        var sudokuScore = 0;
+        var sudokuHistory = [];
+        var sudokuCatEmojis = ['😺', '😸', '😻', '🐱', '🐈', '😽', '🐾'];
+        var sudokuSize = 9;
+        var sudokuBoxSize = 3;
+        
+        function generateSudoku() {
+            // Generate valid 9x9 Sudoku solution
+            var grid = Array.from({length: 9}, () => Array(9).fill(0));
+            
+            // Simple backtracking solver
+            function solveSudoku(grid) {
+                for (var r = 0; r < 9; r++) {
+                    for (var c = 0; c < 9; c++) {
+                        if (grid[r][c] === 0) {
+                            var nums = shuffleArray([1,2,3,4,5,6,7,8,9]);
+                            for (var n = 0; n < nums.length; n++) {
+                                var num = nums[n];
+                                if (isValidSudoku(grid, r, c, num)) {
+                                    grid[r][c] = num;
+                                    if (solveSudoku(grid)) return true;
+                                    grid[r][c] = 0;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+            
+            function isValidSudoku(grid, row, col, num) {
+                for (var i = 0; i < 9; i++) {
+                    if (grid[row][i] === num) return false;
+                    if (grid[i][col] === num) return false;
+                }
+                var boxRow = Math.floor(row / 3) * 3;
+                var boxCol = Math.floor(col / 3) * 3;
+                for (var r = boxRow; r < boxRow + 3; r++) {
+                    for (var c = boxCol; c < boxCol + 3; c++) {
+                        if (grid[r][c] === num) return false;
+                    }
+                }
+                return true;
+            }
+            
+            function shuffleArray(arr) {
+                for (var i = arr.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+                return arr;
+            }
+            
+            // Generate by starting with a base valid pattern and shuffling
+            var base = [
+                [1,2,3,4,5,6,7,8,9],
+                [4,5,6,7,8,9,1,2,3],
+                [7,8,9,1,2,3,4,5,6],
+                [2,3,4,5,6,7,8,9,1],
+                [5,6,7,8,9,1,2,3,4],
+                [8,9,1,2,3,4,5,6,7],
+                [3,4,5,6,7,8,9,1,2],
+                [6,7,8,9,1,2,3,4,5],
+                [9,1,2,3,4,5,6,7,8]
+            ];
+            
+            // Shuffle rows within each band
+            for (var band = 0; band < 3; band++) {
+                var rows = shuffleArray([band*3, band*3+1, band*3+2]);
+                var tempRows = [];
+                for (var i = 0; i < 3; i++) tempRows.push(base[rows[i]]);
+                for (var i = 0; i < 3; i++) base[band*3 + i] = tempRows[i];
+            }
+            
+            // Shuffle columns within each stack
+            for (var stack = 0; stack < 3; stack++) {
+                var cols = shuffleArray([stack*3, stack*3+1, stack*3+2]);
+                for (var r = 0; r < 9; r++) {
+                    var tempRow = [];
+                    for (var i = 0; i < 3; i++) tempRow.push(base[r][cols[i]]);
+                    for (var i = 0; i < 3; i++) base[r][stack*3 + i] = tempRow[i];
+                }
+            }
+            
+            sudokuSolution = base;
+            
+            // Create puzzle with some cells given (remove 40-50 cells)
+            sudokuGiven = [];
+            sudokuGrid = [];
+            var removeCount = 40 + Math.floor(Math.random() * 15);
+            var positions = [];
+            for (var r = 0; r < 9; r++) {
+                sudokuGrid[r] = [];
+                sudokuGiven[r] = [];
+                for (var c = 0; c < 9; c++) {
+                    sudokuGrid[r][c] = base[r][c];
+                    sudokuGiven[r][c] = true;
+                    positions.push(r * 9 + c);
+                }
+            }
+            
+            // Shuffle positions to remove
+            for (var i = positions.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = positions[i];
+                positions[i] = positions[j];
+                positions[j] = temp;
+            }
+            
+            for (var i = 0; i < removeCount && i < positions.length; i++) {
+                var pos = positions[i];
+                var r = Math.floor(pos / 9);
+                var c = pos % 9;
+                sudokuGrid[r][c] = 0;
+                sudokuGiven[r][c] = false;
+            }
+            
+            sudokuScore = 0;
+            sudokuHistory = [];
+            renderSudoku9x9();
+            updateSudokuScore9x9();
+            document.getElementById('sudokuCat').textContent = '😺';
+        }
+        
+        function renderSudoku9x9() {
+            var gridEl = document.getElementById('sudokuGrid');
+            gridEl.innerHTML = '';
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'sudoku-cell';
+                    
+                    // Add border for 3x3 boxes
+                    if (c % 3 === 2 && c < 8) cell.classList.add('border-right');
+                    if (r % 3 === 2 && r < 8) cell.classList.add('border-bottom');
+                    
+                    if (sudokuGrid[r][c] === 0) {
+                        cell.textContent = '';
+                        cell.classList.add('empty');
+                    } else {
+                        cell.textContent = sudokuGrid[r][c];
+                        if (sudokuGiven[r][c]) {
+                            cell.classList.add('given');
+                        } else {
+                            cell.classList.add('filled');
+                        }
+                    }
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.onclick = function() { selectSudokuCell9x9(this); };
+                    gridEl.appendChild(cell);
+                }
+            }
+            
+            // Highlight selected
+            if (selectedCell) {
+                var cells = gridEl.querySelectorAll('.sudoku-cell');
+                var idx = selectedCell.row * 9 + selectedCell.col;
+                if (cells[idx]) cells[idx].classList.add('selected');
+            }
+            
+            updateSudokuScore9x9();
+            updateNumberButtons9x9();
+        }
+        
+        function selectSudokuCell9x9(el) {
+            var row = parseInt(el.dataset.row);
+            var col = parseInt(el.dataset.col);
+            if (sudokuGiven[row][col]) return;
+            
+            // Remove previous selection
+            var cells = document.querySelectorAll('.sudoku-cell');
+            cells.forEach(function(c) { c.classList.remove('selected'); });
+            
+            selectedCell = { row: row, col: col };
+            el.classList.add('selected');
+        }
+        
+        function updateNumberButtons9x9() {
+            var buttons = document.querySelectorAll('.num-btn');
+            var counts = {};
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] !== 0) {
+                        var num = sudokuGrid[r][c];
+                        counts[num] = (counts[num] || 0) + 1;
+                    }
+                }
+            }
+            buttons.forEach(function(btn) {
+                var num = parseInt(btn.dataset.num);
+                if (counts[num] && counts[num] >= 9) {
+                    btn.classList.add('used');
+                } else {
+                    btn.classList.remove('used');
+                }
+            });
+        }
+        
+        function sudokuNumberClick9x9(num) {
+            if (!selectedCell) {
+                // If no cell selected, auto-select first empty
+                for (var r = 0; r < 9; r++) {
+                    for (var c = 0; c < 9; c++) {
+                        if (sudokuGrid[r][c] === 0) {
+                            selectedCell = { row: r, col: c };
+                            renderSudoku9x9();
+                            break;
+                        }
+                    }
+                    if (selectedCell) break;
+                }
+                if (!selectedCell) return;
+            }
+            
+            var row = selectedCell.row;
+            var col = selectedCell.col;
+            
+            if (sudokuGiven[row][col]) return;
+            
+            // Check if correct
+            var correct = sudokuSolution[row][col];
+            var cells = document.querySelectorAll('.sudoku-cell');
+            var idx = row * 9 + col;
+            
+            if (num === correct) {
+                // Save history for undo
+                sudokuHistory.push({ row: row, col: col, oldValue: 0, newValue: num });
+                
+                sudokuGrid[row][col] = num;
+                sudokuScore++;
+                cells[idx].textContent = num;
+                cells[idx].classList.remove('empty');
+                cells[idx].classList.add('filled');
+                cells[idx].classList.add('correct');
+                setTimeout(function() { cells[idx].classList.remove('correct'); }, 500);
+                
+                // Cat happy
+                document.getElementById('sudokuCat').textContent = '😸';
+                setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 800);
+                
+                updateSudokuScore9x9();
+                updateNumberButtons9x9();
+                selectedCell = null;
+                
+                // Check win
+                if (sudokuScore === 81) {
+                    document.getElementById('sudokuCat').textContent = '🎉🐱';
+                    setTimeout(function() { 
+                        document.getElementById('sudokuCat').textContent = '🏆😸';
+                        playMeow();
+                    }, 300);
+                    showSuccess('🎉 Sudoku complete! 🐱🏆');
+                }
+            } else {
+                // Wrong answer
+                cells[idx].classList.add('wrong');
+                document.getElementById('sudokuCat').textContent = '😿';
+                setTimeout(function() { 
+                    cells[idx].classList.remove('wrong');
+                    document.getElementById('sudokuCat').textContent = '😺';
+                }, 500);
+            }
+        }
+        
+        function updateSudokuScore9x9() {
+            var filled = 0;
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] !== 0) filled++;
+                }
+            }
+            sudokuScore = filled;
+            document.getElementById('sudokuScore').textContent = filled;
+        }
+        
+        function sudokuHint() {
+            // Find first empty cell and fill with correct answer
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] === 0) {
+                        sudokuHistory.push({ row: r, col: c, oldValue: 0, newValue: sudokuSolution[r][c] });
+                        sudokuGrid[r][c] = sudokuSolution[r][c];
+                        sudokuScore++;
+                        renderSudoku9x9();
+                        updateSudokuScore9x9();
+                        document.getElementById('sudokuCat').textContent = '😻';
+                        setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 800);
+                        
+                        if (sudokuScore === 81) {
+                            document.getElementById('sudokuCat').textContent = '🎉🐱';
+                            setTimeout(function() { 
+                                document.getElementById('sudokuCat').textContent = '🏆😸';
+                                playMeow();
+                            }, 300);
+                            showSuccess('🎉 Sudoku complete! 🐱🏆');
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+        
+        function sudokuUndo() {
+            if (sudokuHistory.length === 0) return;
+            var last = sudokuHistory.pop();
+            sudokuGrid[last.row][last.col] = last.oldValue;
+            sudokuScore--;
+            renderSudoku9x9();
+            updateSudokuScore9x9();
+            document.getElementById('sudokuCat').textContent = '😽';
+            setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 500);
+        }
+        
+        function resetSudoku() {
+            generateSudoku();
+            showSuccess('🔄 New Sudoku puzzle! 🐱');
+        }
+        
+        function toggleSudoku() {
+            var panel = document.getElementById('sudokuPanel');
+            panel.classList.toggle('show');
+            if (panel.classList.contains('show') && !sudokuGrid.length) {
+                generateSudoku();
+            }
+        }
+        
+        // Close sudoku when clicking outside
+        document.addEventListener('click', function(e) {
+            var container = document.querySelector('.sudoku-container');
+            var panel = document.getElementById('sudokuPanel');
+            if (container && panel && !container.contains(e.target) && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+            }
+        });
+        
         // ============================================================
         // PAW EXTRACTOR - FULL SCRIPT
         // ============================================================
@@ -1421,7 +1868,7 @@
 
                 var now = new Date();
                 var dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-                var filename = 'Parkson_Card_Report_' + dateStr + '.xlsx';
+                var filename = 'ParksonCardSwap_Report_' + dateStr + '.xlsx';
 
                 XLSX.writeFile(wb, filename);
 
@@ -1503,16 +1950,141 @@
             showSuccess('Cleared! 🌊');
         }
 
-        // ============================================================
-        // INIT
-        // ============================================================
+// ============================================================
+// INIT
+// ============================================================
 
-        updateCat('😺 Sedia!', '🐾 Upload transaction file dulu ya!', '🐱', '📁 Upload Transaction');
-        console.log('🐱🏖️ PAW Extractor ready!');
-        console.log('📁 Upload transaction files + Cashier Names (2 methods)');
-        console.log('📤 Method 1: Upload Excel/TXT');
-        console.log('📝 Method 2: Paste Cashier ID & Name');
-        console.log('🐱 Kucing akan melompat dan menangkap ikan!');
+// Init Sudoku 9x9
+generateSudoku();
+
+// Setup number buttons for 9x9
+document.querySelectorAll('.num-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+        var num = parseInt(this.dataset.num);
+        sudokuNumberClick9x9(num);
+    });
+});
+
+// ============================================================
+// KEYBOARD SUPPORT FOR SUDOKU 9x9
+// ============================================================
+document.addEventListener('keydown', function(e) {
+    // Only process if Sudoku panel is open
+    var panel = document.getElementById('sudokuPanel');
+    if (!panel || !panel.classList.contains('show')) return;
+    
+    // Number keys 1-9
+    if (e.key >= '1' && e.key <= '9') {
+        e.preventDefault();
+        var num = parseInt(e.key);
+        sudokuNumberClick9x9(num);
+    }
+    
+    // H key for Hint
+    if (e.key === 'h' || e.key === 'H') {
+        e.preventDefault();
+        sudokuHint();
+    }
+    
+    // Z key for Undo (with Ctrl)
+    if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+        e.preventDefault();
+        sudokuUndo();
+    }
+    
+    // R key for Reset/New
+    if (e.key === 'r' || e.key === 'R') {
+        e.preventDefault();
+        resetSudoku();
+    }
+    
+    // Escape key to close Sudoku
+    if (e.key === 'Escape') {
+        panel.classList.remove('show');
+    }
+    
+    // Arrow keys to navigate cells
+    if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+        e.preventDefault();
+        if (!selectedCell) {
+            // Select first empty cell
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] === 0) {
+                        selectedCell = { row: r, col: c };
+                        renderSudoku9x9();
+                        return;
+                    }
+                }
+            }
+            return;
+        }
+        
+        var row = selectedCell.row;
+        var col = selectedCell.col;
+        
+        if (e.key === 'ArrowUp') row = Math.max(0, row - 1);
+        if (e.key === 'ArrowDown') row = Math.min(8, row + 1);
+        if (e.key === 'ArrowLeft') col = Math.max(0, col - 1);
+        if (e.key === 'ArrowRight') col = Math.min(8, col + 1);
+        
+        // Skip given cells
+        if (sudokuGiven[row][col]) {
+            // Try to find next empty in that direction
+            var found = false;
+            var tempRow = row, tempCol = col;
+            for (var i = 0; i < 9; i++) {
+                if (e.key === 'ArrowUp') tempRow = Math.max(0, row - i);
+                if (e.key === 'ArrowDown') tempRow = Math.min(8, row + i);
+                if (e.key === 'ArrowLeft') tempCol = Math.max(0, col - i);
+                if (e.key === 'ArrowRight') tempCol = Math.min(8, col + i);
+                if (!sudokuGiven[tempRow][tempCol]) {
+                    row = tempRow;
+                    col = tempCol;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) return;
+        }
+        
+        selectedCell = { row: row, col: col };
+        renderSudoku9x9();
+    }
+    
+    // Delete/Backspace to clear cell
+    if (e.key === 'Delete' || e.key === 'Backspace') {
+        e.preventDefault();
+        if (selectedCell) {
+            var row = selectedCell.row;
+            var col = selectedCell.col;
+            if (!sudokuGiven[row][col] && sudokuGrid[row][col] !== 0) {
+                sudokuGrid[row][col] = 0;
+                sudokuScore--;
+                renderSudoku9x9();
+                updateSudokuScore9x9();
+                document.getElementById('sudokuCat').textContent = '😽';
+                setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 500);
+            }
+        }
+    }
+});
+
+updateCat('😺 Sedia!', '🐾 Upload transaction file dulu ya!', '🐱', '📁 Upload Transaction');
+console.log('🐱🏖️ PAW Extractor ready!');
+console.log('📁 Upload transaction files + Cashier Names (2 methods)');
+console.log('📤 Method 1: Upload Excel/TXT');
+console.log('📝 Method 2: Paste Cashier ID & Name');
+console.log('🧩 Sudoku 9x9 sedia! Klik 🐾 Sudoku untuk main');
+console.log('⌨️ Keyboard Shortcuts:');
+console.log('   🔢 1-9  : Isi number');
+console.log('   ⬆⬇⬅➡ : Navigate cells');
+console.log('   ⌨️ H    : Hint');
+console.log('   ⌨️ R    : New puzzle');
+console.log('   ⌨️ Del  : Clear cell');
+console.log('   ⌨️ Esc  : Close Sudoku');
+console.log('   ⌨️ Ctrl+Z : Undo');
+console.log('🐱 Kucing akan melompat dan menangkap ikan!');
     </script>
 </body>
 </html>
