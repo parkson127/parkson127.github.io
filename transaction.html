@@ -118,10 +118,21 @@
         .ignored-content{display:none;max-height:100px;overflow:auto}
         .ignored-content.show{display:block}
         
-        /* HIDE CHECKBOXES - all forced ON */
-        .checkbox-group{display:none !important}
+        /* Cashier methods - 2 methods only */
+        .cashier-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:5px 0}
+        .cashier-method{background:#f8f9fa;padding:10px;border-radius:8px;border:1px solid #dee2e6}
+        .cashier-method .method-label{font-size:12px;font-weight:700;color:#495057;margin-bottom:5px;display:block}
+        .cashier-method input[type=file]{font-size:11px;padding:4px;width:100%}
+        .cashier-method textarea{height:50px;font-size:11px;padding:4px;width:100%;resize:vertical}
+        .cashier-method .badge-method{display:inline-block;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:700;margin-right:4px}
+        .badge-upload{background:#28a745;color:#fff}
+        .badge-paste{background:#17a2b8;color:#fff}
+        .cashier-status-small{font-size:11px;margin-top:3px;padding:3px 6px;border-radius:4px;display:none}
+        .cashier-status-small.success{background:#d4edda;color:#155724;display:block}
+        .cashier-status-small.info{background:#cce5ff;color:#004085;display:block}
+        .cashier-status-small.error{background:#f8d7da;color:#721c24;display:block}
         
-        @media(max-width:768px){.grid-2{grid-template-columns:1fr}.cat-container{flex-wrap:wrap;justify-content:center;text-align:center;gap:10px}.cat-container .cat-right{text-align:center;width:100%}.cat-container .progress-cat{width:100%;margin:5px 0}.stats{grid-template-columns:repeat(2,1fr)}}
+        @media(max-width:768px){.grid-2{grid-template-columns:1fr}.cashier-methods{grid-template-columns:1fr}.cat-container{flex-wrap:wrap;justify-content:center;text-align:center;gap:10px}.cat-container .cat-right{text-align:center;width:100%}.cat-container .progress-cat{width:100%;margin:5px 0}.stats{grid-template-columns:repeat(2,1fr)}}
         @media(max-width:480px){.grid-2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.row{flex-direction:column;align-items:stretch}.row label{min-width:auto}}
     </style>
 </head>
@@ -175,14 +186,32 @@
                 <div id="transStatus" class="status-box info" style="display:none;font-size:12px;">⏳ Loading...</div>
             </div>
 
-            <div class="upload-box optional" id="uploadCashierBox">
+            <div class="upload-box optional" id="uploadCashierMasterBox">
                 <span class="upload-cat-indicator">🐱</span>
-                <label>📄 Cashier Listing <span class="badge badge-optional">OPTIONAL</span></label>
-                <input type="file" id="cashierInput" accept=".txt,.csv,.xlsx,.xls">
-                <div class="hint">Upload <span class="badge badge-txt">TXT</span> <span class="badge badge-excel">Excel</span> — auto match staff name</div>
-                <div id="cashierStatus" class="status-box info" style="display:none;font-size:12px;">⏳ Loading...</div>
-                <div id="staffCount" style="display:none;font-weight:bold;color:#28a745;font-size:13px;margin-top:5px;">✅ Staff loaded: <span id="staffTotal">0</span></div>
-                <div id="staffPreview" class="staff-preview"></div>
+                <label>📋 Cashier Name <span class="badge badge-optional">OPTIONAL</span></label>
+                
+                <!-- 2 Methods only -->
+                <div class="cashier-methods">
+                    <!-- Method 1: Upload File -->
+                    <div class="cashier-method">
+                        <span class="badge-method badge-upload">📤 UPLOAD</span>
+                        <span class="method-label">Excel / TXT</span>
+                        <input type="file" id="cashierFileInput" accept=".xlsx,.xls,.txt,.csv">
+                        <div id="cashierFileStatus" class="cashier-status-small"></div>
+                    </div>
+                    
+                    <!-- Method 2: Paste Text -->
+                    <div class="cashier-method">
+                        <span class="badge-method badge-paste">📝 PASTE</span>
+                        <span class="method-label">Cashier ID &amp; Name</span>
+                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;NOREFY HAFSHAH&#10;789012&#9;NUR FATIHAH SABRINA"></textarea>
+                        <button class="btn-primary btn-sm" onclick="processCashierPaste()" style="margin-top:3px;font-size:11px;padding:3px 10px;">✅ Load Names</button>
+                        <div id="cashierPasteStatus" class="cashier-status-small"></div>
+                    </div>
+                </div>
+                
+                <div id="cashierMasterCount" style="display:none;font-weight:bold;color:#28a745;font-size:13px;margin-top:5px;">✅ Total Staff: <span id="cashierMasterTotal">0</span></div>
+                <div id="cashierMasterPreview" class="staff-preview"></div>
             </div>
         </div>
 
@@ -216,8 +245,8 @@
 
         <!-- Buttons -->
         <div class="flex">
-            <button class="btn-primary" onclick="processAll()"><span class="btn-icon">🐱</span> Process All</button>
-            <button class="btn-excel" onclick="exportExcel()"><span class="btn-icon">🐟</span> Export Excel</button>
+            <button class="btn-primary" onclick="processAll()" id="btnProcessAll"><span class="btn-icon">🐱</span> Process All</button>
+            <button class="btn-excel" onclick="exportExcel()" id="btnExportExcel"><span class="btn-icon">🐟</span> Export Excel</button>
             <button class="btn-info" onclick="showDashboard()">📊 Dashboard</button>
             <button class="btn-danger" onclick="clearAll()">🗑️ Clear</button>
             <button class="btn-warning btn-sm" onclick="loadSample()">📋 Sample</button>
@@ -328,15 +357,15 @@
             }
 
             var transBox = document.getElementById('uploadTransBox');
-            var cashierBox = document.getElementById('uploadCashierBox');
+            var masterBox = document.getElementById('uploadCashierMasterBox');
             if (transBox) {
                 transBox.classList.remove('active-cat');
                 if (actionText && actionText.indexOf('Transaction') >= 0) transBox.classList.add('active-cat');
             }
-            if (cashierBox) {
-                cashierBox.classList.remove('active-cat');
-                if (actionText && actionText.indexOf('Cashier') >= 0) cashierBox.classList.add('active-cat');
-                if (actionText && actionText.indexOf('Export') >= 0) cashierBox.classList.remove('active-cat');
+            if (masterBox) {
+                masterBox.classList.remove('active-cat');
+                if (actionText && actionText.indexOf('Cashier') >= 0) masterBox.classList.add('active-cat');
+                if (actionText && actionText.indexOf('Export') >= 0) masterBox.classList.remove('active-cat');
             }
 
             if (catStatus) {
@@ -489,46 +518,171 @@
         }
 
         // ============================================================
-        // CASHIER LISTING UPLOAD
+        // CASHIER NAME FUNCTIONS - 2 METHODS
         // ============================================================
 
-        var ci = getEl('cashierInput');
-        if (ci) {
-            ci.addEventListener('change', function(e) {
+        function updateStaffMap() {
+            var total = Object.keys(staffMap).length;
+            var totalEl = getEl('cashierMasterTotal');
+            if (totalEl) totalEl.textContent = total;
+            var countEl = getEl('cashierMasterCount');
+            if (countEl) countEl.style.display = 'block';
+            
+            var preview = getEl('cashierMasterPreview');
+            if (preview && total > 0) {
+                preview.style.display = 'block';
+                var html = '<strong>👥 Staff (' + total + '):</strong><br>';
+                var sorted = Object.keys(staffMap).sort();
+                for (var i = 0; i < Math.min(sorted.length, 15); i++) {
+                    html += sorted[i] + ' → ' + staffMap[sorted[i]] + '<br>';
+                }
+                if (sorted.length > 15) html += '... and ' + (sorted.length - 15) + ' more';
+                preview.innerHTML = html;
+            } else if (preview) {
+                preview.style.display = 'none';
+            }
+            
+            return total;
+        }
+
+        function processCashierData(rawData) {
+            var map = {};
+            var lines = rawData.split('\n');
+            
+            for (var i = 0; i < lines.length; i++) {
+                var line = lines[i].trim();
+                if (!line) continue;
+                
+                // Skip header lines
+                var lower = line.toLowerCase();
+                if (lower.indexOf('cashier id') >= 0 || lower.indexOf('staff id') >= 0 || 
+                    lower.indexOf('id') === 0 || lower.indexOf('name') === 0 || lower.indexOf('nama') === 0 ||
+                    lower.indexOf('cashier') >= 0 && lower.indexOf('id') >= 0) {
+                    continue;
+                }
+                
+                // Try multiple separators
+                var parts = line.split(/\t|,|;|\|/);
+                var cleanParts = [];
+                for (var p = 0; p < parts.length; p++) {
+                    var part = parts[p].trim();
+                    if (part) cleanParts.push(part);
+                }
+                
+                if (cleanParts.length < 2) continue;
+                
+                // Find ID and Name
+                var id = null;
+                var name = null;
+                var idIndex = -1;
+                var nameIndex = -1;
+                
+                // Try to find ID (numeric) - look for 4-8 digit numbers
+                for (var c = 0; c < cleanParts.length; c++) {
+                    var val = cleanParts[c];
+                    var match = val.match(/\d+/);
+                    if (match && match[0].length >= 4 && match[0].length <= 8) {
+                        if (idIndex === -1) {
+                            idIndex = c;
+                            id = match[0];
+                        }
+                    }
+                }
+                
+                // If no ID found, try first column
+                if (idIndex === -1 && cleanParts.length >= 2) {
+                    var firstMatch = cleanParts[0].match(/\d+/);
+                    if (firstMatch && firstMatch[0].length >= 4) {
+                        idIndex = 0;
+                        id = firstMatch[0];
+                    }
+                }
+                
+                // Find Name (not numeric, not status words)
+                var statusWords = ['SUPERVISOR', 'CASHIER', 'MANAGER', 'TRAINEE', 'SENIOR', 'STAFF', 'CLERK', 'CHIEF'];
+                for (var c2 = 0; c2 < cleanParts.length; c2++) {
+                    if (c2 === idIndex) continue;
+                    var val2 = cleanParts[c2];
+                    var isStatus = false;
+                    for (var s = 0; s < statusWords.length; s++) {
+                        if (val2.toUpperCase() === statusWords[s] || val2.toUpperCase().indexOf(statusWords[s]) >= 0) {
+                            isStatus = true;
+                            break;
+                        }
+                    }
+                    if (!isStatus && val2.length >= 2 && val2.match(/[A-Za-z]/)) {
+                        if (nameIndex === -1) {
+                            nameIndex = c2;
+                            name = val2;
+                        }
+                    }
+                }
+                
+                // If no name found, use second column
+                if (nameIndex === -1 && cleanParts.length >= 2) {
+                    var possibleName = cleanParts[1];
+                    if (possibleName.length >= 2 && possibleName.match(/[A-Za-z]/)) {
+                        nameIndex = 1;
+                        name = possibleName;
+                    }
+                }
+                
+                // Clean ID - pad to 6 digits
+                if (id) {
+                    while (id.length < 6) id = '0' + id;
+                    if (id.length > 6) id = id.slice(0, 6);
+                    if (name && name.length > 0) {
+                        // Clean name - remove extra status words
+                        for (var s2 = 0; s2 < statusWords.length; s2++) {
+                            name = name.replace(new RegExp('\\b' + statusWords[s2] + '\\b', 'gi'), '').trim();
+                        }
+                        name = name.replace(/\s+/g, ' ');
+                        if (name.length > 0) {
+                            map[id] = name;
+                        }
+                    }
+                }
+            }
+            
+            // Merge with existing staffMap
+            for (var key in map) {
+                if (map[key]) {
+                    staffMap[key] = map[key];
+                }
+            }
+            
+            var total = updateStaffMap();
+            return total;
+        }
+
+        // ============================================================
+        // METHOD 1: UPLOAD FILE (Excel/TXT)
+        // ============================================================
+
+        var cashierFileInput = getEl('cashierFileInput');
+        if (cashierFileInput) {
+            cashierFileInput.addEventListener('change', function(e) {
                 var file = this.files[0];
                 if (!file) return;
-                var status = getEl('cashierStatus');
-                if (status) { status.style.display = 'block';
-                    status.className = 'status-box info';
-                    status.textContent = '⏳ Reading ' + file.name + '...'; }
-                catJumpTo('uploadCashierBox');
-                updateCat('🐱 Menunggu...', '🐾 Membaca file cashier...', '😺', '📄 Upload Cashier Listing');
+                var status = getEl('cashierFileStatus');
+                if (status) {
+                    status.className = 'cashier-status-small info';
+                    status.textContent = '⏳ Reading ' + file.name + '...';
+                    status.style.display = 'block';
+                }
+                catJumpTo('uploadCashierMasterBox');
+                updateCat('🐱 Menunggu...', '🐾 Membaca file cashier...', '😺', '📋 Upload Cashier File');
                 var ext = file.name.split('.').pop().toLowerCase();
 
-                function processStaff(text) {
-                    var result = extractStaffExcel1(text);
-                    staffMap = result;
-                    var count = Object.keys(staffMap).length;
-                    var st = getEl('staffTotal');
-                    if (st) st.textContent = count;
-                    var sc = getEl('staffCount');
-                    if (sc) sc.style.display = 'block';
-                    var preview = getEl('staffPreview');
-                    if (preview && count > 0) {
-                        preview.style.display = 'block';
-                        var html = '<strong>👥 Staff (' + count + '):</strong><br>';
-                        var sorted = Object.keys(staffMap).sort();
-                        for (var i = 0; i < Math.min(sorted.length, 15); i++) {
-                            html += sorted[i] + ' → ' + staffMap[sorted[i]] + '<br>';
-                        }
-                        if (sorted.length > 15) html += '... and ' + (sorted.length - 15) + ' more';
-                        preview.innerHTML = html;
+                function processFile(text) {
+                    var total = processCashierData(text);
+                    if (status) {
+                        status.className = 'cashier-status-small success';
+                        status.textContent = '✅ Loaded ' + total + ' names from file!';
                     }
-                    if (status) { status.className = 'status-box success';
-                        status.textContent = '✅ Loaded ' + count + ' staff!'; }
-                    showSuccess('Cashier listing loaded: ' + count + ' staff');
+                    showSuccess('Cashier file loaded: ' + total + ' names');
                     catCatchFish();
-                    updateCat('😺', '🐾 Staff loaded! ' + count + ' staff', '😸', '📄 Cashier Listing ✅');
+                    updateCat('😺', '🐾 File loaded! ' + total + ' names', '😸', '📋 File ✅');
                     setTimeout(function() {
                         catJumpTo('btnProcessAll');
                         updateCat('🐱 Menunggu...', '🐾 Sedia untuk Process All!', '🐱', '🚀 Process All');
@@ -537,7 +691,7 @@
 
                 if (ext === 'txt' || ext === 'csv') {
                     var reader = new FileReader();
-                    reader.onload = function(ev) { processStaff(ev.target.result); };
+                    reader.onload = function(ev) { processFile(ev.target.result); };
                     reader.readAsText(file);
                 } else if (ext === 'xlsx' || ext === 'xls') {
                     var reader2 = new FileReader();
@@ -552,79 +706,69 @@
                                 var row = json[r];
                                 var line = '';
                                 for (var c = 0; c < row.length; c++) {
-                                    if (row[c]) line += row[c] + '\t';
+                                    if (row[c] !== undefined && row[c] !== null && row[c] !== '') {
+                                        line += row[c] + '\t';
+                                    }
                                 }
                                 if (line.trim()) lines.push(line.trim());
                             }
-                            processStaff(lines.join('\n'));
+                            processFile(lines.join('\n'));
                         } catch (err) {
-                            if (status) { status.className = 'status-box error';
-                                status.textContent = '❌ ' + err.message; }
+                            if (status) {
+                                status.className = 'cashier-status-small error';
+                                status.textContent = '❌ ' + err.message;
+                            }
                             showError('Error reading Excel: ' + err.message);
                         }
                     };
                     reader2.readAsArrayBuffer(file);
                 } else {
-                    if (status) { status.className = 'status-box error';
-                        status.textContent = '❌ Unsupported format. Use TXT or Excel.'; }
+                    if (status) {
+                        status.className = 'cashier-status-small error';
+                        status.textContent = '❌ Unsupported format. Use TXT or Excel.';
+                    }
                     showError('Unsupported format. Use TXT or Excel.');
                 }
             });
         }
 
         // ============================================================
-        // EXCEL1 EXTRACT STAFF
+        // METHOD 2: PASTE TEXT
         // ============================================================
 
-        function extractStaffExcel1(text) {
-            var result = {};
-            var statusList = ['SUPERVISOR', 'CASHIER', 'MANAGER', 'CHIEF_CSHR', 'TRAINEE', 'SENIOR', 'STAFF', 'CLERK'];
-            var lines = text.split('\n');
-            for (var i = 0; i < lines.length; i++) {
-                var line = lines[i].trim();
-                if (!line) continue;
-                if (line.match(/^Cashier ID|^CASHIER ID|^STAFF ID|^ID|^Name|^NAME/i)) continue;
-                var parts = line.split(/\t|\s{2,}/);
-                var cleanParts = [];
-                for (var p = 0; p < parts.length; p++) { if (parts[p].trim()) cleanParts.push(parts[p].trim()); }
-                if (cleanParts.length < 2) continue;
-                var id = cleanParts[0];
-                if (!id.match(/^\d{6}$/)) continue;
-                if (result[id]) continue;
-                var firstWord = cleanParts[1] || '';
-                if (firstWord.match(/^\d{1,2}\/\d{1,2}\/\d{2,4}$/)) continue;
-                if (firstWord.match(/^(Yes|No)$/i)) continue;
-                if (firstWord.match(/^\d+$/)) continue;
-                if (firstWord.toUpperCase() === 'CASHIER') continue;
-                if (firstWord.toUpperCase() === 'MANAGER') continue;
-                if (firstWord.toUpperCase() === 'SUPERVISOR') continue;
-                var foundStatus = null;
-                var statusIndex = -1;
-                var after = line.substring(id.length).trim();
-                for (var s = 0; s < statusList.length; s++) {
-                    var status = statusList[s];
-                    var pos = after.toUpperCase().indexOf(status);
-                    if (pos >= 0 && (statusIndex === -1 || pos < statusIndex)) { statusIndex = pos;
-                        foundStatus = status; }
+        function processCashierPaste() {
+            var pasteInput = getEl('cashierPasteInput');
+            if (!pasteInput || !pasteInput.value.trim()) {
+                var status = getEl('cashierPasteStatus');
+                if (status) {
+                    status.className = 'cashier-status-small error';
+                    status.textContent = '❌ Please paste some data first!';
+                    status.style.display = 'block';
                 }
-                if (foundStatus) {
-                    var namePart = after.substring(0, statusIndex).trim();
-                    namePart = namePart.replace(/\d{6}/g, '').trim();
-                    namePart = namePart.replace(/\d{1,2}\/\d{1,2}\/\d{2,4}/g, '').trim();
-                    namePart = namePart.replace(/\d{1,2}:\d{2}:\d{2}/g, '').trim();
-                    namePart = namePart.replace(/\b(Yes|No)\b/gi, '').trim();
-                    namePart = namePart.replace(/\s+/g, ' ');
-                    for (var s2 = 0; s2 < statusList.length; s2++) {
-                        namePart = namePart.replace(new RegExp('\\b' + statusList[s2] + '\\b', 'gi'), '').trim();
-                    }
-                    if (!namePart || namePart.toUpperCase() === 'CASHIER' || namePart.toUpperCase() === 'MANAGER' ||
-                        namePart.toUpperCase() === 'SUPERVISOR') continue;
-                    if (namePart && namePart.length > 0 && namePart.match(/[A-Za-z\.\'\""\(\)\-]/)) {
-                        result[id] = namePart;
-                    }
-                }
+                return;
             }
-            return result;
+            var status = getEl('cashierPasteStatus');
+            if (status) {
+                status.className = 'cashier-status-small info';
+                status.textContent = '⏳ Processing pasted data...';
+                status.style.display = 'block';
+            }
+            catJumpTo('uploadCashierMasterBox');
+            updateCat('🐱 Menunggu...', '🐾 Memproses paste data...', '😺', '📋 Processing Paste');
+            
+            var total = processCashierData(pasteInput.value);
+            
+            if (status) {
+                status.className = 'cashier-status-small success';
+                status.textContent = '✅ Loaded ' + total + ' names from paste!';
+            }
+            showSuccess('Cashier paste loaded: ' + total + ' names');
+            catCatchFish();
+            updateCat('😺', '🐾 Paste loaded! ' + total + ' names', '😸', '📋 Paste ✅');
+            setTimeout(function() {
+                catJumpTo('btnProcessAll');
+                updateCat('🐱 Menunggu...', '🐾 Sedia untuk Process All!', '🐱', '🚀 Process All');
+            }, 1500);
         }
 
         // ============================================================
@@ -660,9 +804,9 @@
                             catCatchFish();
                             updateCat('😺', '🐾 ' + files.length + ' files loaded!', '😸', '📁 Transaction ✅');
                             setTimeout(function() {
-                                catJumpTo('uploadCashierBox');
-                                updateCat('🐱 Menunggu...', '🐾 Upload Cashier Listing (optional)', '🐱',
-                                    '📄 Upload Cashier Listing');
+                                catJumpTo('uploadCashierMasterBox');
+                                updateCat('🐱 Menunggu...', '🐾 Upload Cashier Names (optional)', '🐱',
+                                    '📋 Cashier Names');
                             }, 1500);
                             if (Object.keys(staffMap).length > 0 && AUTO_MATCH) {
                                 setTimeout(function() {
@@ -1047,7 +1191,7 @@
         }
 
         // ============================================================
-        // EXPORT EXCEL - DENGAN HEADER & DATA BETUL
+        // EXPORT EXCEL
         // ============================================================
 
         function exportExcel() {
@@ -1057,16 +1201,11 @@
             if (Object.keys(staffMap).length > 0) matchStaffNames();
 
             try {
-                // ============================================================
-                // RULE: Exclude POS '001' dari semua sheet EXCEPT Raw Data
-                // ============================================================
                 var filteredData = allRawData.filter(function(d) { return d.pos !== '001'; });
 
                 var wb = XLSX.utils.book_new();
 
-                // ==========================================
                 // SHEET 1: Staff Dashboard
-                // ==========================================
                 var staffData = {};
                 for (var i = 0; i < filteredData.length; i++) {
                     var d = filteredData[i];
@@ -1106,9 +1245,7 @@
                 ws1['!cols'] = [{ wch: 6 }, { wch: 15 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws1, 'Staff Dashboard');
 
-                // ==========================================
                 // SHEET 2: SWAP Parkson
-                // ==========================================
                 var posData = {};
                 for (var i2 = 0; i2 < filteredData.length; i2++) {
                     var d4 = filteredData[i2];
@@ -1141,9 +1278,7 @@
                 ws2['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws2, 'SWAP Parkson');
 
-                // ==========================================
                 // SHEET 3: NOT SWAP
-                // ==========================================
                 var noSwapRows = [['RANK', 'POS', 'RANGE DATE', 'TOTAL (NOT SWAP PC)']];
                 var noSwapList = [];
                 for (var p2 = 0; p2 < posKeys.length; p2++) {
@@ -1164,9 +1299,7 @@
                 ws3['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws3, 'NOT SWAP Parkson');
 
-                // ==========================================
                 // SHEET 4: POS Tabulation
-                // ==========================================
                 var tabRows = [
                     ['RANK', 'POS', 'RANGE DATE', 'TOTAL', 'PARKSON', 'BONUSLINK', 'BOTH', '% PARKSON', '% BONUSLINK']
                 ];
@@ -1216,9 +1349,7 @@
                 ws4['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws4, 'POS Tabulation');
 
-                // ==========================================
-                // SHEET 5: Raw Data (INCLUDE SEMUA POS)
-                // ==========================================
+                // SHEET 5: Raw Data
                 var rawRows = [headers];
                 for (var r = 0; r < csvData.length; r++) {
                     rawRows.push(csvData[r]);
@@ -1231,9 +1362,7 @@
                 });
                 XLSX.utils.book_append_sheet(wb, ws5, 'Raw Data');
 
-                // ==========================================
                 // SHEET 6: POS by Cashier by Date
-                // ==========================================
                 var posCashierDate = {};
                 for (var i5 = 0; i5 < filteredData.length; i5++) {
                     var d8 = filteredData[i5];
@@ -1292,7 +1421,7 @@
 
                 var now = new Date();
                 var dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-                var filename = 'POS_Report_' + dateStr + '.xlsx';
+                var filename = 'Parkson_Card_Report_' + dateStr + '.xlsx';
 
                 XLSX.writeFile(wb, filename);
 
@@ -1341,8 +1470,10 @@
             ignoredLines = [];
             var fi = getEl('fileInput');
             if (fi) fi.value = '';
-            var ci = getEl('cashierInput');
-            if (ci) ci.value = '';
+            var cfi = getEl('cashierFileInput');
+            if (cfi) cfi.value = '';
+            var cpi = getEl('cashierPasteInput');
+            if (cpi) cpi.value = '';
             var pi = getEl('pasteInput');
             if (pi) pi.value = '';
             var pc = getEl('previewContainer');
@@ -1351,14 +1482,16 @@
             if (dc) dc.style.display = 'none';
             var stats = getEl('stats');
             if (stats) stats.style.display = 'none';
-            var sc = getEl('staffCount');
-            if (sc) sc.style.display = 'none';
-            var sp = getEl('staffPreview');
-            if (sp) sp.style.display = 'none';
-            var cs = getEl('cashierStatus');
-            if (cs) cs.style.display = 'none';
+            var preview = getEl('cashierMasterPreview');
+            if (preview) preview.style.display = 'none';
+            var count = getEl('cashierMasterCount');
+            if (count) count.style.display = 'none';
             var ts = getEl('transStatus');
             if (ts) ts.style.display = 'none';
+            var fs = getEl('cashierFileStatus');
+            if (fs) fs.style.display = 'none';
+            var ps = getEl('cashierPasteStatus');
+            if (ps) ps.style.display = 'none';
             var pg = getEl('progressContainer');
             if (pg) pg.style.display = 'none';
             var ii = getEl('ignoredInfo');
@@ -1376,7 +1509,9 @@
 
         updateCat('😺 Sedia!', '🐾 Upload transaction file dulu ya!', '🐱', '📁 Upload Transaction');
         console.log('🐱🏖️ PAW Extractor ready!');
-        console.log('📁 Upload transaction files + Cashier Listing (optional)');
+        console.log('📁 Upload transaction files + Cashier Names (2 methods)');
+        console.log('📤 Method 1: Upload Excel/TXT');
+        console.log('📝 Method 2: Paste Cashier ID & Name');
         console.log('🐱 Kucing akan melompat dan menangkap ikan!');
     </script>
 </body>
