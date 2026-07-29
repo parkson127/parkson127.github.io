@@ -204,7 +204,7 @@
                     <div class="cashier-method">
                         <span class="badge-method badge-paste">📝 PASTE</span>
                         <span class="method-label">Cashier ID &amp; Name</span>
-                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;Ahmad Bin Ali&#10;789012&#9;Siti Binti Hassan"></textarea>
+                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;NOREFY HAFSHAH&#10;789012&#9;NUR FATIHAH SABRINA"></textarea>
                         <button class="btn-primary btn-sm" onclick="processCashierPaste()" style="margin-top:3px;font-size:11px;padding:3px 10px;">✅ Load Names</button>
                         <div id="cashierPasteStatus" class="cashier-status-small"></div>
                     </div>
@@ -1421,7 +1421,7 @@
 
                 var now = new Date();
                 var dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-                var filename = 'POS_Report_' + dateStr + '.xlsx';
+                var filename = 'Parkson_Card_Report_' + dateStr + '.xlsx';
 
                 XLSX.writeFile(wb, filename);
 
