@@ -164,7 +164,7 @@
 <script>
 // ============ KONFIGURASI ============
 const API_URL = "https://script.google.com/macros/s/AKfycbxiIpcpm_flWk0wqPpXw1HSmGULOASWu5mbwSMPePx2MFTh7p4vc68dLVbjshRz47g0gw/exec"; // Ganti dengan URL Google Apps Script
-const USER_ID = "user"; // ID TETAP - tukar ikut suka
+const USER_ID = "user"; // ID TETAP
 
 // ============ ELEMEN ============
 const blackhole = document.getElementById('blackhole');
@@ -190,10 +190,50 @@ function showToast(msg, type = 'info') {
   toast._t = setTimeout(() => toast.classList.remove('show'), 4000);
 }
 
-// ============ API CALL ============
-async function callAPI(data) {
+// ============ API CALL (GUNA JSONP) ============
+function callAPI(data) {
+  return new Promise((resolve, reject) => {
+    const callbackName = 'jsonp_callback_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4);
+    
+    // Create script element
+    const script = document.createElement('script');
+    const params = new URLSearchParams();
+    params.append('callback', callbackName);
+    params.append('action', data.action);
+    params.append('userId', data.userId || USER_ID);
+    
+    // Untuk upload, kita kena encode data ke URL (hanya untuk data kecil)
+    // Untuk file besar, guna POST
+    if (data.action === 'upload') {
+      // Untuk upload, kita akan guna POST berasingan
+      // JSONP hanya untuk GET (list, status, delete)
+      reject(new Error('Upload must use POST method'));
+      return;
+    }
+    
+    if (data.fileId) params.append('fileId', data.fileId);
+    
+    // Define callback
+    window[callbackName] = function(response) {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      resolve(response);
+    };
+    
+    script.src = API_URL + '?' + params.toString();
+    script.onerror = function() {
+      delete window[callbackName];
+      document.body.removeChild(script);
+      reject(new Error('JSONP request failed'));
+    };
+    
+    document.body.appendChild(script);
+  });
+}
+
+// ============ API CALL (POST UNTUK UPLOAD) ============
+async function callAPIPost(data) {
   try {
-    // Hantar sebagai FormData untuk elak CORS
     const formData = new FormData();
     formData.append('payload', JSON.stringify(data));
     
@@ -202,24 +242,30 @@ async function callAPI(data) {
       body: formData
     });
     
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    // Google Apps Script kadang-kadang return text
+    const text = await response.text();
+    try {
+      return JSON.parse(text);
+    } catch (e) {
+      // Jika bukan JSON, cuba parse dari response
+      return { success: true, raw: text };
     }
     
-    return await response.json();
-    
   } catch (e) {
-    console.error('API Error:', e);
-    showToast('❌ Gagal berhubung: ' + e.message, 'error');
-    return { success: false, error: e.message };
+    console.error('POST Error:', e);
+    throw e;
   }
 }
 
-// ============ LOAD DATA ============
+// ============ LOAD DATA (GUNA JSONP) ============
 async function loadData() {
   try {
-    // Get status
-    const status = await callAPI({ action: 'getStatus', userId: USER_ID });
+    // Get status via JSONP
+    const status = await callAPI({ 
+      action: 'getStatus', 
+      userId: USER_ID 
+    });
+    
     if (status.success) {
       const used = status.used || 0;
       const max = status.max || 10 * 1024 * 1024 * 1024;
@@ -239,8 +285,12 @@ async function loadData() {
       }
     }
 
-    // Get files
-    const result = await callAPI({ action: 'list', userId: USER_ID });
+    // Get files via JSONP
+    const result = await callAPI({ 
+      action: 'list', 
+      userId: USER_ID 
+    });
+    
     if (result.success) {
       fileCount.textContent = (result.count || 0) + ' fail';
       renderFiles(result.files || []);
@@ -248,7 +298,7 @@ async function loadData() {
     
   } catch (e) {
     console.error('Load error:', e);
-    showToast('❌ Ralat memuat data', 'error');
+    showToast('❌ Ralat memuat data: ' + e.message, 'error');
   }
 }
 
@@ -273,7 +323,6 @@ function renderFiles(files) {
     if (days <= 3) expiryClass = 'urgent';
     else if (days <= 7) expiryClass = 'warning';
     
-    // Pilih icon berdasarkan extension
     const ext = file.name.split('.').pop().toLowerCase();
     if (['jpg','jpeg','png','gif','webp','svg'].includes(ext)) icon = '🖼️';
     else if (['mp4','avi','mov','mkv'].includes(ext)) icon = '🎬';
@@ -302,12 +351,20 @@ function renderFiles(files) {
       const id = this.dataset.id;
       if (!confirm('Padam fail ini?')) return;
       
-      const result = await callAPI({ action: 'delete', fileId: id, userId: USER_ID });
-      if (result.success) {
-        showToast('🗑️ Fail dipadam', 'success');
-        loadData();
-      } else {
-        showToast('❌ Gagal padam: ' + (result.error || 'unknown'), 'error');
+      try {
+        const result = await callAPI({ 
+          action: 'delete', 
+          fileId: id, 
+          userId: USER_ID 
+        });
+        if (result.success) {
+          showToast('🗑️ Fail dipadam', 'success');
+          loadData();
+        } else {
+          showToast('❌ Gagal padam: ' + (result.error || 'unknown'), 'error');
+        }
+      } catch (e) {
+        showToast('❌ Ralat: ' + e.message, 'error');
       }
     });
   });
@@ -342,14 +399,14 @@ async function uploadFiles(files) {
         content: base64
       };
       
-      const result = await callAPI(payload);
+      const result = await callAPIPost(payload);
       if (result.success) {
         successCount++;
+        showToast(`✅ ${file.name} ditelan!`, 'success');
       } else {
         showToast(`❌ ${file.name}: ${result.error}`, 'error');
       }
       
-      // Delay sikit untuk effect
       await new Promise(r => setTimeout(r, 300));
       
     } catch (e) {
@@ -389,7 +446,7 @@ refreshBtn.addEventListener('click', loadData);
 // ============ INIT ============
 loadData();
 
-console.log('🌌 Black Hole Storage V2');
+console.log('🌌 Black Hole Storage V2 - JSONP Version');
 console.log('👤 User ID:', USER_ID);
 console.log('🔗 API:', API_URL);
 </script>
