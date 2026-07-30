@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌌 Black Hole Storage V2</title>
+    
+    <style>
+        /* ===== RESET ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            min-height: 100vh;
+            background: #0a0a0a;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #fff;
+            overflow-x: hidden;
+        }
+        
+        /* ===== HEADER ===== */
+        .header {
+            background: linear-gradient(135deg, #1a0a2e, #0d0d0d);
+            padding: 20px;
+            border-bottom: 1px solid rgba(156, 39, 176, 0.3);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        
+        .header-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .logo h1 {
+            font-size: 24px;
+            background: linear-gradient(135deg, #9c27b0, #2196f3);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .user-id {
+            background: rgba(255,255,255,0.05);
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 13px;
+            color: #aaa;
+            font-family: monospace;
+        }
+        
+        .btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, #9c27b0, #6a1b9a);
+            color: white;
+        }
+        
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 20px rgba(156, 39, 176, 0.4); }
+        .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+        .btn-secondary { background: rgba(255,255,255,0.1); }
+        .btn-danger { background: linear-gradient(135deg, #f44336, #c62828); }
+        .btn-success { background: linear-gradient(135deg, #4caf50, #2e7d32); }
+        
+        /* ===== MAIN LAYOUT ===== */
+        .main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .main { grid-template-columns: 1fr; }
+        }
+        
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            background: rgba(20, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(156, 39, 176, 0.2);
+            height: fit-content;
+            position: sticky;
+            top: 100px;
+        }
+        
+        /* Black Hole */
+        .black-hole-wrapper {
+            position: relative;
+            cursor: pointer;
+            width: 200px;
+            height: 200px;
+            margin: 0 auto 20px;
+        }
+        
+        .black-hole {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: radial-gradient(circle at 35% 35%, 
+                #1a1a2e 0%, #0d0d0d 40%, #000000 60%,
+                #1a0a2e 75%, #2d1b69 85%, #4a1a7a 92%, #9c27b0 100%
+            );
+            box-shadow: 0 0 60px rgba(156, 39, 176, 0.3);
+            animation: pulse 3s ease-in-out infinite;
+            position: relative;
+            transition: transform 0.3s ease;
+        }
+        
+        .black-hole:hover { transform: scale(1.05); }
+        .black-hole:active { transform: scale(0.95); }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+        
+        .accretion-disk {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 40%;
+            transform: translate(-50%, -50%) rotateX(75deg);
+            border-radius: 50%;
+            background: radial-gradient(ellipse, 
+                rgba(156, 39, 176, 0.3) 0%,
+                rgba(33, 150, 243, 0.2) 40%,
+                transparent 70%
+            );
+            animation: spin 8s linear infinite;
+            pointer-events: none;
+        }
+        
+        @keyframes spin {
+            0% { transform: translate(-50%, -50%) rotateX(75deg) rotate(0deg); }
+            100% { transform: translate(-50%, -50%) rotateX(75deg) rotate(360deg); }
+        }
+        
+        /* Status Panel */
+        .status-panel {
+            margin-top: 20px;
+        }
+        
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            font-size: 13px;
+        }
+        
+        .status-label { color: #888; }
+        .status-value { font-weight: 500; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 10px 0;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #9c27b0, #2196f3);
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+        
+        .indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            border-radius: 10px;
+            background: rgba(0,0,0,0.3);
+            margin-top: 10px;
+        }
+        
+        .dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            animation: pulse-dot 2s ease-in-out infinite;
+        }
+        .dot.green { background: #4caf50; }
+        .dot.yellow { background: #ffeb3b; }
+        .dot.red { background: #f44336; }
+        
+        @keyframes pulse-dot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+        
+        /* ===== MAIN CONTENT ===== */
+        .content {
+            background: rgba(20, 20, 40, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(156, 39, 176, 0.2);
+        }
+        
+        .content-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: #aaa;
+        }
+        
+        .breadcrumb span { color: #fff; cursor: pointer; }
+        .breadcrumb span:hover { color: #9c27b0; }
+        
+        .actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        /* File Grid */
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .file-item {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(255,255,255,0.05);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .file-item:hover {
+            background: rgba(255,255,255,0.08);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .file-icon { font-size: 40px; margin-bottom: 8px; }
+        .file-name { font-size: 13px; color: #ddd; word-break: break-all; }
+        .file-size { font-size: 11px; color: #888; }
+        .file-expiry { font-size: 11px; color: #ff9800; margin-top: 5px; }
+        .file-expiry.urgent { color: #f44336; }
+        
+        .file-delete-btn {
+            position: absolute;
+            top: 5px;
+            right: 5px;
+            background: none;
+            border: none;
+            color: #666;
+            cursor: pointer;
+            font-size: 14px;
+            padding: 4px 8px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+        
+        .file-delete-btn:hover {
+            color: #f44336;
+            background: rgba(244, 67, 54, 0.1);
+        }
+        
+        /* Folder Item */
+        .folder-item {
+            background: rgba(33, 150, 243, 0.05);
+            border-color: rgba(33, 150, 243, 0.2);
+        }
+        
+        .folder-item .file-icon { color: #2196f3; }
+        
+        /* ===== MODAL ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            backdrop-filter: blur(5px);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal.active { display: flex; }
+        
+        .modal-content {
+            background: #1a1a2e;
+            border-radius: 20px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .modal-title {
+            font-size: 20px;
+            margin-bottom: 20px;
+            color: #fff;
+        }
+        
+        .modal input, .modal select {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.3);
+            color: #fff;
+            font-size: 14px;
+            margin-bottom: 15px;
+        }
+        
+        .modal input:focus, .modal select:focus {
+            outline: none;
+            border-color: #9c27b0;
+        }
+        
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+        
+        /* ===== TOAST ===== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: rgba(20,20,40,0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 15px;
+            padding: 15px 30px;
+            z-index: 2000;
+            opacity: 0;
+            transition: all 0.5s ease;
+            border: 1px solid rgba(156, 39, 176, 0.3);
+            max-width: 90%;
+            text-align: center;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast.success { border-color: #4caf50; }
+        .toast.error { border-color: #f44336; }
+        .toast.warning { border-color: #ff9800; }
+        
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-state .icon { font-size: 80px; margin-bottom: 20px; }
+        .empty-state h3 { color: #aaa; margin-bottom: 10px; }
+        
+        /* ===== UPLOAD OVERLAY ===== */
+        .upload-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(5px);
+            z-index: 1500;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .upload-overlay.active { display: flex; }
+        
+        .upload-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(156,39,176,0.2);
+            border-top: 4px solid #9c27b0;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        .upload-text { font-size: 18px; color: white; }
+        
+        /* ===== SCROLLBAR ===== */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(255,255,255,0.05); }
+        ::-webkit-scrollbar-thumb { background: rgba(156,39,176,0.5); border-radius: 10px; }
+    </style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+    <div class="header-content">
+        <div class="logo">
+            <span style="font-size:28px;">🌌</span>
+            <h1>Black Hole Storage</h1>
+            <span style="font-size:12px; color:#888; background:rgba(255,255,255,0.05); padding:2px 10px; border-radius:10px;">V2</span>
+        </div>
+        <div class="user-section">
+            <span class="user-id" id="userIdDisplay">👤 user_...</span>
+            <button class="btn btn-secondary" onclick="regenerateUserId()">🔄 New ID</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== MAIN ===== -->
+<div class="main">
+    <!-- Sidebar -->
+    <div class="sidebar">
+        <div class="black-hole-wrapper" id="blackHoleWrapper">
+            <div class="black-hole" id="blackHole">
+                <div class="accretion-disk"></div>
+            </div>
+        </div>
+        
+        <div style="text-align:center; font-size:13px; color:#888; margin-bottom:15px;">
+            Click to upload 📤<br>
+            or drag & drop
+        </div>
+        
+        <div class="status-panel">
+            <div class="status-item">
+                <span class="status-label">📦 Storage Used</span>
+                <span class="status-value" id="storageUsed">0 GB / 10 GB</span>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill" style="width:0%"></div>
+            </div>
+            
+            <div class="status-item">
+                <span class="status-label">📁 Files</span>
+                <span class="status-value" id="fileCount">0</span>
+            </div>
+            <div class="status-item">
+                <span class="status-label">⏳ Auto Delete</span>
+                <span class="status-value" id="autoDeleteDays">15 days</span>
+            </div>
+            
+            <div class="indicator">
+                <span class="dot green" id="statusDot"></span>
+                <span id="statusText">Available</span>
+                <span style="margin-left:auto; font-size:12px; color:#888;" id="expiryWarning"></span>
+            </div>
+            
+            <div style="margin-top:15px; display:flex; gap:8px; flex-wrap:wrap;">
+                <button class="btn btn-secondary" onclick="createFolder()" style="flex:1;">📁 New Folder</button>
+                <button class="btn btn-secondary" onclick="loadFiles()" style="flex:0.5;">🔄</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="content">
+        <div class="content-header">
+            <div class="breadcrumb" id="breadcrumb">
+                <span onclick="navigateTo('/')">🏠 Root</span>
+            </div>
+            <div class="actions">
+                <button class="btn btn-secondary" onclick="showExpiryInfo()">⏳ Expiry Info</button>
+                <button class="btn" onclick="document.getElementById('fileInput').click()">📤 Upload</button>
+            </div>
+        </div>
+        
+        <input type="file" id="fileInput" multiple style="display:none">
+        
+        <div id="fileGrid" class="file-grid">
+            <!-- Files will be rendered here -->
+        </div>
+    </div>
+</div>
+
+<!-- ===== MODALS ===== -->
+<!-- Create Folder Modal -->
+<div class="modal" id="folderModal">
+    <div class="modal-content">
+        <h3 class="modal-title">📁 Create New Folder</h3>
+        <input type="text" id="folderNameInput" placeholder="Folder name..." />
+        <div class="modal-actions">
+            <button class="btn btn-secondary" onclick="closeModal('folderModal')">Cancel</button>
+            <button class="btn" onclick="confirmCreateFolder()">Create</button>
+        </div>
+    </div>
+</div>
+
+<!-- Expiry Info Modal -->
+<div class="modal" id="expiryModal">
+    <div class="modal-content">
+        <h3 class="modal-title">⏳ Auto Delete Information</h3>
+        <div id="expiryContent">
+            <p style="color:#aaa; margin-bottom:15px;">
+                Files will be automatically deleted after <strong id="expiryDaysDisplay">15</strong> days.
+            </p>
+            <div id="expiringFilesList"></div>
+        </div>
+        <div class="modal-actions">
+            <button class="btn" onclick="closeModal('expiryModal')">Close</button>
+        </div>
+    </div>
+</div>
+
+<!-- ===== TOAST ===== -->
+<div class="toast" id="toast"></div>
+
+<!-- ===== UPLOAD OVERLAY ===== -->
+<div class="upload-overlay" id="uploadOverlay">
+    <div class="upload-spinner"></div>
+    <div class="upload-text" id="uploadText">🌌 Swallowing file...</div>
+</div>
+
+<!-- ===== JAVASCRIPT ===== -->
+<script>
+// ============ KONFIGURASI ============
+const API_URL = "https://script.google.com/macros/s/AKfycbyQUf7ddc4Dx8jJb9tDcUvVUURtLM-9FK2MLFMQvNeS-FCDtl0ZNv5tVzbWvaChOg_OGA/exec"; // Ganti dengan URL Google Apps Script anda
+const MAX_STORAGE = 10 * 1024 * 1024 * 1024; // 10 GB
+
+// ============ STATE ============
+let userId = localStorage.getItem('blackhole_userId') || generateUserId();
+let currentPath = '/';
+let currentFiles = [];
+let currentFolders = [];
+let statusData = null;
+
+// ============ FUNGSI UTILITY ============
+function generateUserId() {
+    const id = 'user_' + Math.random().toString(36).substr(2, 9);
+    localStorage.setItem('blackhole_userId', id);
+    return id;
+}
+
+function regenerateUserId() {
+    userId = generateUserId();
+    document.getElementById('userIdDisplay').textContent = '👤 ' + userId;
+    showToast('🔄 New user ID generated!', 'success');
+    loadFiles();
+}
+
+function formatBytes(bytes) {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+    if (bytes < 1073741824) return (bytes / 1048576).toFixed(1) + ' MB';
+    return (bytes / 1073741824).toFixed(2) + ' GB';
+}
+
+function getFileIcon(filename) {
+    const ext = filename.split('.').pop().toLowerCase();
+    const icons = {
+        'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️', 'svg': '🖼️',
+        'pdf': '📄', 'doc': '📝', 'docx': '📝', 'xls': '📊', 'xlsx': '📊',
+        'mp3': '🎵', 'wav': '🎵', 'mp4': '🎬', 'avi': '🎬', 'mov': '🎬',
+        'zip': '📦', 'rar': '📦', '7z': '📦', 'txt': '📃'
+    };
+    return icons[ext] || '📎';
+}
+
+// ============ TOAST ============
+function showToast(message, type = 'info') {
+    const toast = document.getElementById('toast');
+    toast.textContent = message;
+    toast.className = 'toast show ' + type;
+    clearTimeout(toast._timeout);
+    toast._timeout = setTimeout(() => toast.classList.remove('show'), 4000);
+}
+
+// ============ MODAL ============
+function openModal(id) {
+    document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+    document.getElementById(id).classList.remove('active');
+}
+
+// ============ API CALLS ============
+async function callAPI(data) {
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        });
+        return { success: true };
+    } catch (error) {
+        console.error('API Error:', error);
+        return { success: false, error: error.message };
+    }
+}
+
+// ============ LOAD STATUS ============
+async function loadStatus() {
+    const result = await callAPI({
+        action: 'getStatus',
+        userId: userId
+    });
+    
+    // Simulate status (since no-cors can't read response)
+    // In production, use proper CORS or JSONP
+    const used = parseInt(localStorage.getItem('blackhole_used_' + userId) || '0');
+    const count = parseInt(localStorage.getItem('blackhole_count_' + userId) || '0');
+    
+    const percent = (used / MAX_STORAGE) * 100;
+    const isFull = used >= MAX_STORAGE;
+    
+    document.getElementById('storageUsed').textContent = 
+        `${formatBytes(used)} / ${formatBytes(MAX_STORAGE)}`;
+    document.getElementById('progressFill').style.width = Math.min(percent, 100) + '%';
+    document.getElementById('fileCount').textContent = count;
+    document.getElementById('autoDeleteDays').textContent = '15 days';
+    document.getElementById('userIdDisplay').textContent = '👤 ' + userId;
+    
+    const dot = document.getElementById('statusDot');
+    const text = document.getElementById('statusText');
+    const warning = document.getElementById('expiryWarning');
+    
+    if (isFull) {
+        dot.className = 'dot red';
+        text.textContent = '🚫 Full';
+        warning.textContent = '⚠️ Storage full!';
+    } else if (percent > 80) {
+        dot.className = 'dot yellow';
+        text.textContent = '⚠️ Almost Full';
+        warning.textContent = `${Math.round(100 - percent)}% remaining`;
+    } else {
+        dot.className = 'dot green';
+        text.textContent = '✅ Available';
+        warning.textContent = `${Math.round(100 - percent)}% free`;
+    }
+    
+    statusData = { used, max: MAX_STORAGE, percent, isFull, count };
+}
+
+// ============ LOAD FILES ============
+async function loadFiles(path = currentPath) {
+    currentPath = path;
+    
+    // Simulate file loading with localStorage
+    const key = 'blackhole_files_' + userId + '_' + (path || '/');
+    let data = JSON.parse(localStorage.getItem(key) || '{"files":[],"folders":[]}');
+    
+    // Generate some demo files if empty
+    if (data.files.length === 0 && data.folders.length === 0) {
+        const demos = [
+            { name: 'Welcome.txt', size: 1024 },
+            { name: 'Photo.jpg', size: 2 * 1024 * 1024 },
+            { name: 'Document.pdf', size: 512 * 1024 }
+        ];
+        data.files = demos.map(f => ({
+            ...f,
+            id: 'file_' + Math.random().toString(36).substr(2, 6),
+            date: new Date().toISOString(),
+            expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+            daysLeft: 15
+        }));
+        localStorage.setItem(key, JSON.stringify(data));
+    }
+    
+    currentFiles = data.files || [];
+    currentFolders = data.folders || [];
+    
+    renderFiles();
+    updateBreadcrumb();
+    
+    // Update count
+    const total = currentFiles.length + currentFolders.length;
+    localStorage.setItem('blackhole_count_' + userId, total.toString());
+}
+
+// ============ RENDER FILES ============
+function renderFiles() {
+    const grid = document.getElementById('fileGrid');
+    
+    if (currentFolders.length === 0 && currentFiles.length === 0) {
+        grid.innerHTML = `
+            <div class="empty-state" style="grid-column:1/-1;">
+                <div class="icon">🌌</div>
+                <h3>Empty Space</h3>
+                <p style="color:#666;">Drop files here or click the black hole</p>
+            </div>
+        `;
+        return;
+    }
+    
+    let html = '';
+    
+    // Folders first
+    currentFolders.forEach(folder => {
+        html += `
+            <div class="file-item folder-item" onclick="navigateTo('${folder.name}')">
+                <div class="file-icon">📁</div>
+                <div class="file-name">${folder.name}</div>
+                <div style="font-size:11px; color:#888;">Folder</div>
+                <button class="file-delete-btn" onclick="event.stopPropagation(); deleteFolder('${folder.name}')">✕</button>
+            </div>
+        `;
+    });
+    
+    // Files
+    currentFiles.forEach(file => {
+        const daysLeft = file.daysLeft || 0;
+        const expiryClass = daysLeft <= 3 ? 'file-expiry urgent' : 'file-expiry';
+        const icon = getFileIcon(file.name);
+        
+        html += `
+            <div class="file-item">
+                <div class="file-icon">${icon}</div>
+                <div class="file-name">${file.name}</div>
+                <div class="file-size">${formatBytes(file.size)}</div>
+                <div class="${expiryClass}">⏳ ${daysLeft} days left</div>
+                <button class="file-delete-btn" onclick="deleteFile('${file.id}')">✕</button>
+            </div>
+        `;
+    });
+    
+    grid.innerHTML = html;
+}
+
+// ============ BREADCRUMB ============
+function updateBreadcrumb() {
+    const breadcrumb = document.getElementById('breadcrumb');
+    const parts = currentPath.split('/').filter(p => p);
+    let html = `<span onclick="navigateTo('/')">🏠 Root</span>`;
+    let path = '';
+    
+    parts.forEach((part, index) => {
+        path += '/' + part;
+        if (index === parts.length - 1) {
+            html += ` / <span style="color:#9c27b0;">${part}</span>`;
+        } else {
+            html += ` / <span onclick="navigateTo('${path}')">${part}</span>`;
+        }
+    });
+    
+    breadcrumb.innerHTML = html;
+}
+
+// ============ NAVIGATION ============
+function navigateTo(path) {
+    if (path === '/') {
+        currentPath = '/';
+    } else if (path.startsWith('/')) {
+        currentPath = path;
+    } else {
+        currentPath = currentPath === '/' ? '/' + path : currentPath + '/' + path;
+    }
+    loadFiles(currentPath);
+}
+
+// ============ UPLOAD ============
+async function handleUpload(files) {
+    if (!files || files.length === 0) return;
+    
+    const overlay = document.getElementById('uploadOverlay');
+    const text = document.getElementById('uploadText');
+    overlay.classList.add('active');
+    
+    for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        text.textContent = `🌌 Swallowing ${file.name}... (${i+1}/${files.length})`;
+        
+        // Simulate upload
+        await new Promise(r => setTimeout(r, 1500));
+        
+        // Save to localStorage
+        const key = 'blackhole_files_' + userId + '_' + (currentPath || '/');
+        let data = JSON.parse(localStorage.getItem(key) || '{"files":[],"folders":[]}');
+        
+        data.files.push({
+            id: 'file_' + Math.random().toString(36).substr(2, 6),
+            name: file.name,
+            size: file.size,
+            date: new Date().toISOString(),
+            expiryDate: new Date(Date.now() + 15 * 24 * 60 * 60 * 1000).toISOString(),
+            daysLeft: 15
+        });
+        
+        localStorage.setItem(key, JSON.stringify(data));
+        
+        // Update storage usage
+        const used = parseInt(localStorage.getItem('blackhole_used_' + userId) || '0');
+        localStorage.setItem('blackhole_used_' + userId, (used + file.size).toString());
+    }
+    
+    overlay.classList.remove('active');
+    showToast(`✅ ${files.length} file(s) swallowed!`, 'success');
+    await loadStatus();
+    await loadFiles(currentPath);
+}
+
+// ============ CREATE FOLDER ============
+function createFolder() {
+    document.getElementById('folderNameInput').value = '';
+    openModal('folderModal');
+}
+
+function confirmCreateFolder() {
+    const name = document.getElementById('folderNameInput').value.trim();
+    if (!name) {
+        showToast('❌ Please enter a folder name', 'error');
+        return;
+    }
+    
+    const key = 'blackhole_files_' + userId + '_' + (currentPath || '/');
+    let data = JSON.parse(localStorage.getItem(key) || '{"files":[],"folders":[]}');
+    
+    if (data.folders.some(f => f.name === name)) {
+        showToast('❌ Folder already exists', 'error');
+        return;
+    }
+    
+    data.folders.push({ name: name });
+    localStorage.setItem(key, JSON.stringify(data));
+    
+    closeModal('folderModal');
+    showToast(`📁 Folder "${name}" created!`, 'success');
+    loadFiles(currentPath);
+}
+
+// ============ DELETE FOLDER ============
+function deleteFolder(name) {
+    if (!confirm(`Delete folder "${name}" and all its contents?`)) return;
+    
+    const key = 'blackhole_files_' + userId + '_' + (currentPath || '/');
+    let data = JSON.parse(localStorage.getItem(key) || '{"files":[],"folders":[]}');
+    data.folders = data.folders.filter(f => f.name !== name);
+    localStorage.setItem(key, JSON.stringify(data));
+    
+    showToast(`🗑️ Folder "${name}" deleted`, 'success');
+    loadFiles(currentPath);
+}
+
+// ============ DELETE FILE ============
+function deleteFile(fileId) {
+    if (!confirm('Delete this file?')) return;
+    
+    const key = 'blackhole_files_' + userId + '_' + (currentPath || '/');
+    let data = JSON.parse(localStorage.getItem(key) || '{"files":[],"folders":[]}');
+    const file = data.files.find(f => f.id === fileId);
+    if (file) {
+        const used = parseInt(localStorage.getItem('blackhole_used_' + userId) || '0');
+        localStorage.setItem('blackhole_used_' + userId, Math.max(0, used - file.size).toString());
+    }
+    data.files = data.files.filter(f => f.id !== fileId);
+    localStorage.setItem(key, JSON.stringify(data));
+    
+    showToast('🗑️ File deleted', 'success');
+    loadStatus();
+    loadFiles(currentPath);
+}
+
+// ============ EXPIRY INFO ============
+function showExpiryInfo() {
+    const modal = document.getElementById('expiryModal');
+    const content = document.getElementById('expiringFilesList');
+    
+    // Collect all files from all folders
+    let allFiles = [];
+    // This is simplified - in real implementation, you'd scan all folders
+    // For demo, we'll show sample data
+    
+    document.getElementById('expiryDaysDisplay').textContent = '15';
+    content.innerHTML = `
+        <div style="background:rgba(255,255,255,0.03); padding:15px; border-radius:10px; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; font-size:13px; color:#888; margin-bottom:8px;">
+                <span>📄 All files will be deleted after 15 days</span>
+                <span>⏳ ${new Date(Date.now() + 15*24*60*60*1000).toLocaleDateString()}</span>
+            </div>
+            <div style="color:#ff9800; font-size:12px;">
+                ⚠️ ${currentFiles.length} file(s) in current folder
+            </div>
+        </div>
+        <div style="color:#666; font-size:12px; margin-top:10px;">
+            Files older than 15 days are automatically removed from the black hole.
+        </div>
+    `;
+    
+    openModal('expiryModal');
+}
+
+// ============ DRAG & DROP ============
+document.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    document.getElementById('blackHole').style.transform = 'scale(1.1)';
+});
+
+document.addEventListener('dragleave', (e) => {
+    e.preventDefault();
+    document.getElementById('blackHole').style.transform = 'scale(1)';
+});
+
+document.addEventListener('drop', async (e) => {
+    e.preventDefault();
+    document.getElementById('blackHole').style.transform = 'scale(1)';
+    
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+        await handleUpload(files);
+    }
+});
+
+// ============ EVENT LISTENERS ============
+document.getElementById('blackHole').addEventListener('click', () => {
+    document.getElementById('fileInput').click();
+});
+
+document.getElementById('fileInput').addEventListener('change', async function() {
+    if (this.files.length > 0) {
+        await handleUpload(this.files);
+        this.value = '';
+    }
+});
+
+// ============ INIT ============
+document.getElementById('userIdDisplay').textContent = '👤 ' + userId;
+loadStatus();
+loadFiles();
+
+// Auto refresh every 30 seconds
+setInterval(() => {
+    loadStatus();
+    loadFiles(currentPath);
+}, 30000);
+
+console.log('🌌 Black Hole Storage V2 loaded!');
+console.log('👤 User ID:', userId);
+console.log('📁 Features: Folders, Auto Delete (15 days), Open Access');
+</script>
+
+</body>
+</html>
