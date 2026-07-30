@@ -483,6 +483,10 @@ loadData();
 
 console.log('🌌 Black Hole Storage V2 - With Download');
 console.log('👤 User ID:', USER_ID);
+  // Auto refresh every 10 seconds
+setInterval(() => {
+    loadData();
+}, 10000); // 10,000 ms = 10 saat
 </script>
 </body>
 </html>
