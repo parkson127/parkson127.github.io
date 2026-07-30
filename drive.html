@@ -421,7 +421,7 @@ fileInput.addEventListener('change', function() {
 });
 
 // Drag & Drop
-document.addEventListener('dragover', e => e.preventDefault());
+document.addEventListener('dragover', e => e.preventDefault()); 
 document.addEventListener('drop', async e => {
   e.preventDefault();
   if (e.dataTransfer.files.length) {
