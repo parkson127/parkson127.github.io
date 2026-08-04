@@ -1,143 +1,1127 @@
 <!DOCTYPE html>
 <html lang="ms">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>🐱 PAW Extractor</title>
     <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js">
     </script>
     <style>
         /* ===== RESET & BASE ===== */
-        *{box-sizing:border-box;margin:0;padding:0}
-        body{font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;max-width:1200px;margin:0 auto;padding:15px;background:linear-gradient(135deg,#fdf6e3 0%,#f5e6ca 50%,#e8f5e9 100%);min-height:100vh;position:relative;overflow-x:hidden}
-        
-        .paw-bg{position:fixed;font-size:28px;opacity:.08;pointer-events:none;z-index:0;animation:floatPaw 20s infinite linear}
-        @keyframes floatPaw{0%{transform:translateY(100vh) rotate(0deg) scale(.5);opacity:.05}50%{opacity:.12}100%{transform:translateY(-10vh) rotate(360deg) scale(1);opacity:0}}
-        .paw-bg:nth-child(1){left:5%;animation-duration:22s}.paw-bg:nth-child(2){left:20%;animation-duration:18s;animation-delay:3s}.paw-bg:nth-child(3){left:40%;animation-duration:25s;animation-delay:5s}.paw-bg:nth-child(4){left:60%;animation-duration:16s;animation-delay:8s}.paw-bg:nth-child(5){left:80%;animation-duration:21s;animation-delay:2s}.paw-bg:nth-child(6){left:90%;animation-duration:19s;animation-delay:10s}
-        
-        .container{background:rgba(255,255,255,.92);backdrop-filter:blur(8px);padding:20px;border-radius:16px;box-shadow:0 8px 32px rgba(0,0,0,.12);position:relative;z-index:1;border:2px solid rgba(255,183,77,.3)}
-        
-        .cat-header{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:10px}
-        .cat-icon{font-size:40px;animation:bounceCat 2.5s infinite ease-in-out;cursor:pointer;display:inline-block}
-        @keyframes bounceCat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
-        .cat-header h1{color:#d35400;border-bottom:none;padding-bottom:0;font-size:1.6rem;text-shadow:2px 2px 0 #f39c12;flex:1}
-        .cat-header .sub{font-size:0.8rem;color:#7f6000;opacity:0.7;font-style:italic}
-        
-        .cat-container{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding:10px;background:rgba(255,183,77,.15);border-radius:12px;border:2px dashed rgba(255,183,77,.3);min-height:80px;position:relative;overflow:hidden;flex-wrap:wrap;gap:10px}
-        .cat-container .cat-left{font-size:50px;transition:all .8s cubic-bezier(.34,1.56,.64,1);display:inline-block;cursor:pointer;position:relative;animation:catIdle 2s infinite ease-in-out;text-align:center}
-        .cat-container .cat-left .action-text{font-size:12px;color:#d35400;font-weight:700;display:block;text-align:center;margin-top:2px}
-        .cat-container .cat-left .fish{font-size:22px;display:inline-block;animation:fishSwim 1.5s infinite ease-in-out;position:absolute;right:-30px;top:10px}
-        @keyframes fishSwim{0%,100%{transform:translateX(0) rotate(0)}50%{transform:translateX(10px) rotate(-5deg)}}
-        @keyframes catIdle{0%,100%{transform:translateY(0) rotate(0)}50%{transform:translateY(-5px) rotate(-2deg)}}
-        @keyframes catJump{0%{transform:translateY(0) scale(1)}30%{transform:translateY(-40px) scale(1.1) rotate(-5deg)}60%{transform:translateY(-40px) scale(1.1) rotate(5deg)}100%{transform:translateY(0) scale(1)}}
-        @keyframes catCatch{0%{transform:scale(1)}25%{transform:scale(1.2) rotate(-10deg)}50%{transform:scale(1.3) rotate(10deg)}75%{transform:scale(1.2) rotate(-5deg)}100%{transform:scale(1) rotate(0)}}
-        @keyframes catDance{0%,100%{transform:rotate(0) scale(1)}25%{transform:rotate(-10deg) scale(1.1)}75%{transform:rotate(10deg) scale(1.1)}}
-        @keyframes fishCatch{0%{transform:translateX(0) scale(1);opacity:1}50%{transform:translateX(50px) scale(1.5);opacity:1}100%{transform:translateX(100px) scale(.5);opacity:0}}
-        
-        .cat-jump{animation:catJump .8s ease-in-out !important}
-        .cat-catch{animation:catCatch .6s ease-in-out !important}
-        .cat-dance{animation:catDance .8s ease-in-out !important}
-        .cat-fish-catch{animation:fishCatch .8s ease-in-out forwards !important}
-        
-        .cat-container .cat-status{font-size:13px;color:#7f6000;font-weight:700;background:#fff3cd;padding:4px 14px;border-radius:20px;border:2px solid #f39c12;animation:pulseStatus 1.5s infinite}
-        @keyframes pulseStatus{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.7;transform:scale(.97)}}
-        .cat-container .cat-right{font-size:14px;color:#7f6000;text-align:right;line-height:1.4;min-width:150px}
-        .cat-container .cat-right .highlight{color:#d35400;font-weight:700}
-        .cat-container .progress-cat{flex:1;margin:0 15px;min-width:120px}
-        .cat-container .progress-cat .mini-bar{height:6px;background:#e9ecef;border-radius:6px;overflow:hidden;margin-top:4px}
-        .cat-container .progress-cat .mini-bar .mini-fill{height:100%;background:linear-gradient(90deg,#f39c12,#e67e22);border-radius:6px;transition:width .5s;width:0%}
-        .cat-container .progress-cat .mini-label{font-size:11px;color:#666}
-        
-        .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:10px 0}
-        .upload-box{border:2px dashed #007bff;padding:15px;border-radius:8px;text-align:center;background:#f8f9fa;transition:all .3s;position:relative}
-        .upload-box:hover{background:#e3f2fd;border-color:#0056b3}
-        .upload-box.optional{border-color:#28a745}.upload-box.optional:hover{background:#d4edda}
-        .upload-box .upload-cat-indicator{font-size:28px;display:block;margin-bottom:3px;animation:catIdle 2s infinite ease-in-out}
-        .upload-box.active-cat{border-color:#f39c12;background:#fff8f0;box-shadow:0 0 20px rgba(243,156,18,.2)}
-        .upload-box label{font-weight:700;display:block;margin-bottom:5px;font-size:14px}
-        .upload-box .hint{font-size:11px;color:#666}
-        .upload-box input[type=file]{padding:6px;font-size:12px;width:100%}
-        
-        .badge{display:inline-block;padding:2px 10px;border-radius:12px;font-size:10px;font-weight:700}
-        .badge-required{background:#dc3545;color:#fff}
-        .badge-optional{background:#28a745;color:#fff}
-        .badge-txt{background:#17a2b8;color:#fff}
-        .badge-excel{background:#217346;color:#fff}
-        
-        .flex{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0}
-        button{padding:8px 20px;border:none;border-radius:6px;cursor:pointer;font-size:14px;font-weight:700;transition:all .3s;position:relative}
-        button:hover{transform:scale(1.03)}
-        .btn-primary{background:#007bff;color:#fff}.btn-primary:hover{background:#0056b3}
-        .btn-excel{background:#217346;color:#fff}.btn-excel:hover{background:#1a5c38}
-        .btn-info{background:#17a2b8;color:#fff}.btn-info:hover{background:#138496}
-        .btn-danger{background:#dc3545;color:#fff}.btn-danger:hover{background:#b02a37}
-        .btn-warning{background:#ffc107;color:#333}.btn-warning:hover{background:#e0a800}
-        .btn-sm{padding:4px 12px;font-size:12px}
-        .btn .btn-icon{display:inline-block;margin-right:5px}
-        
-        .status-box{padding:8px 12px;border-radius:6px;font-size:13px;display:none;margin:5px 0}
-        .status-box.success{background:#d4edda;color:#155724;border-left:4px solid #28a745}
-        .status-box.info{background:#cce5ff;color:#004085;border-left:4px solid #007bff}
-        .status-box.error{background:#f8d7da;color:#721c24;border-left:4px solid #dc3545}
-        .status-box.warning{background:#fff3cd;color:#856404;border-left:4px solid #ffc107}
-        
-        .staff-preview{display:none;margin-top:8px;max-height:150px;overflow:auto;border:1px solid #ddd;border-radius:6px;padding:8px;font-size:11px;background:#fafafa}
-        .preview{margin-top:15px;overflow:auto;max-height:400px;border:2px solid #ddd;border-radius:8px;display:none}
-        table{width:100%;border-collapse:collapse;font-size:11px}
-        th{background:#007bff;color:#fff;position:sticky;top:0;z-index:10;padding:6px;text-align:left;font-weight:700}
-        td{padding:4px 6px;border-bottom:1px solid #eee;white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis}
-        tr:nth-child(even){background:#f9f9f9}tr:hover{background:#e3f2fd}
-        
-        .stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:8px;padding:10px;background:#e9ecef;border-radius:8px;margin:8px 0;font-size:13px}
-        .stats .stat-item{text-align:center}
-        .stats .stat-item .num{font-size:20px;font-weight:700;color:#007bff}
-        .stats .stat-item .label{font-size:11px;color:#666}
-        
-        .progress-container{display:none;margin:10px 0}
-        .progress-bar{height:22px;background:#e9ecef;border-radius:12px;overflow:hidden;position:relative}
-        .progress-bar .fill{height:100%;background:linear-gradient(90deg,#f39c12,#e67e22);border-radius:12px;transition:width .3s;width:0%;text-align:center;color:#fff;font-size:12px;line-height:22px;font-weight:700}
-        .progress-text{display:flex;justify-content:space-between;font-size:12px;color:#666;margin-top:3px}
-        
-        .advanced-toggle{cursor:pointer;color:#007bff;font-size:13px;user-select:none}
-        .advanced-toggle:hover{text-decoration:underline}
-        .advanced-content{display:none;padding:10px;background:#f8f9fa;border-radius:8px;margin:8px 0}
-        .advanced-content.show{display:block}
-        .row{display:flex;gap:10px;margin:6px 0;flex-wrap:wrap;align-items:center}
-        .row label{font-weight:700;min-width:100px;font-size:13px}
-        .row input{flex:1;padding:6px;border:2px solid #ddd;border-radius:5px;min-width:150px;font-size:13px}
-        textarea{width:100%;height:80px;font-family:monospace;font-size:12px;padding:8px;border:2px solid #ddd;border-radius:6px;margin:5px 0;resize:vertical}
-        textarea:focus{border-color:#007bff;outline:none}
-        .text-small{font-size:12px;color:#666}
-        
-        .cat-footer{text-align:center;margin-top:15px;color:#b8860b;font-size:.85rem;opacity:.6;border-top:1px solid #f5e6ca;padding-top:12px}
-        .cat-footer span{animation:meowText 2s infinite;display:inline-block}
-        @keyframes meowText{0%,100%{transform:scale(1)}50%{transform:scale(1.05) rotate(-2deg);color:#e67e22}}
-        
-        .ignored-toggle{cursor:pointer;color:#856404;font-weight:700;font-size:12px}
-        .ignored-toggle:hover{text-decoration:underline}
-        .ignored-content{display:none;max-height:100px;overflow:auto}
-        .ignored-content.show{display:block}
-        
-        /* Cashier methods - 2 methods only */
-        .cashier-methods{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:5px 0}
-        .cashier-method{background:#f8f9fa;padding:10px;border-radius:8px;border:1px solid #dee2e6}
-        .cashier-method .method-label{font-size:12px;font-weight:700;color:#495057;margin-bottom:5px;display:block}
-        .cashier-method input[type=file]{font-size:11px;padding:4px;width:100%}
-        .cashier-method textarea{height:50px;font-size:11px;padding:4px;width:100%;resize:vertical}
-        .cashier-method .badge-method{display:inline-block;padding:1px 8px;border-radius:10px;font-size:9px;font-weight:700;margin-right:4px}
-        .badge-upload{background:#28a745;color:#fff}
-        .badge-paste{background:#17a2b8;color:#fff}
-        .cashier-status-small{font-size:11px;margin-top:3px;padding:3px 6px;border-radius:4px;display:none}
-        .cashier-status-small.success{background:#d4edda;color:#155724;display:block}
-        .cashier-status-small.info{background:#cce5ff;color:#004085;display:block}
-        .cashier-status-small.error{background:#f8d7da;color:#721c24;display:block}
-        
-        @media(max-width:768px){.grid-2{grid-template-columns:1fr}.cashier-methods{grid-template-columns:1fr}.cat-container{flex-wrap:wrap;justify-content:center;text-align:center;gap:10px}.cat-container .cat-right{text-align:center;width:100%}.cat-container .progress-cat{width:100%;margin:5px 0}.stats{grid-template-columns:repeat(2,1fr)}}
-        @media(max-width:480px){.grid-2{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.row{flex-direction:column;align-items:stretch}.row label{min-width:auto}}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 15px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+            /* --- TEMA: gambar latar belakang --- */
+            background: url('https://raw.githubusercontent.com/parkson127/parkson127.github.io/refs/heads/main/f34676274f62e754a6ee7484436d4ee7.avif') no-repeat center center fixed;
+            background-size: cover;
+        }
+        /* overlay untuk kebolehbacaan */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: -1;
+        }
+        /* paw background (hiasan) */
+        .paw-bg {
+            position: fixed;
+            font-size: 28px;
+            opacity: .08;
+            pointer-events: none;
+            z-index: 0;
+            animation: floatPaw 20s infinite linear
+        }
+        @keyframes floatPaw {
+            0% {
+                transform: translateY(100vh) rotate(0deg) scale(.5);
+                opacity: .05
+            }
+            50% {
+                opacity: .12
+            }
+            100% {
+                transform: translateY(-10vh) rotate(360deg) scale(1);
+                opacity: 0
+            }
+        }
+        .paw-bg:nth-child(1) {
+            left: 5%;
+            animation-duration: 22s
+        }
+        .paw-bg:nth-child(2) {
+            left: 20%;
+            animation-duration: 18s;
+            animation-delay: 3s
+        }
+        .paw-bg:nth-child(3) {
+            left: 40%;
+            animation-duration: 25s;
+            animation-delay: 5s
+        }
+        .paw-bg:nth-child(4) {
+            left: 60%;
+            animation-duration: 16s;
+            animation-delay: 8s
+        }
+        .paw-bg:nth-child(5) {
+            left: 80%;
+            animation-duration: 21s;
+            animation-delay: 2s
+        }
+        .paw-bg:nth-child(6) {
+            left: 90%;
+            animation-duration: 19s;
+            animation-delay: 10s
+        }
+        .container {
+            background: rgba(255, 255, 255, .92);
+            backdrop-filter: blur(8px);
+            padding: 20px;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .25);
+            position: relative;
+            z-index: 1;
+            border: 2px solid rgba(255, 183, 77, .3)
+        }
+        .cat-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 10px
+        }
+        .cat-icon {
+            font-size: 40px;
+            animation: bounceCat 2.5s infinite ease-in-out;
+            cursor: pointer;
+            display: inline-block
+        }
+        @keyframes bounceCat {
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+        .cat-header h1 {
+            color: #d35400;
+            border-bottom: none;
+            padding-bottom: 0;
+            font-size: 1.6rem;
+            text-shadow: 2px 2px 0 #f39c12;
+            flex: 1
+        }
+        .cat-header .sub {
+            font-size: 0.8rem;
+            color: #7f6000;
+            opacity: 0.7;
+            font-style: italic
+        }
+        .sudoku-container {
+            position: relative;
+            display: inline-block;
+            margin-left: auto;
+            cursor: pointer;
+            user-select: none
+        }
+        .sudoku-container .sudoku-toggle {
+            font-size: 12px;
+            color: #7f6000;
+            background: rgba(255, 183, 77, .2);
+            padding: 4px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 183, 77, .3);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: all .3s
+        }
+        .sudoku-container .sudoku-toggle:hover {
+            background: rgba(255, 183, 77, .4);
+            transform: scale(1.05)
+        }
+        .sudoku-container .sudoku-toggle .cat-paw {
+            font-size: 16px;
+            animation: catIdle 2s infinite ease-in-out;
+            display: inline-block
+        }
+        .sudoku-panel {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            background: rgba(255, 255, 255, .98);
+            border: 2px solid #f39c12;
+            border-radius: 12px;
+            padding: 12px 12px 15px 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, .2);
+            z-index: 100;
+            min-width: 340px;
+            backdrop-filter: blur(8px)
+        }
+        .sudoku-panel.show {
+            display: block;
+            animation: slideDown .3s ease-out
+        }
+        @keyframes slideDown {
+            0% {
+                opacity: 0;
+                transform: translateY(-10px) scale(.95)
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1)
+            }
+        }
+        .sudoku-panel .sudoku-title {
+            font-size: 12px;
+            font-weight: 700;
+            color: #d35400;
+            text-align: center;
+            margin-bottom: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center
+        }
+        .sudoku-panel .sudoku-title span {
+            font-size: 13px
+        }
+        .sudoku-panel .sudoku-close {
+            background: none;
+            border: none;
+            font-size: 16px;
+            cursor: pointer;
+            color: #999;
+            padding: 0 4px
+        }
+        .sudoku-panel .sudoku-close:hover {
+            color: #dc3545
+        }
+        .sudoku-grid {
+            display: grid;
+            grid-template-columns: repeat(9, 1fr);
+            gap: 1px;
+            margin: 4px auto;
+            width: 306px;
+            border: 2px solid #333;
+            padding: 1px;
+            background: #333;
+            border-radius: 4px
+        }
+        .sudoku-cell {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 700;
+            border-radius: 1px;
+            background: #fff;
+            border: 1px solid #ddd;
+            cursor: pointer;
+            transition: all .15s;
+            color: #333;
+            position: relative
+        }
+        .sudoku-cell:hover {
+            background: #e3f2fd;
+            transform: scale(1.05);
+            z-index: 2
+        }
+        .sudoku-cell.empty {
+            color: #999;
+            font-weight: 400;
+            background: #fafafa
+        }
+        .sudoku-cell.filled {
+            background: #fff;
+            color: #d35400;
+            border-color: #f39c12
+        }
+        .sudoku-cell.given {
+            background: #e9ecef;
+            color: #495057;
+            cursor: default;
+            border-color: #ced4da
+        }
+        .sudoku-cell.given:hover {
+            transform: none;
+            background: #e9ecef
+        }
+        .sudoku-cell.selected {
+            background: #ffd93d !important;
+            border-color: #f39c12 !important;
+            transform: scale(1.08);
+            z-index: 3;
+            box-shadow: 0 0 12px rgba(243, 156, 18, .4)
+        }
+        .sudoku-cell.correct {
+            animation: pulseGreen .5s
+        }
+        .sudoku-cell.wrong {
+            animation: shake .4s;
+            background: #ff6b6b !important
+        }
+        .sudoku-cell .cell-note {
+            font-size: 7px;
+            color: #999;
+            position: absolute;
+            top: 1px;
+            left: 2px;
+            line-height: 1
+        }
+        .sudoku-cell.border-right {
+            border-right: 2px solid #333
+        }
+        .sudoku-cell.border-bottom {
+            border-bottom: 2px solid #333
+        }
+        .sudoku-cell.border-left {
+            border-left: 2px solid #333
+        }
+        .sudoku-cell.border-top {
+            border-top: 2px solid #333
+        }
+        @keyframes pulseGreen {
+            0%,
+            100% {
+                background: #d4edda
+            }
+            50% {
+                background: #28a745;
+                color: #fff
+            }
+        }
+        @keyframes shake {
+            0%,
+            100% {
+                transform: translateX(0)
+            }
+            20% {
+                transform: translateX(-5px)
+            }
+            40% {
+                transform: translateX(5px)
+            }
+            60% {
+                transform: translateX(-5px)
+            }
+            80% {
+                transform: translateX(5px)
+            }
+        }
+        .sudoku-numbers {
+            display: flex;
+            gap: 3px;
+            justify-content: center;
+            margin: 5px 0 3px 0;
+            flex-wrap: wrap
+        }
+        .sudoku-numbers .num-btn {
+            width: 26px;
+            height: 26px;
+            border-radius: 50%;
+            border: 1px solid #dee2e6;
+            background: #f8f9fa;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all .2s;
+            color: #333;
+            display: flex;
+            align-items: center;
+            justify-content: center
+        }
+        .sudoku-numbers .num-btn:hover {
+            background: #f39c12;
+            color: #fff;
+            transform: scale(1.1);
+            border-color: #f39c12
+        }
+        .sudoku-numbers .num-btn.active {
+            background: #d35400;
+            color: #fff;
+            border-color: #d35400
+        }
+        .sudoku-numbers .num-btn.used {
+            opacity: .3;
+            cursor: not-allowed
+        }
+        .sudoku-status {
+            font-size: 10px;
+            color: #666;
+            text-align: center;
+            margin-top: 4px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap
+        }
+        .sudoku-status .sudoku-hint {
+            color: #f39c12;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(243, 156, 18, .1)
+        }
+        .sudoku-status .sudoku-hint:hover {
+            background: rgba(243, 156, 18, .2)
+        }
+        .sudoku-status .sudoku-score {
+            color: #28a745;
+            font-weight: 700
+        }
+        .sudoku-status .sudoku-undo {
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: #f8f9fa
+        }
+        .sudoku-status .sudoku-undo:hover {
+            background: #e9ecef
+        }
+        .sudoku-status .sudoku-reset {
+            color: #dc3545;
+            cursor: pointer;
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(220, 53, 69, .1)
+        }
+        .sudoku-status .sudoku-reset:hover {
+            background: rgba(220, 53, 69, .2)
+        }
+        .sudoku-cat {
+            font-size: 24px;
+            text-align: center;
+            margin-top: 3px;
+            animation: catIdle 2s infinite ease-in-out;
+            display: block
+        }
+        .cat-header .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto
+        }
+        @media(max-width:768px) {
+            .sudoku-panel {
+                left: 50%;
+                transform: translateX(-50%);
+                right: auto;
+                top: 45px;
+                min-width: 300px
+            }
+            .sudoku-panel.show {
+                transform: translateX(-50%) scale(1)
+            }
+            .sudoku-grid {
+                width: 270px
+            }
+            .sudoku-cell {
+                width: 28px;
+                height: 28px;
+                font-size: 12px
+            }
+        }
+        @media(max-width:480px) {
+            .sudoku-panel {
+                min-width: 280px
+            }
+            .sudoku-grid {
+                width: 243px
+            }
+            .sudoku-cell {
+                width: 25px;
+                height: 25px;
+                font-size: 11px
+            }
+        }
+        .cat-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: rgba(255, 183, 77, .15);
+            border-radius: 12px;
+            border: 2px dashed rgba(255, 183, 77, .3);
+            min-height: 80px;
+            position: relative;
+            overflow: hidden;
+            flex-wrap: wrap;
+            gap: 10px
+        }
+        .cat-container .cat-left {
+            font-size: 50px;
+            transition: all .8s cubic-bezier(.34, 1.56, .64, 1);
+            display: inline-block;
+            cursor: pointer;
+            position: relative;
+            animation: catIdle 2s infinite ease-in-out;
+            text-align: center
+        }
+        .cat-container .cat-left .action-text {
+            font-size: 12px;
+            color: #d35400;
+            font-weight: 700;
+            display: block;
+            text-align: center;
+            margin-top: 2px
+        }
+        .cat-container .cat-left .fish {
+            font-size: 22px;
+            display: inline-block;
+            animation: fishSwim 1.5s infinite ease-in-out;
+            position: absolute;
+            right: -30px;
+            top: 10px
+        }
+        @keyframes fishSwim {
+            0%,
+            100% {
+                transform: translateX(0) rotate(0)
+            }
+            50% {
+                transform: translateX(10px) rotate(-5deg)
+            }
+        }
+        @keyframes catIdle {
+            0%,
+            100% {
+                transform: translateY(0) rotate(0)
+            }
+            50% {
+                transform: translateY(-5px) rotate(-2deg)
+            }
+        }
+        @keyframes catJump {
+            0% {
+                transform: translateY(0) scale(1)
+            }
+            30% {
+                transform: translateY(-40px) scale(1.1) rotate(-5deg)
+            }
+            60% {
+                transform: translateY(-40px) scale(1.1) rotate(5deg)
+            }
+            100% {
+                transform: translateY(0) scale(1)
+            }
+        }
+        @keyframes catCatch {
+            0% {
+                transform: scale(1)
+            }
+            25% {
+                transform: scale(1.2) rotate(-10deg)
+            }
+            50% {
+                transform: scale(1.3) rotate(10deg)
+            }
+            75% {
+                transform: scale(1.2) rotate(-5deg)
+            }
+            100% {
+                transform: scale(1) rotate(0)
+            }
+        }
+        @keyframes catDance {
+            0%,
+            100% {
+                transform: rotate(0) scale(1)
+            }
+            25% {
+                transform: rotate(-10deg) scale(1.1)
+            }
+            75% {
+                transform: rotate(10deg) scale(1.1)
+            }
+        }
+        @keyframes fishCatch {
+            0% {
+                transform: translateX(0) scale(1);
+                opacity: 1
+            }
+            50% {
+                transform: translateX(50px) scale(1.5);
+                opacity: 1
+            }
+            100% {
+                transform: translateX(100px) scale(.5);
+                opacity: 0
+            }
+        }
+        .cat-jump {
+            animation: catJump .8s ease-in-out !important
+        }
+        .cat-catch {
+            animation: catCatch .6s ease-in-out !important
+        }
+        .cat-dance {
+            animation: catDance .8s ease-in-out !important
+        }
+        .cat-fish-catch {
+            animation: fishCatch .8s ease-in-out forwards !important
+        }
+        .cat-container .cat-status {
+            font-size: 13px;
+            color: #7f6000;
+            font-weight: 700;
+            background: #fff3cd;
+            padding: 4px 14px;
+            border-radius: 20px;
+            border: 2px solid #f39c12;
+            animation: pulseStatus 1.5s infinite
+        }
+        @keyframes pulseStatus {
+            0%,
+            100% {
+                opacity: 1;
+                transform: scale(1)
+            }
+            50% {
+                opacity: .7;
+                transform: scale(.97)
+            }
+        }
+        .cat-container .cat-right {
+            font-size: 14px;
+            color: #7f6000;
+            text-align: right;
+            line-height: 1.4;
+            min-width: 150px
+        }
+        .cat-container .cat-right .highlight {
+            color: #d35400;
+            font-weight: 700
+        }
+        .cat-container .progress-cat {
+            flex: 1;
+            margin: 0 15px;
+            min-width: 120px
+        }
+        .cat-container .progress-cat .mini-bar {
+            height: 6px;
+            background: #e9ecef;
+            border-radius: 6px;
+            overflow: hidden;
+            margin-top: 4px
+        }
+        .cat-container .progress-cat .mini-bar .mini-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+            border-radius: 6px;
+            transition: width .5s;
+            width: 0%
+        }
+        .cat-container .progress-cat .mini-label {
+            font-size: 11px;
+            color: #666
+        }
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 10px 0
+        }
+        .upload-box {
+            border: 2px dashed #007bff;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.7);
+            transition: all .3s;
+            position: relative
+        }
+        .upload-box:hover {
+            background: #e3f2fd;
+            border-color: #0056b3
+        }
+        .upload-box.optional {
+            border-color: #28a745
+        }
+        .upload-box.optional:hover {
+            background: #d4edda
+        }
+        .upload-box .upload-cat-indicator {
+            font-size: 28px;
+            display: block;
+            margin-bottom: 3px;
+            animation: catIdle 2s infinite ease-in-out
+        }
+        .upload-box.active-cat {
+            border-color: #f39c12;
+            background: #fff8f0;
+            box-shadow: 0 0 20px rgba(243, 156, 18, .2)
+        }
+        .upload-box label {
+            font-weight: 700;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px
+        }
+        .upload-box .hint {
+            font-size: 11px;
+            color: #666
+        }
+        .upload-box input[type=file] {
+            padding: 6px;
+            font-size: 12px;
+            width: 100%
+        }
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 700
+        }
+        .badge-required {
+            background: #dc3545;
+            color: #fff
+        }
+        .badge-optional {
+            background: #28a745;
+            color: #fff
+        }
+        .badge-txt {
+            background: #17a2b8;
+            color: #fff
+        }
+        .badge-excel {
+            background: #217346;
+            color: #fff
+        }
+        .flex {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin: 10px 0
+        }
+        button {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: all .3s;
+            position: relative
+        }
+        button:hover {
+            transform: scale(1.03)
+        }
+        .btn-primary {
+            background: #007bff;
+            color: #fff
+        }
+        .btn-primary:hover {
+            background: #0056b3
+        }
+        .btn-excel {
+            background: #217346;
+            color: #fff
+        }
+        .btn-excel:hover {
+            background: #1a5c38
+        }
+        .btn-info {
+            background: #17a2b8;
+            color: #fff
+        }
+        .btn-info:hover {
+            background: #138496
+        }
+        .btn-danger {
+            background: #dc3545;
+            color: #fff
+        }
+        .btn-danger:hover {
+            background: #b02a37
+        }
+        .btn-warning {
+            background: #ffc107;
+            color: #333
+        }
+        .btn-warning:hover {
+            background: #e0a800
+        }
+        .btn-secondary {
+            background: #6c757d;
+            color: #fff
+        }
+        .btn-secondary:hover {
+            background: #5a6268
+        }
+        .btn-sm {
+            padding: 4px 12px;
+            font-size: 12px
+        }
+        .btn .btn-icon {
+            display: inline-block;
+            margin-right: 5px
+        }
+        .status-box {
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 13px;
+            display: none;
+            margin: 5px 0
+        }
+        .status-box.success {
+            background: #d4edda;
+            color: #155724;
+            border-left: 4px solid #28a745
+        }
+        .status-box.info {
+            background: #cce5ff;
+            color: #004085;
+            border-left: 4px solid #007bff
+        }
+        .status-box.error {
+            background: #f8d7da;
+            color: #721c24;
+            border-left: 4px solid #dc3545
+        }
+        .status-box.warning {
+            background: #fff3cd;
+            color: #856404;
+            border-left: 4px solid #ffc107
+        }
+        .staff-preview {
+            display: none;
+            margin-top: 8px;
+            max-height: 150px;
+            overflow: auto;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            padding: 8px;
+            font-size: 11px;
+            background: #fafafa
+        }
+        .preview {
+            margin-top: 15px;
+            overflow: auto;
+            max-height: 400px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            display: none
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 11px
+        }
+        th {
+            background: #007bff;
+            color: #fff;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            padding: 6px;
+            text-align: left;
+            font-weight: 700
+        }
+        td {
+            padding: 4px 6px;
+            border-bottom: 1px solid #eee;
+            white-space: nowrap;
+            max-width: 120px;
+            overflow: hidden;
+            text-overflow: ellipsis
+        }
+        tr:nth-child(even) {
+            background: #f9f9f9
+        }
+        tr:hover {
+            background: #e3f2fd
+        }
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+            padding: 10px;
+            background: #e9ecef;
+            border-radius: 8px;
+            margin: 8px 0;
+            font-size: 13px
+        }
+        .stats .stat-item {
+            text-align: center
+        }
+        .stats .stat-item .num {
+            font-size: 20px;
+            font-weight: 700;
+            color: #007bff
+        }
+        .stats .stat-item .label {
+            font-size: 11px;
+            color: #666
+        }
+        .progress-container {
+            display: none;
+            margin: 10px 0
+        }
+        .progress-bar {
+            height: 22px;
+            background: #e9ecef;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: linear-gradient(90deg, #f39c12, #e67e22);
+            border-radius: 12px;
+            transition: width .3s;
+            width: 0%;
+            text-align: center;
+            color: #fff;
+            font-size: 12px;
+            line-height: 22px;
+            font-weight: 700
+        }
+        .progress-text {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px
+        }
+        .advanced-toggle {
+            cursor: pointer;
+            color: #007bff;
+            font-size: 13px;
+            user-select: none
+        }
+        .advanced-toggle:hover {
+            text-decoration: underline
+        }
+        .advanced-content {
+            display: none;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            margin: 8px 0
+        }
+        .advanced-content.show {
+            display: block
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+            margin: 6px 0;
+            flex-wrap: wrap;
+            align-items: center
+        }
+        .row label {
+            font-weight: 700;
+            min-width: 100px;
+            font-size: 13px
+        }
+        .row input {
+            flex: 1;
+            padding: 6px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            min-width: 150px;
+            font-size: 13px
+        }
+        textarea {
+            width: 100%;
+            height: 80px;
+            font-family: monospace;
+            font-size: 12px;
+            padding: 8px;
+            border: 2px solid #ddd;
+            border-radius: 6px;
+            margin: 5px 0;
+            resize: vertical
+        }
+        textarea:focus {
+            border-color: #007bff;
+            outline: none
+        }
+        .text-small {
+            font-size: 12px;
+            color: #666
+        }
+        .cat-footer {
+            text-align: center;
+            margin-top: 15px;
+            color: #b8860b;
+            font-size: .85rem;
+            opacity: .6;
+            border-top: 1px solid #f5e6ca;
+            padding-top: 12px
+        }
+        .cat-footer span {
+            animation: meowText 2s infinite;
+            display: inline-block
+        }
+        @keyframes meowText {
+            0%,
+            100% {
+                transform: scale(1)
+            }
+            50% {
+                transform: scale(1.05) rotate(-2deg);
+                color: #e67e22
+            }
+        }
+        .ignored-toggle {
+            cursor: pointer;
+            color: #856404;
+            font-weight: 700;
+            font-size: 12px
+        }
+        .ignored-toggle:hover {
+            text-decoration: underline
+        }
+        .ignored-content {
+            display: none;
+            max-height: 100px;
+            overflow: auto
+        }
+        .ignored-content.show {
+            display: block
+        }
+        .cashier-methods {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin: 5px 0
+        }
+        .cashier-method {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #dee2e6
+        }
+        .cashier-method .method-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: #495057;
+            margin-bottom: 5px;
+            display: block
+        }
+        .cashier-method input[type=file] {
+            font-size: 11px;
+            padding: 4px;
+            width: 100%
+        }
+        .cashier-method textarea {
+            height: 50px;
+            font-size: 11px;
+            padding: 4px;
+            width: 100%;
+            resize: vertical
+        }
+        .cashier-method .badge-method {
+            display: inline-block;
+            padding: 1px 8px;
+            border-radius: 10px;
+            font-size: 9px;
+            font-weight: 700;
+            margin-right: 4px
+        }
+        .badge-upload {
+            background: #28a745;
+            color: #fff
+        }
+        .badge-paste {
+            background: #17a2b8;
+            color: #fff
+        }
+        .cashier-status-small {
+            font-size: 11px;
+            margin-top: 3px;
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: none
+        }
+        .cashier-status-small.success {
+            background: #d4edda;
+            color: #155724;
+            display: block
+        }
+        .cashier-status-small.info {
+            background: #cce5ff;
+            color: #004085;
+            display: block
+        }
+        .cashier-status-small.error {
+            background: #f8d7da;
+            color: #721c24;
+            display: block
+        }
+        @media(max-width:768px) {
+            .grid-2 {
+                grid-template-columns: 1fr
+            }
+            .cashier-methods {
+                grid-template-columns: 1fr
+            }
+            .cat-container {
+                flex-wrap: wrap;
+                justify-content: center;
+                text-align: center;
+                gap: 10px
+            }
+            .cat-container .cat-right {
+                text-align: center;
+                width: 100%
+            }
+            .cat-container .progress-cat {
+                width: 100%;
+                margin: 5px 0
+            }
+            .stats {
+                grid-template-columns: repeat(2, 1fr)
+            }
+        }
+        @media(max-width:480px) {
+            .grid-2 {
+                grid-template-columns: 1fr
+            }
+            .stats {
+                grid-template-columns: 1fr 1fr
+            }
+            .row {
+                flex-direction: column;
+                align-items: stretch
+            }
+            .row label {
+                min-width: auto
+            }
+        }
     </style>
 </head>
 <body>
-    <!-- Beach Paws Background -->
+    <!-- Paw Backgrounds -->
     <div class="paw-bg">🐾</div>
     <div class="paw-bg">🐾</div>
     <div class="paw-bg">🐾</div>
@@ -146,11 +1130,46 @@
     <div class="paw-bg">🐾</div>
 
     <div class="container">
-        <!-- Cat Header -->
+        <!-- Header -->
         <div class="cat-header">
             <span class="cat-icon" onclick="playMeow()">🐱</span>
             <h1>🏖️ PAW Extractor <span style="font-size:0.6rem;color:#f39c12;">~ meow!</span></h1>
             <span class="sub">🌊🐾 healing di pantai</span>
+            <div class="header-right">
+                <div class="sudoku-container">
+                    <div class="sudoku-toggle" onclick="toggleSudoku()">
+                        <span class="cat-paw">🐾</span>
+                        <span>🧩 Sudoku</span>
+                        <span style="font-size:10px;color:#999;">▼</span>
+                    </div>
+                    <div class="sudoku-panel" id="sudokuPanel">
+                        <div class="sudoku-title">
+                            <span>🧩 Sudoku 9x9</span>
+                            <span style="font-size:10px;font-weight:400;color:#999;">🐱 main</span>
+                            <button class="sudoku-close" onclick="toggleSudoku()">✕</button>
+                        </div>
+                        <div class="sudoku-grid" id="sudokuGrid"></div>
+                        <div class="sudoku-numbers" id="sudokuNumbers">
+                            <button class="num-btn" data-num="1">1</button>
+                            <button class="num-btn" data-num="2">2</button>
+                            <button class="num-btn" data-num="3">3</button>
+                            <button class="num-btn" data-num="4">4</button>
+                            <button class="num-btn" data-num="5">5</button>
+                            <button class="num-btn" data-num="6">6</button>
+                            <button class="num-btn" data-num="7">7</button>
+                            <button class="num-btn" data-num="8">8</button>
+                            <button class="num-btn" data-num="9">9</button>
+                        </div>
+                        <div class="sudoku-status">
+                            <span>⭐ <span class="sudoku-score" id="sudokuScore">0</span>/81</span>
+                            <span class="sudoku-hint" onclick="sudokuHint()">💡 Hint</span>
+                            <span class="sudoku-undo" onclick="sudokuUndo()">↩️ Undo</span>
+                            <span class="sudoku-reset" onclick="resetSudoku()">🔄 New</span>
+                        </div>
+                        <span class="sudoku-cat" id="sudokuCat">😺</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <!-- Cat Adventure Bar -->
@@ -182,15 +1201,13 @@
                 <span class="upload-cat-indicator">🐱</span>
                 <label>📁 Transaction <span class="badge badge-required">WAJIB</span></label>
                 <input type="file" id="fileInput" accept="*/*" multiple>
-                <div class="hint">Upload <strong>SEMUA</strong> jenis file (txt, csv, log, dat, pdf, xlsx, dll)</div>
+                <div class="hint">e.g. 1 Month Bi File Report(TX File) and Select <strong>ALL</strong> file.</div>
                 <div id="transStatus" class="status-box info" style="display:none;font-size:12px;">⏳ Loading...</div>
             </div>
 
             <div class="upload-box optional" id="uploadCashierMasterBox">
                 <span class="upload-cat-indicator">🐱</span>
                 <label>📋 Cashier Name <span class="badge badge-optional">OPTIONAL</span></label>
-                
-                <!-- 2 Methods only -->
                 <div class="cashier-methods">
                     <!-- Method 1: Upload File -->
                     <div class="cashier-method">
@@ -199,17 +1216,18 @@
                         <input type="file" id="cashierFileInput" accept=".xlsx,.xls,.txt,.csv">
                         <div id="cashierFileStatus" class="cashier-status-small"></div>
                     </div>
-                    
                     <!-- Method 2: Paste Text -->
                     <div class="cashier-method">
                         <span class="badge-method badge-paste">📝 PASTE</span>
                         <span class="method-label">Cashier ID &amp; Name</span>
-                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;NOREFY HAFSHAH&#10;789012&#9;NUR FATIHAH SABRINA"></textarea>
-                        <button class="btn-primary btn-sm" onclick="processCashierPaste()" style="margin-top:3px;font-size:11px;padding:3px 10px;">✅ Load Names</button>
+                        <textarea id="cashierPasteInput" placeholder="e.g.&#10;123456&#9;Norefy Hafshah&#10;789012&#9;Nur Fatihah Sabrina"></textarea>
+                        <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:3px;">
+                            <button class="btn-primary btn-sm" onclick="processCashierPaste()" style="font-size:11px;padding:3px 10px;">✅ Load Names</button>
+                            <button class="btn-secondary btn-sm" onclick="loadSampleCashier()" style="font-size:11px;padding:3px 10px;">📋 Sample Cashier</button>
+                        </div>
                         <div id="cashierPasteStatus" class="cashier-status-small"></div>
                     </div>
                 </div>
-                
                 <div id="cashierMasterCount" style="display:none;font-weight:bold;color:#28a745;font-size:13px;margin-top:5px;">✅ Total Staff: <span id="cashierMasterTotal">0</span></div>
                 <div id="cashierMasterPreview" class="staff-preview"></div>
             </div>
@@ -303,10 +1321,316 @@
 
     <script>
         // ============================================================
+        // SUDOKU 9x9 MINI GAME
+        // ============================================================
+        var sudokuGrid = [];
+        var sudokuSolution = [];
+        var sudokuGiven = [];
+        var selectedCell = null;
+        var sudokuScore = 0;
+        var sudokuHistory = [];
+        var sudokuCatEmojis = ['😺', '😸', '😻', '🐱', '🐈', '😽', '🐾'];
+        var sudokuSize = 9;
+        var sudokuBoxSize = 3;
+
+        function generateSudoku() {
+            var grid = Array.from({ length: 9 }, () => Array(9).fill(0));
+
+            function solveSudoku(grid) {
+                for (var r = 0; r < 9; r++) {
+                    for (var c = 0; c < 9; c++) {
+                        if (grid[r][c] === 0) {
+                            var nums = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8, 9]);
+                            for (var n = 0; n < nums.length; n++) {
+                                var num = nums[n];
+                                if (isValidSudoku(grid, r, c, num)) {
+                                    grid[r][c] = num;
+                                    if (solveSudoku(grid)) return true;
+                                    grid[r][c] = 0;
+                                }
+                            }
+                            return false;
+                        }
+                    }
+                }
+                return true;
+            }
+
+            function isValidSudoku(grid, row, col, num) {
+                for (var i = 0; i < 9; i++) {
+                    if (grid[row][i] === num) return false;
+                    if (grid[i][col] === num) return false;
+                }
+                var boxRow = Math.floor(row / 3) * 3;
+                var boxCol = Math.floor(col / 3) * 3;
+                for (var r = boxRow; r < boxRow + 3; r++) {
+                    for (var c = boxCol; c < boxCol + 3; c++) {
+                        if (grid[r][c] === num) return false;
+                    }
+                }
+                return true;
+            }
+
+            function shuffleArray(arr) {
+                for (var i = arr.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = arr[i];
+                    arr[i] = arr[j];
+                    arr[j] = temp;
+                }
+                return arr;
+            }
+
+            var base = [
+                [1, 2, 3, 4, 5, 6, 7, 8, 9],
+                [4, 5, 6, 7, 8, 9, 1, 2, 3],
+                [7, 8, 9, 1, 2, 3, 4, 5, 6],
+                [2, 3, 4, 5, 6, 7, 8, 9, 1],
+                [5, 6, 7, 8, 9, 1, 2, 3, 4],
+                [8, 9, 1, 2, 3, 4, 5, 6, 7],
+                [3, 4, 5, 6, 7, 8, 9, 1, 2],
+                [6, 7, 8, 9, 1, 2, 3, 4, 5],
+                [9, 1, 2, 3, 4, 5, 6, 7, 8]
+            ];
+
+            for (var band = 0; band < 3; band++) {
+                var rows = shuffleArray([band * 3, band * 3 + 1, band * 3 + 2]);
+                var tempRows = [];
+                for (var i = 0; i < 3; i++) tempRows.push(base[rows[i]]);
+                for (var i = 0; i < 3; i++) base[band * 3 + i] = tempRows[i];
+            }
+            for (var stack = 0; stack < 3; stack++) {
+                var cols = shuffleArray([stack * 3, stack * 3 + 1, stack * 3 + 2]);
+                for (var r = 0; r < 9; r++) {
+                    var tempRow = [];
+                    for (var i = 0; i < 3; i++) tempRow.push(base[r][cols[i]]);
+                    for (var i = 0; i < 3; i++) base[r][stack * 3 + i] = tempRow[i];
+                }
+            }
+            sudokuSolution = base;
+
+            sudokuGiven = [];
+            sudokuGrid = [];
+            var removeCount = 40 + Math.floor(Math.random() * 15);
+            var positions = [];
+            for (var r = 0; r < 9; r++) {
+                sudokuGrid[r] = [];
+                sudokuGiven[r] = [];
+                for (var c = 0; c < 9; c++) {
+                    sudokuGrid[r][c] = base[r][c];
+                    sudokuGiven[r][c] = true;
+                    positions.push(r * 9 + c);
+                }
+            }
+            for (var i = positions.length - 1; i > 0; i--) {
+                var j = Math.floor(Math.random() * (i + 1));
+                var temp = positions[i];
+                positions[i] = positions[j];
+                positions[j] = temp;
+            }
+            for (var i = 0; i < removeCount && i < positions.length; i++) {
+                var pos = positions[i];
+                var r = Math.floor(pos / 9);
+                var c = pos % 9;
+                sudokuGrid[r][c] = 0;
+                sudokuGiven[r][c] = false;
+            }
+            sudokuScore = 0;
+            sudokuHistory = [];
+            renderSudoku9x9();
+            updateSudokuScore9x9();
+            document.getElementById('sudokuCat').textContent = '😺';
+        }
+
+        function renderSudoku9x9() {
+            var gridEl = document.getElementById('sudokuGrid');
+            gridEl.innerHTML = '';
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    var cell = document.createElement('div');
+                    cell.className = 'sudoku-cell';
+                    if (c % 3 === 2 && c < 8) cell.classList.add('border-right');
+                    if (r % 3 === 2 && r < 8) cell.classList.add('border-bottom');
+                    if (sudokuGrid[r][c] === 0) {
+                        cell.textContent = '';
+                        cell.classList.add('empty');
+                    } else {
+                        cell.textContent = sudokuGrid[r][c];
+                        if (sudokuGiven[r][c]) {
+                            cell.classList.add('given');
+                        } else {
+                            cell.classList.add('filled');
+                        }
+                    }
+                    cell.dataset.row = r;
+                    cell.dataset.col = c;
+                    cell.onclick = function() { selectSudokuCell9x9(this); };
+                    gridEl.appendChild(cell);
+                }
+            }
+            if (selectedCell) {
+                var cells = gridEl.querySelectorAll('.sudoku-cell');
+                var idx = selectedCell.row * 9 + selectedCell.col;
+                if (cells[idx]) cells[idx].classList.add('selected');
+            }
+            updateSudokuScore9x9();
+            updateNumberButtons9x9();
+        }
+
+        function selectSudokuCell9x9(el) {
+            var row = parseInt(el.dataset.row);
+            var col = parseInt(el.dataset.col);
+            if (sudokuGiven[row][col]) return;
+            var cells = document.querySelectorAll('.sudoku-cell');
+            cells.forEach(function(c) { c.classList.remove('selected'); });
+            selectedCell = { row: row, col: col };
+            el.classList.add('selected');
+        }
+
+        function updateNumberButtons9x9() {
+            var buttons = document.querySelectorAll('.num-btn');
+            var counts = {};
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] !== 0) {
+                        var num = sudokuGrid[r][c];
+                        counts[num] = (counts[num] || 0) + 1;
+                    }
+                }
+            }
+            buttons.forEach(function(btn) {
+                var num = parseInt(btn.dataset.num);
+                if (counts[num] && counts[num] >= 9) {
+                    btn.classList.add('used');
+                } else {
+                    btn.classList.remove('used');
+                }
+            });
+        }
+
+        function sudokuNumberClick9x9(num) {
+            if (!selectedCell) {
+                for (var r = 0; r < 9; r++) {
+                    for (var c = 0; c < 9; c++) {
+                        if (sudokuGrid[r][c] === 0) {
+                            selectedCell = { row: r, col: c };
+                            renderSudoku9x9();
+                            break;
+                        }
+                    }
+                    if (selectedCell) break;
+                }
+                if (!selectedCell) return;
+            }
+            var row = selectedCell.row;
+            var col = selectedCell.col;
+            if (sudokuGiven[row][col]) return;
+            var correct = sudokuSolution[row][col];
+            var cells = document.querySelectorAll('.sudoku-cell');
+            var idx = row * 9 + col;
+            if (num === correct) {
+                sudokuHistory.push({ row: row, col: col, oldValue: 0, newValue: num });
+                sudokuGrid[row][col] = num;
+                sudokuScore++;
+                cells[idx].textContent = num;
+                cells[idx].classList.remove('empty');
+                cells[idx].classList.add('filled');
+                cells[idx].classList.add('correct');
+                setTimeout(function() { cells[idx].classList.remove('correct'); }, 500);
+                document.getElementById('sudokuCat').textContent = '😸';
+                setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 800);
+                updateSudokuScore9x9();
+                updateNumberButtons9x9();
+                selectedCell = null;
+                if (sudokuScore === 81) {
+                    document.getElementById('sudokuCat').textContent = '🎉🐱';
+                    setTimeout(function() {
+                        document.getElementById('sudokuCat').textContent = '🏆😸';
+                        playMeow();
+                    }, 300);
+                    showSuccess('🎉 Sudoku complete! 🐱🏆');
+                }
+            } else {
+                cells[idx].classList.add('wrong');
+                document.getElementById('sudokuCat').textContent = '😿';
+                setTimeout(function() {
+                    cells[idx].classList.remove('wrong');
+                    document.getElementById('sudokuCat').textContent = '😺';
+                }, 500);
+            }
+        }
+
+        function updateSudokuScore9x9() {
+            var filled = 0;
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] !== 0) filled++;
+                }
+            }
+            sudokuScore = filled;
+            document.getElementById('sudokuScore').textContent = filled;
+        }
+
+        function sudokuHint() {
+            for (var r = 0; r < 9; r++) {
+                for (var c = 0; c < 9; c++) {
+                    if (sudokuGrid[r][c] === 0) {
+                        sudokuHistory.push({ row: r, col: c, oldValue: 0, newValue: sudokuSolution[r][c] });
+                        sudokuGrid[r][c] = sudokuSolution[r][c];
+                        sudokuScore++;
+                        renderSudoku9x9();
+                        updateSudokuScore9x9();
+                        document.getElementById('sudokuCat').textContent = '😻';
+                        setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 800);
+                        if (sudokuScore === 81) {
+                            document.getElementById('sudokuCat').textContent = '🎉🐱';
+                            setTimeout(function() {
+                                document.getElementById('sudokuCat').textContent = '🏆😸';
+                                playMeow();
+                            }, 300);
+                            showSuccess('🎉 Sudoku complete! 🐱🏆');
+                        }
+                        return;
+                    }
+                }
+            }
+        }
+
+        function sudokuUndo() {
+            if (sudokuHistory.length === 0) return;
+            var last = sudokuHistory.pop();
+            sudokuGrid[last.row][last.col] = last.oldValue;
+            sudokuScore--;
+            renderSudoku9x9();
+            updateSudokuScore9x9();
+            document.getElementById('sudokuCat').textContent = '😽';
+            setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 500);
+        }
+
+        function resetSudoku() {
+            generateSudoku();
+            showSuccess('🔄 New Sudoku puzzle! 🐱');
+        }
+
+        function toggleSudoku() {
+            var panel = document.getElementById('sudokuPanel');
+            panel.classList.toggle('show');
+            if (panel.classList.contains('show') && !sudokuGrid.length) {
+                generateSudoku();
+            }
+        }
+
+        document.addEventListener('click', function(e) {
+            var container = document.querySelector('.sudoku-container');
+            var panel = document.getElementById('sudokuPanel');
+            if (container && panel && !container.contains(e.target) && panel.classList.contains('show')) {
+                panel.classList.remove('show');
+            }
+        });
+
+        // ============================================================
         // PAW EXTRACTOR - FULL SCRIPT
         // ============================================================
-
-        // SEMUA CHECKBOX WAJIB ON - hidden from UI
         var IGNORE_FIRST = true;
         var IGNORE_LAST = true;
         var SORT_BY_DATE = true;
@@ -325,7 +1649,6 @@
         // ============================================================
         // CAT FUNCTIONS
         // ============================================================
-
         function updateCat(state, message, emoji, actionText) {
             var catEmoji = document.getElementById('catEmoji');
             var catStatus = document.getElementById('catStatus');
@@ -467,7 +1790,6 @@
         // ============================================================
         // HELPERS
         // ============================================================
-
         function getEl(id) { var el = document.getElementById(id); if (!el) { console.warn('Element not found:', id); return null; } return el; }
 
         function showError(msg) { var el = getEl('errorMsg'); if (!el) return;
@@ -506,7 +1828,6 @@
         // ============================================================
         // COLUMN WIDTHS
         // ============================================================
-
         var cw = getEl('columnWidths');
         if (cw) {
             cw.addEventListener('input', function() {
@@ -520,14 +1841,13 @@
         // ============================================================
         // CASHIER NAME FUNCTIONS - 2 METHODS
         // ============================================================
-
         function updateStaffMap() {
             var total = Object.keys(staffMap).length;
             var totalEl = getEl('cashierMasterTotal');
             if (totalEl) totalEl.textContent = total;
             var countEl = getEl('cashierMasterCount');
             if (countEl) countEl.style.display = 'block';
-            
+
             var preview = getEl('cashierMasterPreview');
             if (preview && total > 0) {
                 preview.style.display = 'block';
@@ -541,43 +1861,37 @@
             } else if (preview) {
                 preview.style.display = 'none';
             }
-            
             return total;
         }
 
         function processCashierData(rawData) {
             var map = {};
             var lines = rawData.split('\n');
-            
+
             for (var i = 0; i < lines.length; i++) {
                 var line = lines[i].trim();
                 if (!line) continue;
-                
-                // Skip header lines
+
                 var lower = line.toLowerCase();
-                if (lower.indexOf('cashier id') >= 0 || lower.indexOf('staff id') >= 0 || 
+                if (lower.indexOf('cashier id') >= 0 || lower.indexOf('staff id') >= 0 ||
                     lower.indexOf('id') === 0 || lower.indexOf('name') === 0 || lower.indexOf('nama') === 0 ||
                     lower.indexOf('cashier') >= 0 && lower.indexOf('id') >= 0) {
                     continue;
                 }
-                
-                // Try multiple separators
+
                 var parts = line.split(/\t|,|;|\|/);
                 var cleanParts = [];
                 for (var p = 0; p < parts.length; p++) {
                     var part = parts[p].trim();
                     if (part) cleanParts.push(part);
                 }
-                
                 if (cleanParts.length < 2) continue;
-                
-                // Find ID and Name
+
                 var id = null;
                 var name = null;
                 var idIndex = -1;
                 var nameIndex = -1;
-                
-                // Try to find ID (numeric) - look for 4-8 digit numbers
+
                 for (var c = 0; c < cleanParts.length; c++) {
                     var val = cleanParts[c];
                     var match = val.match(/\d+/);
@@ -588,8 +1902,6 @@
                         }
                     }
                 }
-                
-                // If no ID found, try first column
                 if (idIndex === -1 && cleanParts.length >= 2) {
                     var firstMatch = cleanParts[0].match(/\d+/);
                     if (firstMatch && firstMatch[0].length >= 4) {
@@ -597,8 +1909,7 @@
                         id = firstMatch[0];
                     }
                 }
-                
-                // Find Name (not numeric, not status words)
+
                 var statusWords = ['SUPERVISOR', 'CASHIER', 'MANAGER', 'TRAINEE', 'SENIOR', 'STAFF', 'CLERK', 'CHIEF'];
                 for (var c2 = 0; c2 < cleanParts.length; c2++) {
                     if (c2 === idIndex) continue;
@@ -617,8 +1928,6 @@
                         }
                     }
                 }
-                
-                // If no name found, use second column
                 if (nameIndex === -1 && cleanParts.length >= 2) {
                     var possibleName = cleanParts[1];
                     if (possibleName.length >= 2 && possibleName.match(/[A-Za-z]/)) {
@@ -626,13 +1935,11 @@
                         name = possibleName;
                     }
                 }
-                
-                // Clean ID - pad to 6 digits
+
                 if (id) {
                     while (id.length < 6) id = '0' + id;
                     if (id.length > 6) id = id.slice(0, 6);
                     if (name && name.length > 0) {
-                        // Clean name - remove extra status words
                         for (var s2 = 0; s2 < statusWords.length; s2++) {
                             name = name.replace(new RegExp('\\b' + statusWords[s2] + '\\b', 'gi'), '').trim();
                         }
@@ -643,22 +1950,20 @@
                     }
                 }
             }
-            
-            // Merge with existing staffMap
+
             for (var key in map) {
                 if (map[key]) {
                     staffMap[key] = map[key];
                 }
             }
-            
+
             var total = updateStaffMap();
             return total;
         }
 
         // ============================================================
-        // METHOD 1: UPLOAD FILE (Excel/TXT)
+        // METHOD 1: UPLOAD FILE
         // ============================================================
-
         var cashierFileInput = getEl('cashierFileInput');
         if (cashierFileInput) {
             cashierFileInput.addEventListener('change', function(e) {
@@ -733,9 +2038,8 @@
         }
 
         // ============================================================
-        // METHOD 2: PASTE TEXT
+        // METHOD 2: PASTE TEXT + SAMPLE CASHIER
         // ============================================================
-
         function processCashierPaste() {
             var pasteInput = getEl('cashierPasteInput');
             if (!pasteInput || !pasteInput.value.trim()) {
@@ -755,9 +2059,9 @@
             }
             catJumpTo('uploadCashierMasterBox');
             updateCat('🐱 Menunggu...', '🐾 Memproses paste data...', '😺', '📋 Processing Paste');
-            
+
             var total = processCashierData(pasteInput.value);
-            
+
             if (status) {
                 status.className = 'cashier-status-small success';
                 status.textContent = '✅ Loaded ' + total + ' names from paste!';
@@ -771,10 +2075,20 @@
             }, 1500);
         }
 
+        // Sample Cashier function
+        function loadSampleCashier() {
+            var sample = "123456\tNorefy Hafshah\n789012\tNur Fatihah Sabrina\n345678\tAhmad Fauzi\n901234\tSiti Nurhaliza";
+            var input = document.getElementById('cashierPasteInput');
+            if (input) {
+                input.value = sample;
+                // Auto process
+                processCashierPaste();
+            }
+        }
+
         // ============================================================
         // TRANSACTION UPLOAD
         // ============================================================
-
         var fi = getEl('fileInput');
         if (fi) {
             fi.addEventListener('change', function(e) {
@@ -825,7 +2139,6 @@
         // ============================================================
         // PASTE DATA
         // ============================================================
-
         var pasteInput = getEl('pasteInput');
         if (pasteInput) {
             pasteInput.addEventListener('input', function() {
@@ -842,7 +2155,6 @@
         // ============================================================
         // PROCESS ALL
         // ============================================================
-
         function processAll() {
             if (isProcessing) return;
             isProcessing = true;
@@ -922,7 +2234,6 @@
         // ============================================================
         // SPLIT DATA INTERNAL
         // ============================================================
-
         function splitDataInternal(text) {
             var widthStr = getEl('columnWidths');
             if (!widthStr) return false;
@@ -1035,7 +2346,6 @@
         // ============================================================
         // MATCH STAFF NAMES
         // ============================================================
-
         function matchStaffNames() {
             matchedCount = 0;
             var staffKeys = Object.keys(staffMap);
@@ -1061,7 +2371,6 @@
         // ============================================================
         // UTILITY FUNCTIONS
         // ============================================================
-
         function convertAmount(a) {
             if (!a) return '';
             var m = a.match(/(\d+)\.(\d{2})([+-])/);
@@ -1088,7 +2397,6 @@
         // ============================================================
         // DISPLAY TABLE
         // ============================================================
-
         function displayTable() {
             var thead = getEl('tableHead');
             var tbody = getEl('tableBody');
@@ -1137,7 +2445,6 @@
         // ============================================================
         // DASHBOARD
         // ============================================================
-
         function showDashboard() {
             if (csvData.length === 0) { showError('Please process data first!'); return; }
             var staffData = {};
@@ -1193,7 +2500,6 @@
         // ============================================================
         // EXPORT EXCEL
         // ============================================================
-
         function exportExcel() {
             if (csvData.length === 0) { showError('No data to export! Process first.'); return; }
             catJumpTo('btnExportExcel');
@@ -1217,7 +2523,7 @@
                     if (d.hasBonus && d.hasParkson) staffData[sid].both++;
                     if (d.staffName) staffData[sid].name = d.staffName;
                 }
-                
+
                 var staffRows = [
                     ['#', 'Staff ID', 'Staff Name', 'Total', 'Parkson', 'Bonuslink', 'Both', '% Parkson', '% Bonuslink']
                 ];
@@ -1230,7 +2536,9 @@
                     var pctBonus = d2.total > 0 ? roundPct((d2.bonus / d2.total) * 100) : 0;
                     staffRows.push([rank, sorted[s], d2.name, d2.total, d2.parkson, d2.bonus, d2.both, pctParkson + '%', pctBonus + '%']);
                 }
-                var totalParkson = 0, totalBonus = 0, totalBoth = 0;
+                var totalParkson = 0,
+                    totalBonus = 0,
+                    totalBoth = 0;
                 for (var s2 = 0; s2 < sorted.length; s2++) {
                     var d3 = staffData[sorted[s2]];
                     totalParkson += d3.parkson;
@@ -1257,7 +2565,7 @@
                     if (d4.date && posData[pos].dates.indexOf(d4.date) === -1) posData[pos].dates.push(d4.date);
                 }
                 var posKeys = Object.keys(posData);
-                
+
                 var swapRows = [['RANK', 'POS', 'RANGE DATE', 'TOTAL (SWAP PC)']];
                 var swapList = [];
                 for (var p = 0; p < posKeys.length; p++) {
@@ -1335,7 +2643,10 @@
                     rank4++;
                     tabRows.push([rank4, tabList[s7].pos, tabList[s7].range, tabList[s7].total, tabList[s7].parkson, tabList[s7].bonus, tabList[s7].both, tabList[s7].pctParkson + '%', tabList[s7].pctBonus + '%']);
                 }
-                var totalAll = 0, totalParksonAll2 = 0, totalBonusAll = 0, totalBothAll = 0;
+                var totalAll = 0,
+                    totalParksonAll2 = 0,
+                    totalBonusAll = 0,
+                    totalBothAll = 0;
                 for (var s8 = 0; s8 < tabList.length; s8++) {
                     totalAll += tabList[s8].total;
                     totalParksonAll2 += tabList[s8].parkson;
@@ -1404,7 +2715,10 @@
                     var pctBonusPcd = d9.total > 0 ? roundPct((d9.bonus / d9.total) * 100) : 0;
                     pcdRows.push([d9.date, d9.pos, d9.staffId, d9.staffName, d9.total, d9.swap, d9.noSwap, d9.bonus, pctSwapPcd + '%', pctBonusPcd + '%']);
                 }
-                var totalTransPcd = 0, totalSwapPcd = 0, totalNoSwapPcd = 0, totalBonusPcd = 0;
+                var totalTransPcd = 0,
+                    totalSwapPcd = 0,
+                    totalNoSwapPcd = 0,
+                    totalBonusPcd = 0;
                 for (var s10 = 0; s10 < pcdList.length; s10++) {
                     totalTransPcd += pcdList[s10].total;
                     totalSwapPcd += pcdList[s10].swap;
@@ -1421,7 +2735,7 @@
 
                 var now = new Date();
                 var dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
-                var filename = 'Parkson_Card_Report_' + dateStr + '.xlsx';
+                var filename = 'ParksonCardSwap_Report_' + dateStr + '.xlsx';
 
                 XLSX.writeFile(wb, filename);
 
@@ -1439,7 +2753,6 @@
         // ============================================================
         // SAMPLE DATA
         // ============================================================
-
         function loadSample() {
             var sample =
                 'H21072612722072612:05:23  V002\n00127210726101000042787610392810401625800500111100000000020000000634.00+00000000010000000605.00+00000         6018840020120750000000.00+00000302.00+00000303.00+000000.00+00000605.00+                                                    00000000.00+00000000.00+                               0000000000.00+PMY LS6.2 20141230  00000605.00+0201000002131051                 430871    2                 0000000000.00+00000000.00+                                                                    \n00127210726101000042787710544410554025800500111100000000030000000673.00+00000000010000000039.00+00000         6018840016815264000000.00+00000019.00+00000000.00+000000.00+00000019.00+                                                    00000000.00+00000000.00+                               0000000000.00+PMY LS6.2 20141230  00000039.00+0201000000371930                 430872    2                 0000000000.00+00000000.00+                                                                    \nF000596';
@@ -1460,7 +2773,6 @@
         // ============================================================
         // CLEAR ALL
         // ============================================================
-
         function clearAll() {
             transData = '';
             csvData = [];
@@ -1506,12 +2818,112 @@
         // ============================================================
         // INIT
         // ============================================================
+        generateSudoku();
+
+        document.querySelectorAll('.num-btn').forEach(function(btn) {
+            btn.addEventListener('click', function() {
+                var num = parseInt(this.dataset.num);
+                sudokuNumberClick9x9(num);
+            });
+        });
+
+        // Keyboard shortcuts for Sudoku
+        document.addEventListener('keydown', function(e) {
+            var panel = document.getElementById('sudokuPanel');
+            if (!panel || !panel.classList.contains('show')) return;
+
+            if (e.key >= '1' && e.key <= '9') {
+                e.preventDefault();
+                var num = parseInt(e.key);
+                sudokuNumberClick9x9(num);
+            }
+            if (e.key === 'h' || e.key === 'H') {
+                e.preventDefault();
+                sudokuHint();
+            }
+            if (e.key === 'z' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                sudokuUndo();
+            }
+            if (e.key === 'r' || e.key === 'R') {
+                e.preventDefault();
+                resetSudoku();
+            }
+            if (e.key === 'Escape') {
+                panel.classList.remove('show');
+            }
+            if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.key)) {
+                e.preventDefault();
+                if (!selectedCell) {
+                    for (var r = 0; r < 9; r++) {
+                        for (var c = 0; c < 9; c++) {
+                            if (sudokuGrid[r][c] === 0) {
+                                selectedCell = { row: r, col: c };
+                                renderSudoku9x9();
+                                return;
+                            }
+                        }
+                    }
+                    return;
+                }
+                var row = selectedCell.row;
+                var col = selectedCell.col;
+                if (e.key === 'ArrowUp') row = Math.max(0, row - 1);
+                if (e.key === 'ArrowDown') row = Math.min(8, row + 1);
+                if (e.key === 'ArrowLeft') col = Math.max(0, col - 1);
+                if (e.key === 'ArrowRight') col = Math.min(8, col + 1);
+                if (sudokuGiven[row][col]) {
+                    var found = false;
+                    var tempRow = row,
+                        tempCol = col;
+                    for (var i = 0; i < 9; i++) {
+                        if (e.key === 'ArrowUp') tempRow = Math.max(0, row - i);
+                        if (e.key === 'ArrowDown') tempRow = Math.min(8, row + i);
+                        if (e.key === 'ArrowLeft') tempCol = Math.max(0, col - i);
+                        if (e.key === 'ArrowRight') tempCol = Math.min(8, col + i);
+                        if (!sudokuGiven[tempRow][tempCol]) {
+                            row = tempRow;
+                            col = tempCol;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) return;
+                }
+                selectedCell = { row: row, col: col };
+                renderSudoku9x9();
+            }
+            if (e.key === 'Delete' || e.key === 'Backspace') {
+                e.preventDefault();
+                if (selectedCell) {
+                    var row = selectedCell.row;
+                    var col = selectedCell.col;
+                    if (!sudokuGiven[row][col] && sudokuGrid[row][col] !== 0) {
+                        sudokuGrid[row][col] = 0;
+                        sudokuScore--;
+                        renderSudoku9x9();
+                        updateSudokuScore9x9();
+                        document.getElementById('sudokuCat').textContent = '😽';
+                        setTimeout(function() { document.getElementById('sudokuCat').textContent = '😺'; }, 500);
+                    }
+                }
+            }
+        });
 
         updateCat('😺 Sedia!', '🐾 Upload transaction file dulu ya!', '🐱', '📁 Upload Transaction');
         console.log('🐱🏖️ PAW Extractor ready!');
         console.log('📁 Upload transaction files + Cashier Names (2 methods)');
         console.log('📤 Method 1: Upload Excel/TXT');
         console.log('📝 Method 2: Paste Cashier ID & Name');
+        console.log('🧩 Sudoku 9x9 sedia! Klik 🐾 Sudoku untuk main');
+        console.log('⌨️ Keyboard Shortcuts:');
+        console.log('   🔢 1-9  : Isi number');
+        console.log('   ⬆⬇⬅➡ : Navigate cells');
+        console.log('   ⌨️ H    : Hint');
+        console.log('   ⌨️ R    : New puzzle');
+        console.log('   ⌨️ Del  : Clear cell');
+        console.log('   ⌨️ Esc  : Close Sudoku');
+        console.log('   ⌨️ Ctrl+Z : Undo');
         console.log('🐱 Kucing akan melompat dan menangkap ikan!');
     </script>
 </body>
