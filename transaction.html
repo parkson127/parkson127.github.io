@@ -21,11 +21,9 @@
             min-height: 100vh;
             position: relative;
             overflow-x: hidden;
-            /* --- TEMA: gambar latar belakang --- */
             background: url('https://raw.githubusercontent.com/parkson127/parkson127.github.io/refs/heads/main/f34676274f62e754a6ee7484436d4ee7.avif') no-repeat center center fixed;
             background-size: cover;
         }
-        /* overlay lebih cerah untuk kebolehbacaan */
         body::before {
             content: '';
             position: fixed;
@@ -34,10 +32,8 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.15);
-            /* kurang gelap */
             z-index: -1;
         }
-        /* paw background (hiasan) */
         .paw-bg {
             position: fixed;
             font-size: 28px;
@@ -88,11 +84,10 @@
             animation-duration: 19s;
             animation-delay: 10s
         }
+
         .container {
             background: rgba(255, 255, 255, 0.88);
-            /* lebih jelas */
             backdrop-filter: blur(4px);
-            /* kurang kabur */
             padding: 20px;
             border-radius: 16px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.25);
@@ -100,27 +95,14 @@
             z-index: 1;
             border: 2px solid rgba(255, 183, 77, 0.5);
         }
+
+        /* ===== HEADER ===== */
         .cat-header {
             display: flex;
             align-items: center;
             gap: 12px;
             flex-wrap: wrap;
             margin-bottom: 10px
-        }
-        .cat-icon {
-            font-size: 40px;
-            animation: bounceCat 2.5s infinite ease-in-out;
-            cursor: pointer;
-            display: inline-block
-        }
-        @keyframes bounceCat {
-            0%,
-            100% {
-                transform: translateY(0)
-            }
-            50% {
-                transform: translateY(-10px)
-            }
         }
         .cat-header h1 {
             color: #d35400;
@@ -136,10 +118,17 @@
             opacity: 0.7;
             font-style: italic
         }
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        /* ===== SUDOKU ===== */
         .sudoku-container {
             position: relative;
             display: inline-block;
-            margin-left: auto;
             cursor: pointer;
             user-select: none
         }
@@ -159,11 +148,6 @@
             background: rgba(255, 183, 77, .4);
             transform: scale(1.05)
         }
-        .sudoku-container .sudoku-toggle .cat-paw {
-            font-size: 16px;
-            animation: catIdle 2s infinite ease-in-out;
-            display: inline-block
-        }
         .sudoku-panel {
             display: none;
             position: absolute;
@@ -172,7 +156,7 @@
             background: rgba(255, 255, 255, .98);
             border: 2px solid #f39c12;
             border-radius: 12px;
-            padding: 12px 12px 15px 12px;
+            padding: 12px;
             box-shadow: 0 8px 32px rgba(0, 0, 0, .2);
             z-index: 100;
             min-width: 340px;
@@ -191,30 +175,6 @@
                 opacity: 1;
                 transform: translateY(0) scale(1)
             }
-        }
-        .sudoku-panel .sudoku-title {
-            font-size: 12px;
-            font-weight: 700;
-            color: #d35400;
-            text-align: center;
-            margin-bottom: 4px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center
-        }
-        .sudoku-panel .sudoku-title span {
-            font-size: 13px
-        }
-        .sudoku-panel .sudoku-close {
-            background: none;
-            border: none;
-            font-size: 16px;
-            cursor: pointer;
-            color: #999;
-            padding: 0 4px
-        }
-        .sudoku-panel .sudoku-close:hover {
-            color: #dc3545
         }
         .sudoku-grid {
             display: grid;
@@ -235,7 +195,6 @@
             justify-content: center;
             font-size: 14px;
             font-weight: 700;
-            border-radius: 1px;
             background: #fff;
             border: 1px solid #ddd;
             cursor: pointer;
@@ -282,25 +241,11 @@
             animation: shake .4s;
             background: #ff6b6b !important
         }
-        .sudoku-cell .cell-note {
-            font-size: 7px;
-            color: #999;
-            position: absolute;
-            top: 1px;
-            left: 2px;
-            line-height: 1
-        }
         .sudoku-cell.border-right {
             border-right: 2px solid #333
         }
         .sudoku-cell.border-bottom {
             border-bottom: 2px solid #333
-        }
-        .sudoku-cell.border-left {
-            border-left: 2px solid #333
-        }
-        .sudoku-cell.border-top {
-            border-top: 2px solid #333
         }
         @keyframes pulseGreen {
             0%,
@@ -358,11 +303,6 @@
             transform: scale(1.1);
             border-color: #f39c12
         }
-        .sudoku-numbers .num-btn.active {
-            background: #d35400;
-            color: #fff;
-            border-color: #d35400
-        }
         .sudoku-numbers .num-btn.used {
             opacity: .3;
             cursor: not-allowed
@@ -382,39 +322,23 @@
             color: #f39c12;
             font-weight: 700;
             cursor: pointer;
-            font-size: 10px;
             padding: 2px 8px;
             border-radius: 10px;
             background: rgba(243, 156, 18, .1)
         }
-        .sudoku-status .sudoku-hint:hover {
-            background: rgba(243, 156, 18, .2)
-        }
-        .sudoku-status .sudoku-score {
-            color: #28a745;
-            font-weight: 700
-        }
         .sudoku-status .sudoku-undo {
             color: #6c757d;
             cursor: pointer;
-            font-size: 10px;
             padding: 2px 8px;
             border-radius: 10px;
             background: #f8f9fa
         }
-        .sudoku-status .sudoku-undo:hover {
-            background: #e9ecef
-        }
         .sudoku-status .sudoku-reset {
             color: #dc3545;
             cursor: pointer;
-            font-size: 10px;
             padding: 2px 8px;
             border-radius: 10px;
             background: rgba(220, 53, 69, .1)
-        }
-        .sudoku-status .sudoku-reset:hover {
-            background: rgba(220, 53, 69, .2)
         }
         .sudoku-cat {
             font-size: 24px;
@@ -423,43 +347,21 @@
             animation: catIdle 2s infinite ease-in-out;
             display: block
         }
-        .cat-header .header-right {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-left: auto
+
+        /* ===== CAT & LAIN-LAIN ===== */
+        .cat-icon {
+            font-size: 40px;
+            animation: bounceCat 2.5s infinite ease-in-out;
+            cursor: pointer;
+            display: inline-block
         }
-        @media(max-width:768px) {
-            .sudoku-panel {
-                left: 50%;
-                transform: translateX(-50%);
-                right: auto;
-                top: 45px;
-                min-width: 300px
+        @keyframes bounceCat {
+            0%,
+            100% {
+                transform: translateY(0)
             }
-            .sudoku-panel.show {
-                transform: translateX(-50%) scale(1)
-            }
-            .sudoku-grid {
-                width: 270px
-            }
-            .sudoku-cell {
-                width: 28px;
-                height: 28px;
-                font-size: 12px
-            }
-        }
-        @media(max-width:480px) {
-            .sudoku-panel {
-                min-width: 280px
-            }
-            .sudoku-grid {
-                width: 243px
-            }
-            .sudoku-cell {
-                width: 25px;
-                height: 25px;
-                font-size: 11px
+            50% {
+                transform: translateY(-10px)
             }
         }
         .cat-container {
@@ -472,8 +374,6 @@
             border-radius: 12px;
             border: 2px dashed rgba(255, 183, 77, .3);
             min-height: 80px;
-            position: relative;
-            overflow: hidden;
             flex-wrap: wrap;
             gap: 10px
         }
@@ -617,10 +517,6 @@
             line-height: 1.4;
             min-width: 150px
         }
-        .cat-container .cat-right .highlight {
-            color: #d35400;
-            font-weight: 700
-        }
         .cat-container .progress-cat {
             flex: 1;
             margin: 0 15px;
@@ -644,6 +540,7 @@
             font-size: 11px;
             color: #666
         }
+
         .grid-2 {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -708,14 +605,6 @@
         }
         .badge-optional {
             background: #28a745;
-            color: #fff
-        }
-        .badge-txt {
-            background: #17a2b8;
-            color: #fff
-        }
-        .badge-excel {
-            background: #217346;
             color: #fff
         }
         .flex {
@@ -808,11 +697,6 @@
             background: #f8d7da;
             color: #721c24;
             border-left: 4px solid #dc3545
-        }
-        .status-box.warning {
-            background: #fff3cd;
-            color: #856404;
-            border-left: 4px solid #ffc107
         }
         .staff-preview {
             display: none;
@@ -1081,6 +965,7 @@
             color: #721c24;
             display: block
         }
+
         @media(max-width:768px) {
             .grid-2 {
                 grid-template-columns: 1fr
@@ -1251,7 +1136,8 @@
         <div class="advanced-content" id="advancedContent">
             <div class="row">
                 <label>📏 Column Widths:</label>
-                <input type="text" id="columnWidths" value="5,6,3,10,6,6,6,40,14,14,16,210,16,138">
+                <!-- === INI YANG PERLU DIUBAH === -->
+                <input type="text" id="columnWidths" value="5,6,3,10,6,6,6,40,14,14,16,209,16,139">
             </div>
             <div class="row">
                 <label>📋 Extract Columns:</label>
@@ -1266,8 +1152,8 @@
 
         <!-- Buttons -->
         <div class="flex">
-            <button class="btn-primary" onclick="processAll()" id="btnProcessAll"><span class="btn-icon">🐱</span> Process All</button>
-            <button class="btn-excel" onclick="exportExcel()" id="btnExportExcel"><span class="btn-icon">🐟</span> Export Excel</button>
+            <button class="btn-primary" onclick="processAll()" id="btnProcessAll"><span class="btn-icon">🐱</span> Process All (auto Excel)</button>
+            <button class="btn-excel" onclick="exportExcel()" id="btnExportExcel"><span class="btn-icon">🐟</span> Export Excel (manual)</button>
             <button class="btn-info" onclick="showDashboard()">📊 Dashboard</button>
             <button class="btn-danger" onclick="clearAll()">🗑️ Clear</button>
             <button class="btn-warning btn-sm" onclick="loadSample()">📋 Sample</button>
@@ -1332,9 +1218,6 @@
         var selectedCell = null;
         var sudokuScore = 0;
         var sudokuHistory = [];
-        var sudokuCatEmojis = ['😺', '😸', '😻', '🐱', '🐈', '😽', '🐾'];
-        var sudokuSize = 9;
-        var sudokuBoxSize = 3;
 
         function generateSudoku() {
             var grid = Array.from({ length: 9 }, () => Array(9).fill(0));
@@ -2084,7 +1967,6 @@
             var input = document.getElementById('cashierPasteInput');
             if (input) {
                 input.value = sample;
-                // Auto process
                 processCashierPaste();
             }
         }
@@ -2156,7 +2038,7 @@
         }
 
         // ============================================================
-        // PROCESS ALL
+        // PROCESS ALL + AUTO EXPORT EXCEL
         // ============================================================
         function processAll() {
             if (isProcessing) return;
@@ -2203,8 +2085,8 @@
                     currentStep++;
                     pct = Math.round((currentStep / totalSteps) * 100);
                     var elapsed = Math.round((Date.now() - startTime) / 1000);
-                    updateProgress(pct, '✅ Complete!', elapsed + 's');
-                    showCatProgress(100, '✅ Complete!');
+                    updateProgress(pct, '✅ Complete! Auto-exporting Excel...', elapsed + 's');
+                    showCatProgress(100, '✅ Complete! Auto-exporting Excel...');
                     var rc = getEl('rowCount');
                     if (rc) rc.textContent = csvData.length;
                     var smc = getEl('staffMatchedCount');
@@ -2216,13 +2098,21 @@
                     if (dc) dc.textContent = Object.keys(dates).length;
                     var msg = '✅ Extracted ' + csvData.length + ' rows';
                     if (matchedCount > 0) msg += ' | ' + matchedCount + ' staff matched';
-                    showSuccess(msg);
+                    showSuccess(msg + ' — Excel downloading now...');
+
+                    // === AUTO EXPORT EXCEL ===
+                    try {
+                        exportExcel();
+                    } catch (ex) {
+                        showError('Auto-export error: ' + ex.message);
+                    }
+
                     catCatchFish();
-                    updateCat('🎉', '🐾 Selesai! ' + csvData.length + ' transactions', '😸', '✅ Complete!');
+                    updateCat('🎉', '🐾 Selesai! ' + csvData.length + ' transactions + Excel', '😸', '✅ Complete + Excel');
                     setTimeout(function() {
                         catJumpTo('btnExportExcel');
-                        updateCat('🐱', '🐾 Sedia Export Excel!', '😺', '📊 Export Excel');
-                    }, 1500);
+                        updateCat('🐱', '🐾 Sedia Export Excel (manual)', '😺', '📊 Export Excel');
+                    }, 2000);
                     isProcessing = false;
                 } catch (e) {
                     showError('Error: ' + e.message);
@@ -2501,20 +2391,17 @@
         }
 
         // ============================================================
-        // EXPORT EXCEL
+        // EXPORT EXCEL (digunakan oleh auto-export dan manual)
         // ============================================================
         function exportExcel() {
             if (csvData.length === 0) { showError('No data to export! Process first.'); return; }
-            catJumpTo('btnExportExcel');
-            updateCat('⏳', '🐾 Menyediakan Excel...', '🐱', '📊 Exporting...');
             if (Object.keys(staffMap).length > 0) matchStaffNames();
 
             try {
                 var filteredData = allRawData.filter(function(d) { return d.pos !== '001'; });
-
                 var wb = XLSX.utils.book_new();
 
-                // SHEET 1: Staff Dashboard
+                // --- SHEET 1: Staff Dashboard ---
                 var staffData = {};
                 for (var i = 0; i < filteredData.length; i++) {
                     var d = filteredData[i];
@@ -2526,7 +2413,6 @@
                     if (d.hasBonus && d.hasParkson) staffData[sid].both++;
                     if (d.staffName) staffData[sid].name = d.staffName;
                 }
-
                 var staffRows = [
                     ['#', 'Staff ID', 'Staff Name', 'Total', 'Parkson', 'Bonuslink', 'Both', '% Parkson', '% Bonuslink']
                 ];
@@ -2551,12 +2437,11 @@
                 var overallPctParkson = filteredData.length > 0 ? roundPct((totalParkson / filteredData.length) * 100) : 0;
                 var overallPctBonus = filteredData.length > 0 ? roundPct((totalBonus / filteredData.length) * 100) : 0;
                 staffRows.push(['TOTAL', '', '', filteredData.length, totalParkson, totalBonus, totalBoth, overallPctParkson + '%', overallPctBonus + '%']);
-
                 var ws1 = XLSX.utils.aoa_to_sheet(staffRows);
                 ws1['!cols'] = [{ wch: 6 }, { wch: 15 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws1, 'Staff Dashboard');
 
-                // SHEET 2: SWAP Parkson
+                // --- SHEET 2: SWAP Parkson ---
                 var posData = {};
                 for (var i2 = 0; i2 < filteredData.length; i2++) {
                     var d4 = filteredData[i2];
@@ -2568,7 +2453,6 @@
                     if (d4.date && posData[pos].dates.indexOf(d4.date) === -1) posData[pos].dates.push(d4.date);
                 }
                 var posKeys = Object.keys(posData);
-
                 var swapRows = [['RANK', 'POS', 'RANGE DATE', 'TOTAL (SWAP PC)']];
                 var swapList = [];
                 for (var p = 0; p < posKeys.length; p++) {
@@ -2589,7 +2473,7 @@
                 ws2['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws2, 'SWAP Parkson');
 
-                // SHEET 3: NOT SWAP
+                // --- SHEET 3: NOT SWAP ---
                 var noSwapRows = [['RANK', 'POS', 'RANGE DATE', 'TOTAL (NOT SWAP PC)']];
                 var noSwapList = [];
                 for (var p2 = 0; p2 < posKeys.length; p2++) {
@@ -2610,7 +2494,7 @@
                 ws3['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws3, 'NOT SWAP Parkson');
 
-                // SHEET 4: POS Tabulation
+                // --- SHEET 4: POS Tabulation ---
                 var tabRows = [
                     ['RANK', 'POS', 'RANGE DATE', 'TOTAL', 'PARKSON', 'BONUSLINK', 'BOTH', '% PARKSON', '% BONUSLINK']
                 ];
@@ -2663,20 +2547,39 @@
                 ws4['!cols'] = [{ wch: 8 }, { wch: 15 }, { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 12 }, { wch: 10 }, { wch: 12 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws4, 'POS Tabulation');
 
-                // SHEET 5: Raw Data
+                // --- SHEET 5: Raw Data (dengan parksoncard sebagai teks) ---
                 var rawRows = [headers];
                 for (var r = 0; r < csvData.length; r++) {
-                    rawRows.push(csvData[r]);
+                    var row = csvData[r].slice();
+                    if (row[10] !== undefined && row[10] !== null) {
+                        row[10] = String(row[10]);
+                    }
+                    rawRows.push(row);
                 }
                 var ws5 = XLSX.utils.aoa_to_sheet(rawRows);
-                ws5['!cols'] = headers.map(function(h, idx) {
+                ws5['!cols'] = [];
+                for (var ci = 0; ci < headers.length; ci++) {
                     var col = { wch: 14 };
-                    if (idx === 10) { col.numFmt = '@'; }
-                    return col;
-                });
+                    if (ci === 10) {
+                        col.numFmt = '@';
+                        col.wch = 18;
+                    }
+                    ws5['!cols'].push(col);
+                }
+                var range = XLSX.utils.decode_range(ws5['!ref']);
+                for (var R = range.s.r + 1; R <= range.e.r; R++) {
+                    var cellAddress = XLSX.utils.encode_cell({ r: R, c: 10 });
+                    if (ws5[cellAddress]) {
+                        var val = ws5[cellAddress].v;
+                        if (val !== undefined && val !== null) {
+                            ws5[cellAddress].v = String(val);
+                            ws5[cellAddress].t = 's';
+                        }
+                    }
+                }
                 XLSX.utils.book_append_sheet(wb, ws5, 'Raw Data');
 
-                // SHEET 6: POS by Cashier by Date
+                // --- SHEET 6: POS by Cashier by Date ---
                 var posCashierDate = {};
                 for (var i5 = 0; i5 < filteredData.length; i5++) {
                     var d8 = filteredData[i5];
@@ -2699,7 +2602,6 @@
                     if (d8.hasBonus) posCashierDate[key].bonus++;
                     if (d8.staffName) posCashierDate[key].staffName = d8.staffName;
                 }
-
                 var pcdRows = [
                     ['DATE', 'POS', 'STAFF ID', 'STAFF NAME', 'TOTAL TRANS', 'SWAP (PC)', 'NOT SWAP (PC)', 'BONUSLINK', '% SWAP (PC)', '% BONUSLINK']
                 ];
@@ -2711,7 +2613,6 @@
                     if (posCompare !== 0) return posCompare;
                     return a.staffId.localeCompare(b.staffId);
                 });
-
                 for (var s9 = 0; s9 < pcdList.length; s9++) {
                     var d9 = pcdList[s9];
                     var pctSwapPcd = d9.total > 0 ? roundPct((d9.swap / d9.total) * 100) : 0;
@@ -2731,15 +2632,14 @@
                 var overallPctSwapPcd = totalTransPcd > 0 ? roundPct((totalSwapPcd / totalTransPcd) * 100) : 0;
                 var overallPctBonusPcd = totalTransPcd > 0 ? roundPct((totalBonusPcd / totalTransPcd) * 100) : 0;
                 pcdRows.push(['TOTAL', '', '', '', totalTransPcd, totalSwapPcd, totalNoSwapPcd, totalBonusPcd, overallPctSwapPcd + '%', overallPctBonusPcd + '%']);
-
                 var ws6 = XLSX.utils.aoa_to_sheet(pcdRows);
                 ws6['!cols'] = [{ wch: 14 }, { wch: 10 }, { wch: 15 }, { wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
                 XLSX.utils.book_append_sheet(wb, ws6, 'POS by Cashier by Date');
 
+                // --- Simpan fail ---
                 var now = new Date();
                 var dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
                 var filename = 'ParksonCardSwap_Report_' + dateStr + '.xlsx';
-
                 XLSX.writeFile(wb, filename);
 
                 catCatchFish();
@@ -2914,20 +2814,12 @@
         });
 
         updateCat('😺 Sedia!', '🐾 Upload transaction file dulu ya!', '🐱', '📁 Upload Transaction');
-        console.log('🐱🏖️ PAW Extractor ready!');
+        console.log('🐱🏖️ PAW Extractor ready! Auto-export Excel enabled.');
         console.log('📁 Upload transaction files + Cashier Names (2 methods)');
         console.log('📤 Method 1: Upload Excel/TXT');
         console.log('📝 Method 2: Paste Cashier ID & Name');
         console.log('🧩 Sudoku 9x9 sedia! Klik 🐾 Sudoku untuk main');
-        console.log('⌨️ Keyboard Shortcuts:');
-        console.log('   🔢 1-9  : Isi number');
-        console.log('   ⬆⬇⬅➡ : Navigate cells');
-        console.log('   ⌨️ H    : Hint');
-        console.log('   ⌨️ R    : New puzzle');
-        console.log('   ⌨️ Del  : Clear cell');
-        console.log('   ⌨️ Esc  : Close Sudoku');
-        console.log('   ⌨️ Ctrl+Z : Undo');
-        console.log('🐱 Kucing akan melompat dan menangkap ikan!');
+        console.log('⚡ Process All akan auto muat turun Excel selepas selesai!');
     </script>
 </body>
 </html>
