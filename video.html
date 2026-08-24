@@ -327,10 +327,25 @@
             transition: width 0.2s;
         }
 
-        .codec-info {
-            font-size: 0.75rem;
-            color: #666;
-            margin-left: 4px;
+        .format-status {
+            font-size: 0.8rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #1a1a2a;
+            border: 1px solid #3a3a4a;
+            color: #aaa;
+            width: 100%;
+            text-align: center;
+            margin-top: 4px;
+        }
+        .format-status .supported {
+            color: #5a9a5a;
+        }
+        .format-status .unsupported {
+            color: #c06050;
+        }
+        .format-status .warning {
+            color: #d0a040;
         }
 
         @media (max-width: 600px) {
@@ -368,10 +383,11 @@
 
         <h1>
             🎬 Video Rotator
-            <small>H.264 / H.265 · AAC</small>
+            <small>export with actual codec</small>
         </h1>
         <div class="sub">
-            Upload a video, apply rotation/flip, and export with original dimensions.
+            Upload a video, apply rotation/flip, and export. <strong>Note:</strong> Browsers
+            only support WebM encoding natively. MP4 selection will fallback to WebM.
         </div>
 
         <div class="video-wrapper" id="videoWrapper">
@@ -421,16 +437,17 @@
         <div class="download-section">
             <span class="label">📥 Export</span>
             <select id="formatSelect">
-                <option value="mp4-h264">MP4 (H.264 / AAC)</option>
-                <option value="mp4-h265">MP4 (H.265 / AAC) · HEVC</option>
-                <option value="webm">WebM (VP9 / Opus)</option>
+                <option value="webm">WebM (VP8/Opus) - Recommended</option>
+                <option value="mp4">MP4 (fallback to WebM if H.264 not supported)</option>
             </select>
             <button class="btn btn-success" id="downloadBtn">⬇ Download</button>
             <span class="download-status" id="downloadStatus">
                 <span id="statusText">ready</span>
                 <span class="progress-bar"><span class="fill" id="progressFill"></span></span>
             </span>
-            <span class="codec-info" id="codecInfo">ⓘ</span>
+            <div class="format-status" id="formatStatus">
+                <span id="formatStatusText">Checking browser support...</span>
+            </div>
         </div>
 
     </div>
@@ -458,7 +475,7 @@
             const formatSelect = document.getElementById('formatSelect');
             const statusText = document.getElementById('statusText');
             const progressFill = document.getElementById('progressFill');
-            const codecInfo = document.getElementById('codecInfo');
+            const formatStatusText = document.getElementById('formatStatusText');
 
             // ── state ──
             let currentAngle = 0;
@@ -467,27 +484,59 @@
             let hasVideo = false;
             let isProcessing = false;
 
-            // ── codec definitions ──
-            const CODECS = {
-                'mp4-h264': {
-                    mimeType: 'video/mp4;codecs="avc1.42E01E, mp4a.40.2"',
-                    fallback: 'video/mp4',
-                    label: 'H.264 / AAC',
-                    ext: 'mp4'
-                },
-                'mp4-h265': {
-                    mimeType: 'video/mp4;codecs="hvc1.1.6.L93.90, mp4a.40.2"',
-                    fallback: 'video/mp4',
-                    label: 'H.265 / AAC',
-                    ext: 'mp4'
-                },
-                'webm': {
-                    mimeType: 'video/webm;codecs="vp9, opus"',
-                    fallback: 'video/webm',
-                    label: 'VP9 / Opus',
-                    ext: 'webm'
+            // ── check browser support ──
+            function checkFormatSupport() {
+                const webmSupport = MediaRecorder.isTypeSupported('video/webm;codecs="vp8, opus"') ||
+                                   MediaRecorder.isTypeSupported('video/webm');
+                const mp4Support = MediaRecorder.isTypeSupported('video/mp4;codecs="avc1.42E01E, mp4a.40.2"') ||
+                                  MediaRecorder.isTypeSupported('video/mp4');
+
+                let statusHtml = '';
+                if (webmSupport) {
+                    statusHtml += '✅ WebM: <span class="supported">supported</span> ';
+                } else {
+                    statusHtml += '❌ WebM: <span class="unsupported">not supported</span> ';
                 }
-            };
+
+                if (mp4Support) {
+                    statusHtml += '✅ MP4/H.264: <span class="supported">supported</span> (Safari only)';
+                } else {
+                    statusHtml += '⚠️ MP4/H.264: <span class="warning">not supported</span> (will use WebM)';
+                }
+
+                formatStatusText.innerHTML = statusHtml;
+                return { webmSupport, mp4Support };
+            }
+
+            // ── get actual format to use ──
+            function getActualFormat() {
+                const selected = formatSelect.value;
+                const webmSupported = MediaRecorder.isTypeSupported('video/webm;codecs="vp8, opus"') ||
+                                     MediaRecorder.isTypeSupported('video/webm');
+
+                if (selected === 'webm') {
+                    if (webmSupported) {
+                        return { mimeType: 'video/webm;codecs="vp8, opus"', ext: 'webm', label: 'WebM (VP8/Opus)' };
+                    } else {
+                        // Fallback to basic webm
+                        return { mimeType: 'video/webm', ext: 'webm', label: 'WebM (basic)' };
+                    }
+                }
+
+                // MP4 selected
+                const mp4Supported = MediaRecorder.isTypeSupported('video/mp4;codecs="avc1.42E01E, mp4a.40.2"');
+                if (mp4Supported) {
+                    return { mimeType: 'video/mp4;codecs="avc1.42E01E, mp4a.40.2"', ext: 'mp4', label: 'MP4 (H.264/AAC)' };
+                }
+
+                // MP4 not supported, use WebM but with .mp4 extension (will actually be WebM)
+                if (webmSupported) {
+                    return { mimeType: 'video/webm;codecs="vp8, opus"', ext: 'mp4', label: 'MP4 (actually WebM - fallback)' };
+                }
+
+                // Ultimate fallback
+                return { mimeType: 'video/webm', ext: 'webm', label: 'WebM (fallback)' };
+            }
 
             // ── helpers ──
             function updateTransform() {
@@ -517,39 +566,6 @@
                 flipX = false;
                 flipY = false;
                 updateTransform();
-            }
-
-            function getEffectiveCodec() {
-                const key = formatSelect.value;
-                const codec = CODECS[key];
-                if (!codec) return CODECS['mp4-h264'];
-
-                // Check if the specific codec is supported
-                if (MediaRecorder.isTypeSupported(codec.mimeType)) {
-                    return codec;
-                }
-                // Fallback to generic version
-                if (MediaRecorder.isTypeSupported(codec.fallback)) {
-                    return { ...codec, mimeType: codec.fallback };
-                }
-                // Ultimate fallback to any mp4
-                if (MediaRecorder.isTypeSupported('video/mp4')) {
-                    return { mimeType: 'video/mp4', label: 'MP4 (generic)', ext: 'mp4' };
-                }
-                if (MediaRecorder.isTypeSupported('video/webm')) {
-                    return { mimeType: 'video/webm', label: 'WebM', ext: 'webm' };
-                }
-                return null;
-            }
-
-            function updateCodecInfo() {
-                const codec = getEffectiveCodec();
-                if (codec) {
-                    codecInfo.textContent = `📹 ${codec.label}`;
-                    codecInfo.title = codec.mimeType;
-                } else {
-                    codecInfo.textContent = '⚠️ no supported codec';
-                }
             }
 
             // ── load video ──
@@ -588,10 +604,21 @@
                 }
                 if (isProcessing) return;
 
-                const codec = getEffectiveCodec();
-                if (!codec) {
+                const format = getActualFormat();
+                if (!format) {
                     alert('No supported video format found in your browser.');
                     return;
+                }
+
+                // Show what will be exported
+                const confirmMsg = `Your browser doesn't support MP4/H.264 encoding.\n\n` +
+                                  `The file will be exported as: ${format.label}\n` +
+                                  `File extension: .${format.ext}\n\n` +
+                                  `Continue?`;
+                if (formatSelect.value === 'mp4' && format.label.includes('actually WebM')) {
+                    if (!confirm(confirmMsg)) {
+                        return;
+                    }
                 }
 
                 isProcessing = true;
@@ -639,10 +666,10 @@
                     outputStream.addTrack(audioTrack);
                 }
 
-                const mimeType = codec.mimeType;
+                const mimeType = format.mimeType;
                 const recorder = new MediaRecorder(outputStream, {
                     mimeType: mimeType,
-                    videoBitsPerSecond: 8000000 // 8 Mbps for better quality
+                    videoBitsPerSecond: 5000000 // 5 Mbps
                 });
 
                 let chunks = [];
@@ -655,7 +682,7 @@
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    const ext = codec.ext;
+                    const ext = format.ext;
                     const baseName = fileName.textContent.replace(/\.[^.]+$/, '') || 'video';
                     a.download = `${baseName}_rotated.${ext}`;
                     document.body.appendChild(a);
@@ -669,6 +696,11 @@
                     downloadBtn.disabled = false;
                     statusText.textContent = 'done ✓';
                     progressFill.style.width = '100%';
+
+                    // Show actual format info
+                    setTimeout(() => {
+                        statusText.textContent = `exported as ${format.label}`;
+                    }, 2000);
                 };
 
                 // ── drawing loop ──
@@ -798,7 +830,11 @@
                 }
             });
 
-            formatSelect.addEventListener('change', updateCodecInfo);
+            formatSelect.addEventListener('change', () => {
+                checkFormatSupport();
+                const format = getActualFormat();
+                statusText.textContent = `will export as: ${format.label}`;
+            });
 
             downloadBtn.addEventListener('click', downloadVideo);
 
@@ -828,9 +864,11 @@
             placeholder.style.display = 'block';
             statusText.textContent = 'ready';
             progressFill.style.width = '0%';
-            updateCodecInfo();
+            checkFormatSupport();
 
-            console.log('🎬 Video Rotator ready — H.264 / H.265 support');
+            console.log('🎬 Video Rotator ready');
+            console.log('ℹ️ Note: Most browsers only support WebM encoding.');
+            console.log('   MP4 selection will use WebM as fallback.');
         })();
     </script>
 
