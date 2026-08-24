@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Video Rotator + Download</title>
+    <title>Video Rotator - Smart Format Detection</title>
     <style>
-        /* ── reset & base ── */
         * {
             margin: 0;
             padding: 0;
@@ -27,7 +26,7 @@
             background: #1a1a22;
             border-radius: 24px;
             padding: 30px 35px 40px;
-            max-width: 880px;
+            max-width: 900px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
             border: 1px solid #2e2e3a;
@@ -197,14 +196,6 @@
             border-color: #5a5a7a;
         }
 
-        .btn-danger {
-            background: #a03040;
-            color: #fff;
-        }
-        .btn-danger:hover {
-            background: #c04050;
-        }
-
         .btn-success {
             background: #2a7a4a;
             color: #fff;
@@ -299,9 +290,13 @@
             font-size: 0.9rem;
             cursor: pointer;
             outline: none;
+            min-width: 200px;
         }
         .download-section select:hover {
             border-color: #5a6a9a;
+        }
+        .download-section select option:disabled {
+            color: #666;
         }
 
         .download-status {
@@ -329,7 +324,7 @@
 
         .format-status {
             font-size: 0.8rem;
-            padding: 4px 12px;
+            padding: 8px 14px;
             border-radius: 20px;
             background: #1a1a2a;
             border: 1px solid #3a3a4a;
@@ -337,6 +332,7 @@
             width: 100%;
             text-align: center;
             margin-top: 4px;
+            line-height: 1.6;
         }
         .format-status .supported {
             color: #5a9a5a;
@@ -345,6 +341,30 @@
             color: #c06050;
         }
         .format-status .warning {
+            color: #d0a040;
+        }
+        .format-status .info {
+            color: #4a8ad0;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+        .badge-success {
+            background: #1a4a2a;
+            color: #5a9a5a;
+        }
+        .badge-danger {
+            background: #4a1a1a;
+            color: #c06050;
+        }
+        .badge-warning {
+            background: #4a3a1a;
             color: #d0a040;
         }
 
@@ -374,6 +394,9 @@
                 flex-direction: column;
                 align-items: stretch;
             }
+            .download-section select {
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -383,11 +406,10 @@
 
         <h1>
             🎬 Video Rotator
-            <small>export with actual codec</small>
+            <small>smart format detection</small>
         </h1>
         <div class="sub">
-            Upload a video, apply rotation/flip, and export. <strong>Note:</strong> Browsers
-            only support WebM encoding natively. MP4 selection will fallback to WebM.
+            Upload a video, apply rotation/flip, and export. Your browser's supported formats are auto-detected.
         </div>
 
         <div class="video-wrapper" id="videoWrapper">
@@ -437,8 +459,7 @@
         <div class="download-section">
             <span class="label">📥 Export</span>
             <select id="formatSelect">
-                <option value="webm">WebM (VP8/Opus) - Recommended</option>
-                <option value="mp4">MP4 (fallback to WebM if H.264 not supported)</option>
+                <!-- Will be populated by JavaScript -->
             </select>
             <button class="btn btn-success" id="downloadBtn">⬇ Download</button>
             <span class="download-status" id="downloadStatus">
@@ -446,7 +467,7 @@
                 <span class="progress-bar"><span class="fill" id="progressFill"></span></span>
             </span>
             <div class="format-status" id="formatStatus">
-                <span id="formatStatusText">Checking browser support...</span>
+                <span id="formatStatusText">Detecting browser capabilities...</span>
             </div>
         </div>
 
@@ -483,59 +504,180 @@
             let flipY = false;
             let hasVideo = false;
             let isProcessing = false;
+            let detectedFormats = [];
 
-            // ── check browser support ──
-            function checkFormatSupport() {
-                const webmSupport = MediaRecorder.isTypeSupported('video/webm;codecs="vp8, opus"') ||
-                                   MediaRecorder.isTypeSupported('video/webm');
-                const mp4Support = MediaRecorder.isTypeSupported('video/mp4;codecs="avc1.42E01E, mp4a.40.2"') ||
-                                  MediaRecorder.isTypeSupported('video/mp4');
+            // ── Browser format detection ──
+            function detectSupportedFormats() {
+                const formats = [];
 
-                let statusHtml = '';
-                if (webmSupport) {
-                    statusHtml += '✅ WebM: <span class="supported">supported</span> ';
-                } else {
-                    statusHtml += '❌ WebM: <span class="unsupported">not supported</span> ';
-                }
-
-                if (mp4Support) {
-                    statusHtml += '✅ MP4/H.264: <span class="supported">supported</span> (Safari only)';
-                } else {
-                    statusHtml += '⚠️ MP4/H.264: <span class="warning">not supported</span> (will use WebM)';
-                }
-
-                formatStatusText.innerHTML = statusHtml;
-                return { webmSupport, mp4Support };
-            }
-
-            // ── get actual format to use ──
-            function getActualFormat() {
-                const selected = formatSelect.value;
-                const webmSupported = MediaRecorder.isTypeSupported('video/webm;codecs="vp8, opus"') ||
-                                     MediaRecorder.isTypeSupported('video/webm');
-
-                if (selected === 'webm') {
-                    if (webmSupported) {
-                        return { mimeType: 'video/webm;codecs="vp8, opus"', ext: 'webm', label: 'WebM (VP8/Opus)' };
-                    } else {
-                        // Fallback to basic webm
-                        return { mimeType: 'video/webm', ext: 'webm', label: 'WebM (basic)' };
+                // Check WebM (VP8/VP9)
+                const webmCodecs = [
+                    'video/webm;codecs="vp8, opus"',
+                    'video/webm;codecs="vp9, opus"',
+                    'video/webm'
+                ];
+                for (const codec of webmCodecs) {
+                    if (MediaRecorder.isTypeSupported(codec)) {
+                        formats.push({
+                            id: 'webm',
+                            label: 'WebM (VP8/Opus)',
+                            mimeType: codec,
+                            ext: 'webm',
+                            supported: true,
+                            recommended: true
+                        });
+                        break;
                     }
                 }
 
-                // MP4 selected
-                const mp4Supported = MediaRecorder.isTypeSupported('video/mp4;codecs="avc1.42E01E, mp4a.40.2"');
-                if (mp4Supported) {
-                    return { mimeType: 'video/mp4;codecs="avc1.42E01E, mp4a.40.2"', ext: 'mp4', label: 'MP4 (H.264/AAC)' };
+                // Check MP4 H.264
+                const mp4Codecs = [
+                    'video/mp4;codecs="avc1.42E01E, mp4a.40.2"',
+                    'video/mp4;codecs="avc1.4D401E, mp4a.40.2"',
+                    'video/mp4'
+                ];
+                for (const codec of mp4Codecs) {
+                    if (MediaRecorder.isTypeSupported(codec)) {
+                        formats.push({
+                            id: 'mp4-h264',
+                            label: 'MP4 (H.264/AAC)',
+                            mimeType: codec,
+                            ext: 'mp4',
+                            supported: true,
+                            recommended: false
+                        });
+                        break;
+                    }
                 }
 
-                // MP4 not supported, use WebM but with .mp4 extension (will actually be WebM)
-                if (webmSupported) {
-                    return { mimeType: 'video/webm;codecs="vp8, opus"', ext: 'mp4', label: 'MP4 (actually WebM - fallback)' };
+                // Check MP4 H.265 (HEVC) - Safari only
+                const hevcCodecs = [
+                    'video/mp4;codecs="hvc1.1.6.L93.90, mp4a.40.2"',
+                    'video/mp4;codecs="hev1.1.6.L93.90, mp4a.40.2"'
+                ];
+                for (const codec of hevcCodecs) {
+                    if (MediaRecorder.isTypeSupported(codec)) {
+                        formats.push({
+                            id: 'mp4-h265',
+                            label: 'MP4 (H.265/HEVC/AAC)',
+                            mimeType: codec,
+                            ext: 'mp4',
+                            supported: true,
+                            recommended: false
+                        });
+                        break;
+                    }
                 }
 
+                // If no formats detected, add a fallback
+                if (formats.length === 0) {
+                    formats.push({
+                        id: 'fallback',
+                        label: 'WebM (fallback)',
+                        mimeType: 'video/webm',
+                        ext: 'webm',
+                        supported: false,
+                        recommended: false,
+                        fallback: true
+                    });
+                }
+
+                detectedFormats = formats;
+                return formats;
+            }
+
+            // ── Populate format dropdown ──
+            function populateFormatDropdown() {
+                const formats = detectSupportedFormats();
+                formatSelect.innerHTML = '';
+
+                // Show all supported formats first
+                const supported = formats.filter(f => f.supported);
+                const unsupported = formats.filter(f => !f.supported);
+
+                // Add supported formats
+                supported.forEach(format => {
+                    const option = document.createElement('option');
+                    option.value = format.id;
+                    const label = format.recommended ? `${format.label} ⭐ (recommended)` : format.label;
+                    option.textContent = label;
+                    if (format.recommended) option.selected = true;
+                    formatSelect.appendChild(option);
+                });
+
+                // Add unsupported formats (disabled)
+                unsupported.forEach(format => {
+                    const option = document.createElement('option');
+                    option.value = format.id;
+                    option.textContent = `${format.label} ⚠️ (not supported)`;
+                    option.disabled = true;
+                    formatSelect.appendChild(option);
+                });
+
+                // Update status
+                updateFormatStatus();
+            }
+
+            // ── Update format status display ──
+            function updateFormatStatus() {
+                const formats = detectedFormats;
+                let html = '';
+
+                // Browser info
+                const ua = navigator.userAgent;
+                let browser = 'Unknown';
+                if (ua.includes('Chrome')) browser = 'Chrome';
+                else if (ua.includes('Firefox')) browser = 'Firefox';
+                else if (ua.includes('Safari') && !ua.includes('Chrome')) browser = 'Safari';
+                else if (ua.includes('Edge')) browser = 'Edge';
+
+                html += `📱 <span class="info">${browser}</span> · `;
+
+                formats.forEach((format, index) => {
+                    if (format.supported) {
+                        html += `✅ ${format.label} <span class="badge badge-success">supported</span>`;
+                    } else if (format.fallback) {
+                        html += `⚠️ ${format.label} <span class="badge badge-warning">fallback</span>`;
+                    } else {
+                        html += `❌ ${format.label} <span class="badge badge-danger">not supported</span>`;
+                    }
+                    if (index < formats.length - 1) html += ' · ';
+                });
+
+                // Add explanation
+                html += '<br><small style="color:#666;">';
+                if (formats.some(f => f.id === 'mp4-h264' && f.supported)) {
+                    html += '✅ Your browser supports MP4/H.264 encoding (Safari on macOS/iOS)';
+                } else if (formats.some(f => f.id === 'mp4-h264')) {
+                    html += '⚠️ Your browser does NOT support MP4/H.264 encoding. WebM will be used instead.';
+                } else {
+                    html += 'ℹ️ Using WebM format for best compatibility.';
+                }
+                html += '</small>';
+
+                formatStatusText.innerHTML = html;
+            }
+
+            // ── Get selected format ──
+            function getSelectedFormat() {
+                const selectedId = formatSelect.value;
+                const format = detectedFormats.find(f => f.id === selectedId);
+                if (format && format.supported) {
+                    return format;
+                }
+                // Fallback to first supported
+                const supported = detectedFormats.filter(f => f.supported);
+                if (supported.length > 0) {
+                    return supported[0];
+                }
                 // Ultimate fallback
-                return { mimeType: 'video/webm', ext: 'webm', label: 'WebM (fallback)' };
+                return {
+                    id: 'webm',
+                    label: 'WebM',
+                    mimeType: 'video/webm',
+                    ext: 'webm',
+                    supported: true
+                };
             }
 
             // ── helpers ──
@@ -579,7 +721,6 @@
                 video.style.display = 'block';
                 fileName.textContent = file.name || 'video loaded';
                 resetAll();
-                video.addEventListener('loadedmetadata', function() {}, { once: true });
             }
 
             function clearVideo() {
@@ -604,26 +745,21 @@
                 }
                 if (isProcessing) return;
 
-                const format = getActualFormat();
+                const format = getSelectedFormat();
                 if (!format) {
-                    alert('No supported video format found in your browser.');
+                    alert('No supported video format found.');
                     return;
                 }
 
-                // Show what will be exported
-                const confirmMsg = `Your browser doesn't support MP4/H.264 encoding.\n\n` +
-                                  `The file will be exported as: ${format.label}\n` +
-                                  `File extension: .${format.ext}\n\n` +
-                                  `Continue?`;
-                if (formatSelect.value === 'mp4' && format.label.includes('actually WebM')) {
-                    if (!confirm(confirmMsg)) {
-                        return;
-                    }
+                // Check if selected format is actually supported
+                if (!format.supported) {
+                    alert(`The format "${format.label}" is not supported by your browser.\n\nPlease select a supported format.`);
+                    return;
                 }
 
                 isProcessing = true;
                 downloadBtn.disabled = true;
-                statusText.textContent = 'preparing…';
+                statusText.textContent = `exporting as ${format.label}…`;
                 progressFill.style.width = '0%';
 
                 const wasPaused = video.paused;
@@ -647,7 +783,6 @@
                 canvas.height = outH;
                 const ctx = canvas.getContext('2d');
 
-                // Get video stream with audio
                 let videoStream, audioTrack = null;
                 try {
                     videoStream = video.captureStream();
@@ -666,10 +801,9 @@
                     outputStream.addTrack(audioTrack);
                 }
 
-                const mimeType = format.mimeType;
                 const recorder = new MediaRecorder(outputStream, {
-                    mimeType: mimeType,
-                    videoBitsPerSecond: 5000000 // 5 Mbps
+                    mimeType: format.mimeType,
+                    videoBitsPerSecond: 5000000
                 });
 
                 let chunks = [];
@@ -678,13 +812,12 @@
                 };
 
                 recorder.onstop = () => {
-                    const blob = new Blob(chunks, { type: mimeType.split(';')[0] || mimeType });
+                    const blob = new Blob(chunks, { type: format.mimeType.split(';')[0] || format.mimeType });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a');
                     a.href = url;
-                    const ext = format.ext;
                     const baseName = fileName.textContent.replace(/\.[^.]+$/, '') || 'video';
-                    a.download = `${baseName}_rotated.${ext}`;
+                    a.download = `${baseName}_rotated.${format.ext}`;
                     document.body.appendChild(a);
                     a.click();
                     document.body.removeChild(a);
@@ -694,13 +827,8 @@
                     if (!wasPaused) video.play();
                     isProcessing = false;
                     downloadBtn.disabled = false;
-                    statusText.textContent = 'done ✓';
+                    statusText.textContent = `done ✓ (${format.label})`;
                     progressFill.style.width = '100%';
-
-                    // Show actual format info
-                    setTimeout(() => {
-                        statusText.textContent = `exported as ${format.label}`;
-                    }, 2000);
                 };
 
                 // ── drawing loop ──
@@ -729,8 +857,7 @@
                             ctx.save();
                             ctx.translate(cx, cy);
                             ctx.rotate(rad);
-                            let sx = 1,
-                                sy = 1;
+                            let sx = 1, sy = 1;
                             if (flipX) sx = -1;
                             if (flipY) sy = -1;
                             ctx.scale(sx, sy);
@@ -831,9 +958,10 @@
             });
 
             formatSelect.addEventListener('change', () => {
-                checkFormatSupport();
-                const format = getActualFormat();
-                statusText.textContent = `will export as: ${format.label}`;
+                const format = getSelectedFormat();
+                if (format) {
+                    statusText.textContent = `will export as: ${format.label}`;
+                }
             });
 
             downloadBtn.addEventListener('click', downloadVideo);
@@ -864,11 +992,12 @@
             placeholder.style.display = 'block';
             statusText.textContent = 'ready';
             progressFill.style.width = '0%';
-            checkFormatSupport();
 
-            console.log('🎬 Video Rotator ready');
-            console.log('ℹ️ Note: Most browsers only support WebM encoding.');
-            console.log('   MP4 selection will use WebM as fallback.');
+            // Detect formats and populate dropdown
+            populateFormatDropdown();
+
+            console.log('🎬 Video Rotator ready with smart format detection');
+            console.log('📹 Supported formats:', detectedFormats.filter(f => f.supported).map(f => f.label).join(', '));
         })();
     </script>
 
