@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Video Rotator - Smart Format Detection</title>
+    <title>Video Rotator - Original Size Display</title>
     <style>
         * {
             margin: 0;
@@ -26,7 +26,7 @@
             background: #1a1a22;
             border-radius: 24px;
             padding: 30px 35px 40px;
-            max-width: 900px;
+            max-width: 920px;
             width: 100%;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
             border: 1px solid #2e2e3a;
@@ -368,6 +368,49 @@
             color: #d0a040;
         }
 
+        /* ── DIMENSIONS DISPLAY ── */
+        .dimensions-display {
+            margin-top: 12px;
+            padding: 10px 16px;
+            background: #0e0e16;
+            border-radius: 12px;
+            border: 1px solid #2a2a36;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 20px 40px;
+            font-size: 0.9rem;
+        }
+        .dimensions-display .dim-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .dimensions-display .dim-label {
+            color: #888;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .dimensions-display .dim-value {
+            color: #fff;
+            font-weight: 600;
+            font-variant-numeric: tabular-nums;
+            background: #1a1a2a;
+            padding: 2px 12px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+        .dimensions-display .dim-arrow {
+            color: #555;
+            font-size: 1.2rem;
+        }
+        .dimensions-display .dim-info {
+            color: #4a8ad0;
+            font-size: 0.75rem;
+        }
+
         @media (max-width: 600px) {
             .container {
                 padding: 18px 16px 28px;
@@ -397,6 +440,10 @@
             .download-section select {
                 width: 100%;
             }
+            .dimensions-display {
+                flex-direction: column;
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -406,10 +453,10 @@
 
         <h1>
             🎬 Video Rotator
-            <small>smart format detection</small>
+            <small>original size preserved</small>
         </h1>
         <div class="sub">
-            Upload a video, apply rotation/flip, and export. Your browser's supported formats are auto-detected.
+            Upload a video, apply rotation/flip, and export. Your video keeps its original dimensions.
         </div>
 
         <div class="video-wrapper" id="videoWrapper">
@@ -430,6 +477,24 @@
             </label>
             <span class="file-name" id="fileName">no file selected</span>
             <button class="btn btn-outline" id="clearBtn" style="margin-left:auto;">✕ clear</button>
+        </div>
+
+        <!-- ── DIMENSIONS DISPLAY ── -->
+        <div class="dimensions-display" id="dimensionsDisplay">
+            <div class="dim-item">
+                <span class="dim-label">📐 Original</span>
+                <span class="dim-value" id="originalDim">— × —</span>
+            </div>
+            <span class="dim-arrow" id="dimArrow">➜</span>
+            <div class="dim-item">
+                <span class="dim-label">📥 Export</span>
+                <span class="dim-value" id="exportDim">— × —</span>
+                <span class="dim-info" id="dimInfo">(same as original)</span>
+            </div>
+            <div class="dim-item">
+                <span class="dim-label">🔄 Rotation</span>
+                <span class="dim-value" id="rotationDim">0°</span>
+            </div>
         </div>
 
         <div class="controls">
@@ -498,6 +563,13 @@
             const progressFill = document.getElementById('progressFill');
             const formatStatusText = document.getElementById('formatStatusText');
 
+            // ── Dimensions display refs ──
+            const originalDim = document.getElementById('originalDim');
+            const exportDim = document.getElementById('exportDim');
+            const dimInfo = document.getElementById('dimInfo');
+            const rotationDim = document.getElementById('rotationDim');
+            const dimArrow = document.getElementById('dimArrow');
+
             // ── state ──
             let currentAngle = 0;
             let flipX = false;
@@ -505,6 +577,57 @@
             let hasVideo = false;
             let isProcessing = false;
             let detectedFormats = [];
+            let originalWidth = 0;
+            let originalHeight = 0;
+
+            // ── Update dimensions display ──
+            function updateDimensionsDisplay() {
+                if (!hasVideo || !originalWidth || !originalHeight) {
+                    originalDim.textContent = '— × —';
+                    exportDim.textContent = '— × —';
+                    dimInfo.textContent = '(no video loaded)';
+                    rotationDim.textContent = '0°';
+                    return;
+                }
+
+                // Show original
+                originalDim.textContent = `${originalWidth} × ${originalHeight}`;
+
+                // Calculate export dimensions based on rotation
+                const angleDeg = ((currentAngle % 360) + 360) % 360;
+                const is90 = (angleDeg >= 45 && angleDeg < 135) || (angleDeg >= 225 && angleDeg < 315);
+
+                let outW, outH;
+                if (is90) {
+                    outW = originalHeight;
+                    outH = originalWidth;
+                } else {
+                    outW = originalWidth;
+                    outH = originalHeight;
+                }
+
+                exportDim.textContent = `${outW} × ${outH}`;
+                rotationDim.textContent = `${Math.round(currentAngle)}°`;
+
+                // Show info text
+                if (is90 && currentAngle !== 0) {
+                    dimInfo.textContent = `↔ swapped for 90°/270° rotation`;
+                    dimArrow.textContent = '⟳';
+                } else if (currentAngle !== 0) {
+                    dimInfo.textContent = `✓ same dimensions, rotated ${Math.round(currentAngle)}°`;
+                    dimArrow.textContent = '➜';
+                } else {
+                    dimInfo.textContent = `✓ same as original (no rotation)`;
+                    dimArrow.textContent = '➜';
+                }
+
+                // Add color indicator
+                if (is90) {
+                    exportDim.style.color = '#d0a040';
+                } else {
+                    exportDim.style.color = '#5a9a5a';
+                }
+            }
 
             // ── Browser format detection ──
             function detectSupportedFormats() {
@@ -591,11 +714,9 @@
                 const formats = detectSupportedFormats();
                 formatSelect.innerHTML = '';
 
-                // Show all supported formats first
                 const supported = formats.filter(f => f.supported);
                 const unsupported = formats.filter(f => !f.supported);
 
-                // Add supported formats
                 supported.forEach(format => {
                     const option = document.createElement('option');
                     option.value = format.id;
@@ -605,7 +726,6 @@
                     formatSelect.appendChild(option);
                 });
 
-                // Add unsupported formats (disabled)
                 unsupported.forEach(format => {
                     const option = document.createElement('option');
                     option.value = format.id;
@@ -614,7 +734,6 @@
                     formatSelect.appendChild(option);
                 });
 
-                // Update status
                 updateFormatStatus();
             }
 
@@ -623,7 +742,6 @@
                 const formats = detectedFormats;
                 let html = '';
 
-                // Browser info
                 const ua = navigator.userAgent;
                 let browser = 'Unknown';
                 if (ua.includes('Chrome')) browser = 'Chrome';
@@ -644,7 +762,6 @@
                     if (index < formats.length - 1) html += ' · ';
                 });
 
-                // Add explanation
                 html += '<br><small style="color:#666;">';
                 if (formats.some(f => f.id === 'mp4-h264' && f.supported)) {
                     html += '✅ Your browser supports MP4/H.264 encoding (Safari on macOS/iOS)';
@@ -665,12 +782,10 @@
                 if (format && format.supported) {
                     return format;
                 }
-                // Fallback to first supported
                 const supported = detectedFormats.filter(f => f.supported);
                 if (supported.length > 0) {
                     return supported[0];
                 }
-                // Ultimate fallback
                 return {
                     id: 'webm',
                     label: 'WebM',
@@ -692,6 +807,9 @@
                 angleDisplay.textContent = currentAngle + '°';
                 angleSlider.value = currentAngle;
                 sliderVal.textContent = currentAngle + '°';
+
+                // Update dimensions display whenever rotation changes
+                updateDimensionsDisplay();
             }
 
             function setAngle(deg) {
@@ -720,6 +838,16 @@
                 placeholder.style.display = 'none';
                 video.style.display = 'block';
                 fileName.textContent = file.name || 'video loaded';
+
+                // Get dimensions once metadata is loaded
+                video.addEventListener('loadedmetadata', function onMetadata() {
+                    video.removeEventListener('loadedmetadata', onMetadata);
+                    originalWidth = video.videoWidth;
+                    originalHeight = video.videoHeight;
+                    console.log(`📹 Original video dimensions: ${originalWidth} × ${originalHeight}`);
+                    updateDimensionsDisplay();
+                });
+
                 resetAll();
             }
 
@@ -728,6 +856,8 @@
                 video.src = '';
                 video.load();
                 hasVideo = false;
+                originalWidth = 0;
+                originalHeight = 0;
                 video.style.display = 'none';
                 placeholder.style.display = 'block';
                 fileName.textContent = 'no file selected';
@@ -735,6 +865,7 @@
                 fileInput.value = '';
                 statusText.textContent = 'ready';
                 progressFill.style.width = '0%';
+                updateDimensionsDisplay();
             }
 
             // ── download ──
@@ -751,7 +882,6 @@
                     return;
                 }
 
-                // Check if selected format is actually supported
                 if (!format.supported) {
                     alert(`The format "${format.label}" is not supported by your browser.\n\nPlease select a supported format.`);
                     return;
@@ -777,6 +907,8 @@
                     outW = vw;
                     outH = vh;
                 }
+
+                console.log(`📹 Exporting at: ${outW} × ${outH}`);
 
                 const canvas = document.createElement('canvas');
                 canvas.width = outW;
@@ -857,7 +989,8 @@
                             ctx.save();
                             ctx.translate(cx, cy);
                             ctx.rotate(rad);
-                            let sx = 1, sy = 1;
+                            let sx = 1,
+                                sy = 1;
                             if (flipX) sx = -1;
                             if (flipY) sy = -1;
                             ctx.scale(sx, sy);
@@ -992,11 +1125,11 @@
             placeholder.style.display = 'block';
             statusText.textContent = 'ready';
             progressFill.style.width = '0%';
+            updateDimensionsDisplay();
 
-            // Detect formats and populate dropdown
             populateFormatDropdown();
 
-            console.log('🎬 Video Rotator ready with smart format detection');
+            console.log('🎬 Video Rotator ready with original size display');
             console.log('📹 Supported formats:', detectedFormats.filter(f => f.supported).map(f => f.label).join(', '));
         })();
     </script>
