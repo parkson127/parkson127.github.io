@@ -45,10 +45,9 @@
         /* --- GARISAN NAME, DEPT, BRAND (1 BARIS) --- */
         .info-grid-3 { 
             display: grid; 
-            /* 4fr untuk Name (paling panjang), 2fr untuk Dept & Brand */
             grid-template-columns: auto 4fr auto 2fr auto 2fr; 
             gap: 8px 10px; 
-            margin-bottom: 12px; 
+            margin-bottom: 4px; /* <--- UBAH SINI: Dulu 12px, sekarang 4px (lebih rapat) */
             font-size: 11px; 
             font-weight: bold;
             align-items: center; 
@@ -181,8 +180,12 @@
             .header { height: 10mm; margin: 0; } 
             
             /* Info grid masa print */
-            .info-grid-3 { height: 10mm; margin: 0; margin-bottom: 2mm; }
-            .top-right-info { top: 2mm; right: 0; } /* Laraskan posisi masa print */
+            .info-grid-3 { 
+                height: 10mm; 
+                margin: 0; 
+                margin-bottom: 0mm; /* <--- UBAH SINI: Dulu 2mm, sekarang 0mm (terus rapat) */
+            }
+            .top-right-info { top: 2mm; right: 0; }
             
             .calendar-wrapper { flex-grow: 1; }
             
@@ -191,7 +194,7 @@
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
                 grid-template-rows: 24px; 
-                grid-auto-rows: 2cm; /* <--- SAIZ KOTAK 2CM */
+                grid-auto-rows: 2cm; 
             }
             
             .day-header { height: 24px; padding: 0; }
@@ -226,7 +229,6 @@
         
         <!-- FORM STAFF 1 -->
         <div class="form-wrapper">
-            <!-- Month/Year di Kanan Atas -->
             <div class="top-right-info">
                 <span>MONTH/YEAR:</span>
                 <div class="line"><span class="displayMonthYear"></span></div>
@@ -237,7 +239,6 @@
                 <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
             </div>
             
-            <!-- Name, Dept, Brand dalam 1 baris -->
             <div class="info-grid-3">
                 <div class="label">NAME:</div>
                 <div class="line"></div>
@@ -258,7 +259,6 @@
 
         <!-- FORM STAFF 2 -->
         <div class="form-wrapper">
-            <!-- Month/Year di Kanan Atas -->
             <div class="top-right-info">
                 <span>MONTH/YEAR:</span>
                 <div class="line"><span class="displayMonthYear"></span></div>
@@ -269,7 +269,6 @@
                 <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
             </div>
             
-            <!-- Name, Dept, Brand dalam 1 baris -->
             <div class="info-grid-3">
                 <div class="label">NAME:</div>
                 <div class="line"></div>
