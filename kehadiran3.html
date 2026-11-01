@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Checklist</title>
+    <title>Attendance Checklist (2 Per Page)</title>
     <style>
         /* --- SETTING UNTUK PAPARAN SKRIN (BROWSER) --- */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
@@ -19,9 +19,9 @@
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
 
         /* --- REKA BENTUK FORM --- */
-        .header { text-align: center; margin-bottom: 8px; }
+        .header { text-align: center; margin-bottom: 5px; }
         .header h2 { margin: 0; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; } 
-        .header h3 { margin: 3px 0 0 0; font-size: 11px; font-weight: bold; }
+        .header h3 { margin: 2px 0 0 0; font-size: 11px; font-weight: bold; }
         
         /* --- GARISAN STANDARDIZE --- */
         .info-grid { 
@@ -47,16 +47,36 @@
         }
         .info-grid .line.highlight { font-weight: bold; color: #000; }
         
+        /* --- KAWASAN GRID KALENDAR --- */
+        .calendar-wrapper { position: relative; flex-grow: 1; display: flex; flex-direction: column;}
+        
+        /* WATERMARK LOGO */
+        .watermark {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 80px;
+            font-weight: 900;
+            color: #000;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 5px;
+            white-space: nowrap;
+        }
+
         .grid-container { 
             display: grid; 
             grid-template-columns: repeat(7, 1fr); 
             border: 2px solid black; 
             width: 100%; 
-            background-color: white;
+            background-color: transparent;
             box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
         
-        /* --- HEADER HARI DENGAN SUB-TEXT --- */
+        /* --- HEADER HARI --- */
         .day-header {
             background-color: #333;
             color: white;
@@ -67,25 +87,27 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            line-height: 1.2;
-            padding: 3px 2px;
+            line-height: 1.1;
+            padding: 2px 1px;
         }
         .day-title { font-size: 11px; }
         .day-subtitle { 
-            font-size: 7.5px; 
+            font-size: 7px; 
             font-weight: normal; 
             color: #ddd; 
-            margin-top: 2px;
+            margin-top: 1px;
             text-transform: uppercase;
         }
 
+        /* --- KOTAK TARIKH --- */
         .day-cell { 
             display: flex; 
             flex-direction: column; 
             border: 1px solid black; 
-            min-height: 65px; 
+            min-height: 60px; 
             position: relative;
             box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.7); 
         }
         
         .day-number { 
@@ -94,19 +116,21 @@
             font-weight: bold; 
             font-size: 10px; 
             padding: 1px 4px; 
-            height: 14px; 
+            height: 14px; /* Nipiskan sikit bar nombor */
             line-height: 12px;
             border-bottom: 1px solid black; 
             box-sizing: border-box;
+            width: 100%; /* Penuhkan lebar sebab kotak shift dah takde */
         }
         
         .stamp-space { flex-grow: 1; } 
+
         .empty-cell { background-color: #f9f9f9; border: 1px solid black; box-sizing: border-box; }
 
         /* Highlight Warna */
-        .col-monday { background-color: #ffe699; }
-        .col-saturday { background-color: #b3d9ff; }
-        .col-sunday { background-color: #ffb3b3; }
+        .col-monday { background-color: #ffe699 !important; }
+        .col-saturday { background-color: #b3d9ff !important; }
+        .col-sunday { background-color: #ffb3b3 !important; }
 
         /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
@@ -126,40 +150,43 @@
             .controls { display: none; }
             .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; }
             
+            /* KUNCI TINGGI FORM UNTUK MUAT 2 DALAM A4 */
             .form-wrapper { 
-                height: 143mm; 
+                height: 146mm; /* Naikkan sikit sebab footer dah takde */
                 display: flex;
                 flex-direction: column;
                 page-break-inside: avoid;
                 margin-bottom: 0;
             }
             
-            /* KITA KECILKAN SIKIT RUANG ATAS UNTUK KEMBALIKAN TINGGI KOTAK */
-            .header { height: 11mm; margin: 0; } /* Dulu 12mm */
-            .info-grid { height: 12mm; margin: 0; margin-bottom: 2mm; } /* Dulu 13mm & 3mm */
+            .header { height: 10mm; margin: 0; } 
+            .info-grid { height: 11mm; margin: 0; margin-bottom: 2mm; } 
+            
+            .calendar-wrapper { flex-grow: 1; }
             
             .grid-container { 
                 flex-grow: 1; 
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 28px; /* Turunkan sikit dari 30px ke 28px */
-                grid-auto-rows: 1fr; 
+                grid-template-rows: 24px; /* Header hari */
+                
+                /* ========================================== */
+                /* UBAH SINI UNTUK SAIZ KOTAK (2CM)           */
+                grid-auto-rows: 2cm; /* <--- KUNCI SAIZ 2CM */
+                /* ========================================== */
             }
             
-            .day-header { 
-                height: 28px; 
-                padding: 1px 0; 
-            }
-            .day-title { font-size: 9.5px; }
-            .day-subtitle { font-size: 6.5px; margin-top: 1px;} 
+            .day-header { height: 24px; padding: 0; }
+            .day-title { font-size: 9px; }
+            .day-subtitle { font-size: 6px; margin-top: 0;} 
             
             .day-cell { min-height: 0; height: 100%; } 
-            .day-number { font-size: 10px; padding: 1px 4px; height: 14px; line-height: 12px; }
+            .day-number { font-size: 10px; padding: 1px 4px; height: 14px; line-height: 12px; width: 100%; }
             
             .cut-line { 
                 margin: 1mm 0; 
                 padding: 0;
-                height: 4mm; 
+                height: 2mm; 
                 border-bottom: 1px dashed #000; 
             }
             .cut-line span { display: none; } 
@@ -174,7 +201,7 @@
         <select id="monthSelect"></select>
         <label> Tahun: </label>
         <input type="number" id="yearInput" style="width: 80px;">
-        <button onclick="window.print()">🖨️ Print</button>
+        <button onclick="window.print()">🖨️ Print (2 Form 1 Page)</button>
     </div>
 
     <div class="page-container">
@@ -196,7 +223,11 @@
                 <div class="label">BRAND:</div>
                 <div class="line"></div>
             </div>
-            <div class="grid-container" id="grid1"></div>
+            
+            <div class="calendar-wrapper">
+                <div class="watermark">PARKSON</div>
+                <div class="grid-container" id="grid1"></div>
+            </div>
         </div>
 
         <!-- GARISAN GUNTING -->
@@ -219,7 +250,11 @@
                 <div class="label">BRAND:</div>
                 <div class="line"></div>
             </div>
-            <div class="grid-container" id="grid2"></div>
+            
+            <div class="calendar-wrapper">
+                <div class="watermark">PARKSON</div>
+                <div class="grid-container" id="grid2"></div>
+            </div>
         </div>
 
     </div>
@@ -293,6 +328,7 @@
                     if (currentDayOfWeek === 5) cell.classList.add('col-saturday');
                     if (currentDayOfWeek === 6) cell.classList.add('col-sunday');
 
+                    // Hanya masukkan nombor dan ruang cop
                     cell.innerHTML = `
                         <div class="day-number">
                             <span>${day}</span>
