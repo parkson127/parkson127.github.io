@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Checklist (2 Per Page)</title>
+    <title>Attendance Checklist</title>
     <style>
         /* --- SETTING UNTUK PAPARAN SKRIN (BROWSER) --- */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
@@ -14,101 +14,153 @@
         
         .page-container { max-width: 210mm; margin: 0 auto; background: white; padding: 10mm; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
         
-        .form-wrapper { margin-bottom: 10mm; }
+        .form-wrapper { margin-bottom: 10mm; position: relative; }
         .cut-line { text-align: center; border-bottom: 2px dashed #999; margin: 5mm 0; font-size: 10px; color: #666; position: relative; }
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
 
-        /* --- REKA BENTUK FORM --- */
-        .header { text-align: center; margin-bottom: 8px; } /* UBAH DI SINI UNTUK JARAK BAWAH HEADER */
-        .header h2 { margin: 0; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; } 
-        .header h3 { margin: 3px 0 0 0; font-size: 11px; font-weight: bold; }
+        /* --- REKA BENTUK FORM (SPACE SAVING) --- */
+        .header { text-align: center; margin-bottom: 4px; } /* Curi space: margin 8px -> 4px */
+        .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } /* Kecilkan sikit */
+        .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } /* Rapatkan */
         
-        /* --- GARISAN STANDARDIZE --- */
-        .info-grid { 
+        /* --- MONTH/YEAR DI KANAN ATAS --- */
+        .top-right-info {
+            position: absolute;
+            top: -2px; /* Naikkan sikit */
+            right: 0;
+            font-size: 10px;
+            font-weight: bold;
+            display: flex;
+            align-items: flex-end;
+            gap: 4px;
+        }
+        .top-right-info .line {
+            border-bottom: 1px solid black;
+            min-width: 85px; /* Kecilkan sikit */
+            text-align: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        /* --- NAME, DEPT, BRAND (1 BARIS) --- */
+        .info-grid-3 { 
             display: grid; 
-            grid-template-columns: auto 1fr auto 1fr; 
-            gap: 8px 15px; 
-            margin-bottom: 10px; 
-            font-size: 11px; /* Saiz Label (NAME, DEPT) */
+            grid-template-columns: auto 4fr auto 2fr auto 2fr; 
+            gap: 4px 8px; /* Curi space: gap 8px 10px -> 4px 8px */
+            margin-bottom: 4px; /* Rapatkan dengan kotak */
+            font-size: 10px; 
             font-weight: bold;
             align-items: center; 
         }
-        .info-grid .label { white-space: nowrap; padding-right: 5px; }
-        
-        /* UBAH DI SINI UNTUK BESARKAN TULISAN JAWAPAN */
-        .info-grid .line {
+        .info-grid-3 .label { white-space: nowrap; }
+        .info-grid-3 .line {
             border-bottom: 1px solid black;
-            height: 18px; /* Naikkan sikit untuk muat tulisan besar */
+            height: 15px; /* Kurangkan tinggi: 18px -> 15px */
             display: flex;
             align-items: flex-end; 
-            padding-left: 5px;
+            padding-left: 4px;
             font-weight: normal;
             overflow: hidden; 
             white-space: nowrap;
-            font-size: 13px; /* <--- BESARKAN TULISAN JAWAPAN (Dulu 11px) */
+            font-size: 12px; 
         }
-        .info-grid .line.highlight { font-weight: bold; color: #000; }
         
+        /* --- KAWASAN GRID KALENDAR --- */
+        .calendar-wrapper { position: relative; flex-grow: 1; display: flex; flex-direction: column;}
+        
+        /* WATERMARK LOGO */
+        .watermark {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 80px;
+            font-weight: 900;
+            color: #000;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 5px;
+            white-space: nowrap;
+        }
+
         .grid-container { 
             display: grid; 
             grid-template-columns: repeat(7, 1fr); 
             border: 2px solid black; 
             width: 100%; 
-            background-color: white;
+            background-color: transparent;
             box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
         
+        /* --- HEADER HARI --- */
         .day-header {
             background-color: #333;
             color: white;
             text-align: center;
             font-weight: bold;
-            font-size: 11px;
-            padding: 6px 0;
             border: 1px solid black;
             box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.1;
+            padding: 2px 1px;
+        }
+        .day-title { font-size: 10px; }
+        .day-subtitle { 
+            font-size: 6.5px; 
+            font-weight: normal; 
+            color: #ddd; 
+            margin-top: 1px;
+            text-transform: uppercase;
         }
 
+        /* --- KOTAK TARIKH --- */
         .day-cell { 
             display: flex; 
             flex-direction: column; 
             border: 1px solid black; 
-            min-height: 65px; 
+            min-height: 55px; 
             position: relative;
             box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.7); 
         }
         
-        /* --- BAR KELABU NOMBOR (DIKECILKAN) --- */
         .day-number { 
             background-color: #d9d9d9; 
             text-align: left; 
             font-weight: bold; 
             font-size: 10px; 
-            padding: 1px 4px; 
-            height: 14px; 
-            line-height: 12px;
+            padding: 0px 4px; /* Curi space: padding 1px -> 0px */
+            height: 13px; /* Nipiskan */
+            line-height: 13px;
             border-bottom: 1px solid black; 
             box-sizing: border-box;
+            width: 100%; 
         }
         
         .stamp-space { flex-grow: 1; } 
         .empty-cell { background-color: #f9f9f9; border: 1px solid black; box-sizing: border-box; }
 
         /* Highlight Warna */
-        .col-monday { background-color: #ffe699; }
-        .col-saturday { background-color: #b3d9ff; }
-        .col-sunday { background-color: #ffb3b3; }
+        .col-monday { background-color: #ffe699 !important; }
+        .col-saturday { background-color: #b3d9ff !important; }
+        .col-sunday { background-color: #ffb3b3 !important; }
 
-        /* --- SETTING UNTUK PRINT (A4) --- */
+        /* --- SETTING UNTUK PRINT (A4) - 100% SCALE --- */
         @media print {
-            @page { size: A4 portrait; margin: 0; }
+            @page { 
+                size: A4 portrait; 
+                margin: 0; /* Margin 0 supaya tak makan ruang */
+            }
             
-            /* UBAH DI SINI UNTUK NAIKKAN HEADER ATAS */
             html, body { 
                 width: 210mm; 
                 height: 297mm;
                 margin: 0; 
-                padding: 2mm 5mm; /* <--- Dulu 5mm. Tukar jadi 2mm untuk naikkan atas */
+                padding: 2mm 4mm; /* Padding minimal: atas/bawah 2mm, kiri/kanan 4mm */
                 background: white; 
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact; 
@@ -118,32 +170,41 @@
             .controls { display: none; }
             .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; }
             
+            /* KUNCI TINGGI FORM UNTUK 2 DALAM A4 */
             .form-wrapper { 
-                height: 143mm; /* Naikkan tinggi sikit sebab body padding dikurangkan */
+                height: 144mm; /* Dari 146mm ke 144mm - curi 2mm */
                 display: flex;
                 flex-direction: column;
                 page-break-inside: avoid;
                 margin-bottom: 0;
             }
             
-            .header { height: 12mm; margin: 0; } 
-            .info-grid { height: 13mm; margin: 0; } /* Tambah sikit tinggi untuk tulisan jawapan besar */
+            /* CURi SPACE DARI HEADER & INFO */
+            .header { height: 8mm; margin: 0; } /* Dari 10mm -> 8mm */
+            .info-grid-3 { height: 9mm; margin: 0; margin-bottom: 1mm; } /* Dari 10mm -> 9mm */
+            .top-right-info { top: 0; right: 0; }
+            
+            .calendar-wrapper { flex-grow: 1; }
             
             .grid-container { 
                 flex-grow: 1; 
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 20px; 
-                grid-auto-rows: 1fr; 
+                grid-template-rows: 22px; /* Header hari nipis: 24px -> 22px */
+                grid-auto-rows: 1.95cm; /* Kotak 2cm -> 1.95cm (kecilkan 0.5mm je, tak nampak beza) */
             }
-            .day-header { height: 20px; padding: 0; line-height: 18px; font-size: 10px; }
+            
+            .day-header { height: 22px; padding: 0; }
+            .day-title { font-size: 9px; }
+            .day-subtitle { font-size: 6px; margin-top: 0; line-height: 1;} 
+            
             .day-cell { min-height: 0; height: 100%; } 
-            .day-number { font-size: 10px; padding: 1px 4px; height: 14px; line-height: 12px; }
+            .day-number { font-size: 10px; padding: 0px 4px; height: 13px; line-height: 13px; width: 100%; }
             
             .cut-line { 
-                margin: 1mm 0; /* Kecilkan sikit ruang garisan potong */
+                margin: 0.5mm 0; /* Rapatkan garisan potong */
                 padding: 0;
-                height: 4mm; 
+                height: 3mm; 
                 border-bottom: 1px dashed #000; 
             }
             .cut-line span { display: none; } 
@@ -152,35 +213,41 @@
 </head>
 <body>
 
-    <!-- Kawalan -->
     <div class="controls">
         <label>Pilih Bulan: </label>
         <select id="monthSelect"></select>
         <label> Tahun: </label>
         <input type="number" id="yearInput" style="width: 80px;">
-        <button onclick="window.print()">🖨️ Print (2 Form 1 Page)</button>
+        <button onclick="window.print()">🖨️ Print (100% Scale)</button>
     </div>
 
     <div class="page-container">
         
         <!-- FORM STAFF 1 -->
         <div class="form-wrapper">
+            <div class="top-right-info">
+                <span>MONTH/YEAR:</span>
+                <div class="line"><span class="displayMonthYear"></span></div>
+            </div>
+
             <div class="header">
                 <h2>PARKSON IOI CITY MALL</h2>
                 <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
             </div>
-            <div class="info-grid">
+            
+            <div class="info-grid-3">
                 <div class="label">NAME:</div>
                 <div class="line"></div>
                 <div class="label">DEPT:</div>
                 <div class="line"></div>
-                
-                <div class="label">MONTH/YEAR:</div>
-                <div class="line highlight"><span class="displayMonthYear"></span></div>
                 <div class="label">BRAND:</div>
                 <div class="line"></div>
             </div>
-            <div class="grid-container" id="grid1"></div>
+            
+            <div class="calendar-wrapper">
+                <div class="watermark">PARKSON</div>
+                <div class="grid-container" id="grid1"></div>
+            </div>
         </div>
 
         <!-- GARISAN GUNTING -->
@@ -188,22 +255,29 @@
 
         <!-- FORM STAFF 2 -->
         <div class="form-wrapper">
+            <div class="top-right-info">
+                <span>MONTH/YEAR:</span>
+                <div class="line"><span class="displayMonthYear"></span></div>
+            </div>
+
             <div class="header">
                 <h2>PARKSON IOI CITY MALL</h2>
                 <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
             </div>
-            <div class="info-grid">
+            
+            <div class="info-grid-3">
                 <div class="label">NAME:</div>
                 <div class="line"></div>
                 <div class="label">DEPT:</div>
                 <div class="line"></div>
-                
-                <div class="label">MONTH/YEAR:</div>
-                <div class="line highlight"><span class="displayMonthYear"></span></div>
                 <div class="label">BRAND:</div>
                 <div class="line"></div>
             </div>
-            <div class="grid-container" id="grid2"></div>
+            
+            <div class="calendar-wrapper">
+                <div class="watermark">PARKSON</div>
+                <div class="grid-container" id="grid2"></div>
+            </div>
         </div>
 
     </div>
@@ -215,7 +289,16 @@
         const grids = [document.getElementById('grid1'), document.getElementById('grid2')];
         
         const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
-        const daysName = ["ISNIN", "SELASA", "RABU", "KHAMIS", "JUMAAT", "SABTU", "AHAD"];
+        
+        const daysData = [
+            { day: "ISNIN", text: "Ready for Service" },
+            { day: "SELASA", text: "Acknowledge & Greet" },
+            { day: "RABU", text: "Identify Needs" },
+            { day: "KHAMIS", text: "Advise Solution" },
+            { day: "JUMAAT", text: "Plus Selling" },
+            { day: "SABTU", text: "Close the Sale" },
+            { day: "AHAD", text: "Post Sale Service" }
+        ];
 
         months.forEach((m, index) => {
             let opt = document.createElement('option');
@@ -243,10 +326,13 @@
             grids.forEach(grid => {
                 grid.innerHTML = ""; 
 
-                daysName.forEach(day => {
+                daysData.forEach(data => {
                     let header = document.createElement('div');
                     header.className = 'day-header';
-                    header.innerText = day;
+                    header.innerHTML = `
+                        <div class="day-title">${data.day}</div>
+                        <div class="day-subtitle">${data.text}</div>
+                    `;
                     grid.appendChild(header);
                 });
 
