@@ -14,49 +14,79 @@
         
         .page-container { max-width: 210mm; margin: 0 auto; background: white; padding: 10mm; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
         
-        .form-wrapper { margin-bottom: 10mm; }
+        .form-wrapper { margin-bottom: 10mm; position: relative; }
         .cut-line { text-align: center; border-bottom: 2px dashed #999; margin: 5mm 0; font-size: 10px; color: #666; position: relative; }
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
 
         /* --- REKA BENTUK FORM --- */
-        .header { text-align: center; margin-bottom: 7px; }
-        .header h2 { margin: 0; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; } 
-        .header h3 { margin: 2px 0 0 0; font-size: 11px; font-weight: bold; }
+        .header { text-align: center; margin-bottom: 4px; }
+        .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } 
+        .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } 
         
-        /* --- GARISAN STANDARDIZE --- */
-        .info-grid { 
+        /* --- BULAN & TAHUN DI KANAN ATAS (TANPA TEKS MONTH/YEAR) --- */
+        .top-right-info {
+            position: absolute;
+            top: 0; 
+            right: 20px; 
+            font-size: 12px; /* Besarkan sikit sebab dah takde label */
+            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
+        }
+
+        /* --- NAME, DEPT, BRAND (1 BARIS) --- */
+        .info-grid-3 { 
             display: grid; 
-            grid-template-columns: auto 1fr auto 1fr; 
-            gap: 8px 15px; 
-            margin-bottom: 8px; 
-            font-size: 11px; 
+            grid-template-columns: auto 4fr auto 2fr auto 2fr; 
+            gap: 4px 8px; 
+            margin-bottom: 4px; 
+            font-size: 10px; 
             font-weight: bold;
             align-items: center; 
         }
-        .info-grid .label { white-space: nowrap; padding-right: 5px; }
-        .info-grid .line {
+        .info-grid-3 .label { white-space: nowrap; }
+        .info-grid-3 .line {
             border-bottom: 1px solid black;
-            height: 18px; 
+            height: 15px; 
             display: flex;
             align-items: flex-end; 
-            padding-left: 5px;
+            padding-left: 4px;
             font-weight: normal;
             overflow: hidden; 
             white-space: nowrap;
-            font-size: 13px; 
+            font-size: 12px; 
         }
-        .info-grid .line.highlight { font-weight: bold; color: #000; }
         
+        /* --- KAWASAN GRID KALENDAR --- */
+        .calendar-wrapper { position: relative; flex-grow: 1; display: flex; flex-direction: column;}
+        
+        /* WATERMARK LOGO */
+        .watermark {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) rotate(-25deg);
+            font-size: 80px;
+            font-weight: 900;
+            color: #000;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 5px;
+            white-space: nowrap;
+        }
+
         .grid-container { 
             display: grid; 
             grid-template-columns: repeat(7, 1fr); 
             border: 2px solid black; 
             width: 100%; 
-            background-color: white;
+            background-color: transparent;
             box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
         
-        /* --- HEADER HARI DENGAN SUB-TEXT --- */
+        /* --- HEADER HARI --- */
         .day-header {
             background-color: #333;
             color: white;
@@ -67,46 +97,51 @@
             display: flex;
             flex-direction: column;
             justify-content: center;
-            line-height: 1.2;
-            padding: 3px 2px;
+            line-height: 1.1;
+            padding: 2px 1px;
         }
-        .day-title { font-size: 11px; }
+        .day-title { font-size: 10px; font-weight: bold; }
+        
+        /* SUB-TEXT FOKUS */
         .day-subtitle { 
-            font-size: 7.5px; 
-            font-weight: normal; 
-            color: #ddd; 
-            margin-top: 2px;
+            font-size: 6.5px; 
+            font-weight: bold; 
+            color: #fff; 
+            margin-top: 1px;
             text-transform: uppercase;
         }
 
+        /* --- KOTAK TARIKH --- */
         .day-cell { 
             display: flex; 
             flex-direction: column; 
             border: 1px solid black; 
-            min-height: 65px; 
+            min-height: 55px; 
             position: relative;
             box-sizing: border-box;
+            background-color: rgba(255, 255, 255, 0.7); 
         }
         
         .day-number { 
             background-color: #d9d9d9; 
             text-align: left; 
             font-weight: bold; 
-            font-size: 12px; 
-            padding: 1px 4px; 
-            height: 10px; 
-            line-height: 12px;
+            font-size: 10px; 
+            padding: 0px 4px; 
+            height: 13px; 
+            line-height: 13px;
             border-bottom: 1px solid black; 
             box-sizing: border-box;
+            width: 100%; 
         }
         
         .stamp-space { flex-grow: 1; } 
         .empty-cell { background-color: #f9f9f9; border: 1px solid black; box-sizing: border-box; }
 
         /* Highlight Warna */
-        .col-monday { background-color: #ffe699; }
-        .col-saturday { background-color: #b3d9ff; }
-        .col-sunday { background-color: #ffb3b3; }
+        .col-monday { background-color: #ffe699 !important; }
+        .col-saturday { background-color: #b3d9ff !important; }
+        .col-sunday { background-color: #ffb3b3 !important; }
 
         /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
@@ -116,7 +151,7 @@
                 width: 210mm; 
                 height: 297mm;
                 margin: 0; 
-                padding: 2mm 5mm; 
+                padding: 2mm 4mm; 
                 background: white; 
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact; 
@@ -127,39 +162,44 @@
             .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; }
             
             .form-wrapper { 
-                height: 146mm; 
+                height: 144mm; 
                 display: flex;
                 flex-direction: column;
                 page-break-inside: avoid;
                 margin-bottom: 0;
             }
             
-            /* KITA KECILKAN SIKIT RUANG ATAS UNTUK KEMBALIKAN TINGGI KOTAK */
-            .header { height: 10mm; margin: 0; } /* Dulu 12mm */
-            .info-grid { height: 11mm; margin: 0; margin-bottom: 2mm; } /* Dulu 13mm & 3mm */
+            .header { height: 8mm; margin: 0; } 
+            .info-grid-3 { height: 9mm; margin: 0; margin-bottom: 1mm; } 
+            
+            /* POSISI BULAN & TAHUN MASA PRINT */
+            .top-right-info { 
+                top: 0; 
+                right: 15px; 
+                font-size: 11px; /* Kecilkan sikit masa print supaya tak terpotong */
+            }
+            
+            .calendar-wrapper { flex-grow: 1; }
             
             .grid-container { 
                 flex-grow: 1; 
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 28px; /* Turunkan sikit dari 30px ke 28px */
-                grid-auto-rows: 2cm; 
+                grid-template-rows: 22px; 
+                grid-auto-rows: 1.95cm; 
             }
             
-            .day-header { 
-                height: 28px; 
-                padding: 1px 0; 
-            }
-            .day-title { font-size: 9.5px; }
-            .day-subtitle { font-size: 6.5px; margin-top: 1px;} 
+            .day-header { height: 22px; padding: 0; }
+            .day-title { font-size: 9px; }
+            .day-subtitle { font-size: 6px; margin-top: 0; line-height: 1; font-weight: bold;} 
             
             .day-cell { min-height: 0; height: 100%; } 
-            .day-number { font-size: 10px; padding: 1px 4px; height: 12px; line-height: 12px; }
+            .day-number { font-size: 10px; padding: 0px 4px; height: 13px; line-height: 13px; width: 100%; }
             
             .cut-line { 
-                margin: 1mm 0; 
+                margin: 0.5mm 0; 
                 padding: 0;
-                height: 4mm; 
+                height: 3mm; 
                 border-bottom: 1px dashed #000; 
             }
             .cut-line span { display: none; } 
@@ -168,35 +208,41 @@
 </head>
 <body>
 
-    <!-- Kawalan -->
     <div class="controls">
         <label>Pilih Bulan: </label>
         <select id="monthSelect"></select>
         <label> Tahun: </label>
         <input type="number" id="yearInput" style="width: 80px;">
-        <button onclick="window.print()">🖨️ Print</button>
+        <button onclick="window.print()">🖨️ Print (100% Scale)</button>
     </div>
 
     <div class="page-container">
         
         <!-- FORM STAFF 1 -->
         <div class="form-wrapper">
+            <!-- Bulan & Tahun di Kanan Atas (Tanpa label) -->
+            <div class="top-right-info">
+                <span class="displayMonthYear"></span>
+            </div>
+
             <div class="header">
                 <h2>PARKSON IOI CITY MALL</h2>
                 <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
             </div>
-            <div class="info-grid">
+            
+            <div class="info-grid-3">
                 <div class="label">NAME:</div>
                 <div class="line"></div>
                 <div class="label">DEPT:</div>
                 <div class="line"></div>
-                
-                <div class="label">MONTH/YEAR:</div>
-                <div class="line highlight"><span class="displayMonthYear"></span></div>
                 <div class="label">BRAND:</div>
                 <div class="line"></div>
             </div>
-            <div class="grid-container" id="grid1"></div>
+            
+            <div class="calendar-wrapper">
+                <div class="watermark">PARKSON</div>
+                <div class="grid-container" id="grid1"></div>
+            </div>
         </div>
 
         <!-- GARISAN GUNTING -->
@@ -204,22 +250,29 @@
 
         <!-- FORM STAFF 2 -->
         <div class="form-wrapper">
+            <!-- Bulan & Tahun di Kanan Atas (Tanpa label) -->
+            <div class="top-right-info">
+                <span class="displayMonthYear"></span>
+            </div>
+
             <div class="header">
                 <h2>PARKSON IOI CITY MALL</h2>
                 <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
             </div>
-            <div class="info-grid">
+            
+            <div class="info-grid-3">
                 <div class="label">NAME:</div>
                 <div class="line"></div>
                 <div class="label">DEPT:</div>
                 <div class="line"></div>
-                
-                <div class="label">MONTH/YEAR:</div>
-                <div class="line highlight"><span class="displayMonthYear"></span></div>
                 <div class="label">BRAND:</div>
                 <div class="line"></div>
             </div>
-            <div class="grid-container" id="grid2"></div>
+            
+            <div class="calendar-wrapper">
+                <div class="watermark">PARKSON</div>
+                <div class="grid-container" id="grid2"></div>
+            </div>
         </div>
 
     </div>
