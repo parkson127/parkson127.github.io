@@ -18,28 +18,20 @@
         .cut-line { text-align: center; border-bottom: 2px dashed #999; margin: 5mm 0; font-size: 10px; color: #666; position: relative; }
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
 
-        /* --- REKA BENTUK FORM (SPACE SAVING) --- */
+        /* --- REKA BENTUK FORM --- */
         .header { text-align: center; margin-bottom: 4px; }
         .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } 
         .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } 
         
-        /* --- MONTH/YEAR DI KANAN ATAS (DIUBAH KE KIRI SIKIT) --- */
+        /* --- BULAN & TAHUN DI KANAN ATAS (TANPA TEKS MONTH/YEAR) --- */
         .top-right-info {
             position: absolute;
-            top: -2px; 
-            right: 20px; /* <--- UBAH SINI: Dari 0 ke 20px (gerak ke kiri sikit) */
-            font-size: 10px;
+            top: 0; 
+            right: 20px; 
+            font-size: 12px; /* Besarkan sikit sebab dah takde label */
             font-weight: bold;
-            display: flex;
-            align-items: flex-end;
-            gap: 4px;
-        }
-        .top-right-info .line {
-            border-bottom: 1px solid black;
-            min-width: 85px; 
-            text-align: center;
-            font-size: 12px;
-            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
         }
 
         /* --- NAME, DEPT, BRAND (1 BARIS) --- */
@@ -110,11 +102,11 @@
         }
         .day-title { font-size: 10px; font-weight: bold; }
         
-        /* SUB-TEXT FOKUS (DIJADIKAN BOLD) */
+        /* SUB-TEXT FOKUS */
         .day-subtitle { 
             font-size: 6.5px; 
-            font-weight: bold; /* <--- UBAH SINI: Dari normal ke bold */
-            color: #fff; /* <--- UBAH SINI: Putih cerah supaya jelas */
+            font-weight: bold; 
+            color: #fff; 
             margin-top: 1px;
             text-transform: uppercase;
         }
@@ -151,7 +143,7 @@
         .col-saturday { background-color: #b3d9ff !important; }
         .col-sunday { background-color: #ffb3b3 !important; }
 
-        /* --- SETTING UNTUK PRINT (A4) - 100% SCALE --- */
+        /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
             @page { size: A4 portrait; margin: 0; }
             
@@ -180,8 +172,12 @@
             .header { height: 8mm; margin: 0; } 
             .info-grid-3 { height: 9mm; margin: 0; margin-bottom: 1mm; } 
             
-            /* POSISI MONTH/YEAR MASA PRINT (GERAK KE KIRI) */
-            .top-right-info { top: 0; right: 15px; } /* <--- UBAH SINI: Dari 0 ke 15px */
+            /* POSISI BULAN & TAHUN MASA PRINT */
+            .top-right-info { 
+                top: 0; 
+                right: 15px; 
+                font-size: 11px; /* Kecilkan sikit masa print supaya tak terpotong */
+            }
             
             .calendar-wrapper { flex-grow: 1; }
             
@@ -224,9 +220,9 @@
         
         <!-- FORM STAFF 1 -->
         <div class="form-wrapper">
+            <!-- Bulan & Tahun di Kanan Atas (Tanpa label) -->
             <div class="top-right-info">
-                //<span>MONTH/YEAR:</span>
-                <div class="line"><span class="displayMonthYear"></span></div>
+                <span class="displayMonthYear"></span>
             </div>
 
             <div class="header">
@@ -254,9 +250,9 @@
 
         <!-- FORM STAFF 2 -->
         <div class="form-wrapper">
+            <!-- Bulan & Tahun di Kanan Atas (Tanpa label) -->
             <div class="top-right-info">
-                <span>MONTH/YEAR:</span>
-                <div class="line"><span class="displayMonthYear"></span></div>
+                <span class="displayMonthYear"></span>
             </div>
 
             <div class="header">
