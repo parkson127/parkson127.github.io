@@ -19,15 +19,15 @@
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
 
         /* --- REKA BENTUK FORM (SPACE SAVING) --- */
-        .header { text-align: center; margin-bottom: 4px; } /* Curi space: margin 8px -> 4px */
-        .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } /* Kecilkan sikit */
-        .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } /* Rapatkan */
+        .header { text-align: center; margin-bottom: 4px; }
+        .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } 
+        .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } 
         
-        /* --- MONTH/YEAR DI KANAN ATAS --- */
+        /* --- MONTH/YEAR DI KANAN ATAS (DIUBAH KE KIRI SIKIT) --- */
         .top-right-info {
             position: absolute;
-            top: -2px; /* Naikkan sikit */
-            right: 0;
+            top: -2px; 
+            right: 20px; /* <--- UBAH SINI: Dari 0 ke 20px (gerak ke kiri sikit) */
             font-size: 10px;
             font-weight: bold;
             display: flex;
@@ -36,7 +36,7 @@
         }
         .top-right-info .line {
             border-bottom: 1px solid black;
-            min-width: 85px; /* Kecilkan sikit */
+            min-width: 85px; 
             text-align: center;
             font-size: 12px;
             font-weight: bold;
@@ -46,8 +46,8 @@
         .info-grid-3 { 
             display: grid; 
             grid-template-columns: auto 4fr auto 2fr auto 2fr; 
-            gap: 4px 8px; /* Curi space: gap 8px 10px -> 4px 8px */
-            margin-bottom: 4px; /* Rapatkan dengan kotak */
+            gap: 4px 8px; 
+            margin-bottom: 4px; 
             font-size: 10px; 
             font-weight: bold;
             align-items: center; 
@@ -55,7 +55,7 @@
         .info-grid-3 .label { white-space: nowrap; }
         .info-grid-3 .line {
             border-bottom: 1px solid black;
-            height: 15px; /* Kurangkan tinggi: 18px -> 15px */
+            height: 15px; 
             display: flex;
             align-items: flex-end; 
             padding-left: 4px;
@@ -108,11 +108,13 @@
             line-height: 1.1;
             padding: 2px 1px;
         }
-        .day-title { font-size: 10px; }
+        .day-title { font-size: 10px; font-weight: bold; }
+        
+        /* SUB-TEXT FOKUS (DIJADIKAN BOLD) */
         .day-subtitle { 
             font-size: 6.5px; 
-            font-weight: normal; 
-            color: #ddd; 
+            font-weight: bold; /* <--- UBAH SINI: Dari normal ke bold */
+            color: #fff; /* <--- UBAH SINI: Putih cerah supaya jelas */
             margin-top: 1px;
             text-transform: uppercase;
         }
@@ -133,8 +135,8 @@
             text-align: left; 
             font-weight: bold; 
             font-size: 10px; 
-            padding: 0px 4px; /* Curi space: padding 1px -> 0px */
-            height: 13px; /* Nipiskan */
+            padding: 0px 4px; 
+            height: 13px; 
             line-height: 13px;
             border-bottom: 1px solid black; 
             box-sizing: border-box;
@@ -151,16 +153,13 @@
 
         /* --- SETTING UNTUK PRINT (A4) - 100% SCALE --- */
         @media print {
-            @page { 
-                size: A4 portrait; 
-                margin: 0; /* Margin 0 supaya tak makan ruang */
-            }
+            @page { size: A4 portrait; margin: 0; }
             
             html, body { 
                 width: 210mm; 
                 height: 297mm;
                 margin: 0; 
-                padding: 2mm 4mm; /* Padding minimal: atas/bawah 2mm, kiri/kanan 4mm */
+                padding: 2mm 4mm; 
                 background: white; 
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact; 
@@ -170,19 +169,19 @@
             .controls { display: none; }
             .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; }
             
-            /* KUNCI TINGGI FORM UNTUK 2 DALAM A4 */
             .form-wrapper { 
-                height: 144mm; /* Dari 146mm ke 144mm - curi 2mm */
+                height: 144mm; 
                 display: flex;
                 flex-direction: column;
                 page-break-inside: avoid;
                 margin-bottom: 0;
             }
             
-            /* CURi SPACE DARI HEADER & INFO */
-            .header { height: 8mm; margin: 0; } /* Dari 10mm -> 8mm */
-            .info-grid-3 { height: 9mm; margin: 0; margin-bottom: 1mm; } /* Dari 10mm -> 9mm */
-            .top-right-info { top: 0; right: 0; }
+            .header { height: 8mm; margin: 0; } 
+            .info-grid-3 { height: 9mm; margin: 0; margin-bottom: 1mm; } 
+            
+            /* POSISI MONTH/YEAR MASA PRINT (GERAK KE KIRI) */
+            .top-right-info { top: 0; right: 15px; } /* <--- UBAH SINI: Dari 0 ke 15px */
             
             .calendar-wrapper { flex-grow: 1; }
             
@@ -190,19 +189,19 @@
                 flex-grow: 1; 
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 22px; /* Header hari nipis: 24px -> 22px */
-                grid-auto-rows: 1.95cm; /* Kotak 2cm -> 1.95cm (kecilkan 0.5mm je, tak nampak beza) */
+                grid-template-rows: 22px; 
+                grid-auto-rows: 1.95cm; 
             }
             
             .day-header { height: 22px; padding: 0; }
             .day-title { font-size: 9px; }
-            .day-subtitle { font-size: 6px; margin-top: 0; line-height: 1;} 
+            .day-subtitle { font-size: 6px; margin-top: 0; line-height: 1; font-weight: bold;} 
             
             .day-cell { min-height: 0; height: 100%; } 
             .day-number { font-size: 10px; padding: 0px 4px; height: 13px; line-height: 13px; width: 100%; }
             
             .cut-line { 
-                margin: 0.5mm 0; /* Rapatkan garisan potong */
+                margin: 0.5mm 0; 
                 padding: 0;
                 height: 3mm; 
                 border-bottom: 1px dashed #000; 
