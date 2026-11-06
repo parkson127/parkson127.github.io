@@ -185,13 +185,13 @@
                 flex-grow: 1; 
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 22px; 
-                grid-auto-rows: 1.95cm; 
+                grid-template-rows: 24px; 
+                grid-auto-rows: 1fr; 
             }
             
-            .day-header { height: 22px; padding: 0; }
-            .day-title { font-size: 9px; }
-            .day-subtitle { font-size: 6px; margin-top: 0; line-height: 1; font-weight: bold;} 
+            .day-header { height: 24px; padding: 0; }
+            .day-title { font-size: 10px; }
+            .day-subtitle { font-size: 7px; margin-top: 0; line-height: 1; font-weight: bold;} 
             
             .day-cell { min-height: 0; height: 100%; } 
             .day-number { font-size: 10px; padding: 0px 4px; height: 13px; line-height: 13px; width: 100%; }
@@ -213,7 +213,7 @@
         <select id="monthSelect"></select>
         <label> Tahun: </label>
         <input type="number" id="yearInput" style="width: 80px;">
-        <button onclick="window.print()">🖨️ Print (100% Scale)</button>
+        <button onclick="window.print()">🖨️ Print<I/button>
     </div>
 
     <div class="page-container">
@@ -283,16 +283,16 @@
         const displayMonthYears = document.querySelectorAll('.displayMonthYear');
         const grids = [document.getElementById('grid1'), document.getElementById('grid2')];
         
-        const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+        const months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OKTOBER", "NOVEMBER", "DECEMBER"];
         
         const daysData = [
-            { day: "ISNIN", text: "Ready for Service" },
-            { day: "SELASA", text: "Acknowledge & Greet" },
-            { day: "RABU", text: "Identify Needs" },
-            { day: "KHAMIS", text: "Advise Solution" },
-            { day: "JUMAAT", text: "Plus Selling" },
-            { day: "SABTU", text: "Close the Sale" },
-            { day: "AHAD", text: "Post Sale Service" }
+            { day: "MONDAY", text: "Ready for Service" },
+            { day: "TUESDAY", text: "Acknowledge & Greet" },
+            { day: "WEDNESDAY", text: "Identify Needs" },
+            { day: "THURSDAY", text: "Advise Solution" },
+            { day: "FRIDAY", text: "Plus Selling" },
+            { day: "SATURDAY", text: "Close the Sale" },
+            { day: "SUNDAY", text: "Post Sale Service" }
         ];
 
         months.forEach((m, index) => {
