@@ -2,18 +2,67 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Checklist</title>
+    <title>Attendance Checklist - Live Editor</title>
     <style>
-        /* --- SETTING UNTUK PAPARAN SKRIN (BROWSER) --- */
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
+        /* --- LAYOUT UTAMA --- */
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 0; padding: 0; 
+            background-color: #e0e0e0; 
+            display: flex; 
+            height: 100vh; 
+            overflow: hidden;
+        }
+
+        /* --- PANEL CUSTOMIZER (KIRI) --- */
+        .customizer-panel {
+            width: 320px; background: #fff; height: 100vh;
+            overflow-y: auto; padding: 15px;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            z-index: 200; box-sizing: border-box; font-size: 12px;
+        }
+
+        .customizer-panel h2 { margin: 0 0 15px 0; font-size: 16px; text-align: center; border-bottom: 2px solid #4CAF50; padding-bottom: 10px;}
         
-        .controls { margin-bottom: 20px; padding: 15px; background: #fff; border: 1px solid #ccc; border-radius: 5px; text-align: center; position: sticky; top: 0; z-index: 100;}
-        .controls label { font-weight: bold; }
-        .controls select, .controls input { padding: 5px; margin-right: 15px; font-size: 14px;}
-        .controls button { padding: 6px 15px; font-weight: bold; cursor: pointer; background-color: #4CAF50; color: white; border: none; border-radius: 3px;}
+        .panel-section { margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;}
+        .panel-section h3 { margin: 0 0 8px 0; font-size: 12px; color: #333; background: #f0f0f0; padding: 5px; border-radius: 3px;}
         
-        .page-container { max-width: 210mm; margin: 0 auto; background: white; padding: 10mm; box-shadow: 0 0 10px rgba(0,0,0,0.2); }
-        
+        .control-group { margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between;}
+        .control-group label { flex: 1; margin-right: 5px; font-weight: bold;}
+        .control-group input[type="number"], 
+        .control-group input[type="color"], 
+        .control-group select { 
+            width: 80px; padding: 3px; border: 1px solid #ccc; border-radius: 3px; 
+        }
+        .control-group input[type="color"] { width: 40px; height: 25px; padding: 0; cursor: pointer;}
+
+        .btn-group { display: flex; gap: 5px; margin-top: 10px; }
+        .btn { 
+            flex: 1; padding: 8px; border: none; border-radius: 3px; cursor: pointer; 
+            font-weight: bold; font-size: 12px; 
+        }
+        .btn-primary { background: #4CAF50; color: white; }
+        .btn-primary:hover { background: #45a049; }
+        .btn-secondary { background: #2196F3; color: white; }
+        .btn-secondary:hover { background: #0b7dda; }
+        .btn-danger { background: #f44336; color: white; }
+        .btn-danger:hover { background: #da190b; }
+        .btn-warning { background: #ff9800; color: white; }
+        .btn-warning:hover { background: #e68900; }
+
+        /* --- KAWASAN PREVIEW (KANAN) --- */
+        .preview-area {
+            flex: 1; overflow-y: auto; padding: 20px;
+            display: flex; justify-content: center; box-sizing: border-box;
+        }
+
+        .page-container { 
+            width: 210mm; min-height: 297mm; background: white; 
+            padding: 10mm; box-shadow: 0 0 15px rgba(0,0,0,0.3); 
+            box-sizing: border-box; transform-origin: top center;
+            margin-bottom: 20px;
+        }
+
         .form-wrapper { margin-bottom: 10mm; position: relative; }
         .cut-line { text-align: center; border-bottom: 2px dashed #999; margin: 5mm 0; font-size: 10px; color: #666; position: relative; }
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
@@ -23,170 +72,122 @@
         .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } 
         .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } 
         
-        /* --- BULAN & TAHUN DI KANAN ATAS (TANPA TEKS MONTH/YEAR) --- */
         .top-right-info {
-            position: absolute;
-            top: 0; 
-            right: 20px; 
-            font-size: 12px; /* Besarkan sikit sebab dah takde label */
-            font-weight: bold;
-            text-align: right;
-            white-space: nowrap;
+            position: absolute; top: 0; right: 20px; 
+            font-size: 12px; font-weight: bold;
+            text-align: right; white-space: nowrap;
         }
 
-        /* --- NAME, DEPT, BRAND (1 BARIS) --- */
         .info-grid-3 { 
             display: grid; 
             grid-template-columns: auto 4fr auto 2fr auto 2fr; 
-            gap: 4px 8px; 
-            margin-bottom: 4px; 
-            font-size: 10px; 
-            font-weight: bold;
+            gap: 4px 8px; margin-bottom: 4px; 
+            font-size: 10px; font-weight: bold;
             align-items: center; 
         }
         .info-grid-3 .label { white-space: nowrap; }
         .info-grid-3 .line {
-            border-bottom: 1px solid black;
-            height: 15px; 
-            display: flex;
-            align-items: flex-end; 
-            padding-left: 4px;
-            font-weight: normal;
-            overflow: hidden; 
-            white-space: nowrap;
-            font-size: 12px; 
+            border-bottom: 1px solid black; height: 15px; 
+            display: flex; align-items: flex-end; 
+            padding-left: 4px; font-weight: normal;
+            overflow: hidden; white-space: nowrap; font-size: 12px; 
         }
         
-        /* --- KAWASAN GRID KALENDAR --- */
         .calendar-wrapper { position: relative; flex-grow: 1; display: flex; flex-direction: column;}
         
-        /* WATERMARK LOGO */
         .watermark {
-            position: absolute;
-            top: 50%; left: 50%;
+            position: absolute; top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-25deg);
-            font-size: 80px;
-            font-weight: 900;
-            color: #000;
-            opacity: 0.04;
-            z-index: 0;
-            pointer-events: none;
-            letter-spacing: 5px;
-            white-space: nowrap;
+            font-size: 80px; font-weight: 900; color: #000;
+            opacity: 0.04; z-index: 0; pointer-events: none;
+            letter-spacing: 5px; white-space: nowrap;
         }
 
         .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(7, 1fr); 
-            border: 2px solid black; 
-            width: 100%; 
-            background-color: transparent;
-            box-sizing: border-box;
-            position: relative;
-            z-index: 1;
+            display: grid; grid-template-columns: repeat(7, 1fr); 
+            border: 2px solid black; width: 100%; 
+            background-color: transparent; box-sizing: border-box;
+            position: relative; z-index: 1;
         }
         
-        /* --- HEADER HARI --- */
         .day-header {
-            background-color: #333;
-            color: white;
-            text-align: center;
-            font-weight: bold;
-            border: 1px solid black;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            line-height: 1.1;
-            padding: 2px 1px;
+            background-color: #333; color: white; text-align: center;
+            font-weight: bold; border: 1px solid black; box-sizing: border-box;
+            display: flex; flex-direction: column; justify-content: center;
+            line-height: 1.1; padding: 2px 1px;
         }
         .day-title { font-size: 10px; font-weight: bold; }
         
-        /* SUB-TEXT FOKUS */
         .day-subtitle { 
-            font-size: 6.5px; 
-            font-weight: bold; 
-            color: #fff; 
-            margin-top: 1px;
-            text-transform: uppercase;
+            font-size: 6.5px; font-weight: bold; color: #fff; 
+            margin-top: 1px; text-transform: uppercase;
         }
 
-        /* --- KOTAK TARIKH --- */
         .day-cell { 
-            display: flex; 
-            flex-direction: column; 
-            border: 1px solid black; 
-            min-height: 55px; 
-            position: relative;
-            box-sizing: border-box;
+            display: flex; flex-direction: column; border: 1px solid black; 
+            min-height: 55px; position: relative; box-sizing: border-box;
             background-color: rgba(255, 255, 255, 0.7); 
         }
         
         .day-number { 
-            background-color: #d9d9d9; 
-            text-align: left; 
-            font-weight: bold; 
-            font-size: 10px; 
-            padding: 0px 4px; 
-            height: 13px; 
-            line-height: 13px;
-            border-bottom: 1px solid black; 
-            box-sizing: border-box;
-            width: 100%; 
+            background-color: #d9d9d9; text-align: left; 
+            font-weight: bold; font-size: 10px; padding: 0px 4px; 
+            height: 13px; line-height: 13px;
+            border-bottom: 1px solid black; box-sizing: border-box; width: 100%; 
         }
         
         .stamp-space { flex-grow: 1; } 
         .empty-cell { background-color: #f9f9f9; border: 1px solid black; box-sizing: border-box; }
 
-        /* Highlight Warna */
         .col-monday { background-color: #ffe699 !important; }
         .col-saturday { background-color: #b3d9ff !important; }
         .col-sunday { background-color: #ffb3b3 !important; }
 
+        /* --- STYLE UNTUK EDITABLE TEKS --- */
+        [contenteditable="true"] {
+            outline: none;
+            cursor: text;
+            transition: background 0.2s;
+        }
+        [contenteditable="true"]:hover {
+            background-color: rgba(33, 150, 243, 0.1);
+            outline: 1px dashed #2196F3;
+        }
+        [contenteditable="true"]:focus {
+            background-color: rgba(33, 150, 243, 0.2);
+            outline: 2px solid #2196F3;
+        }
+
         /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
+            body { display: block; height: auto; overflow: visible; background: white;}
+            .customizer-panel { display: none !important; }
+            .preview-area { padding: 0; display: block; overflow: visible; }
+
             @page { size: A4 portrait; margin: 0; }
             
             html, body { 
-                width: 210mm; 
-                height: 297mm;
-                margin: 0; 
-                padding: 2mm 4mm; 
-                background: white; 
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact; 
-                box-sizing: border-box;
+                width: 210mm; height: 297mm; margin: 0; padding: 2mm 4mm; 
+                background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; box-sizing: border-box;
             }
             
-            .controls { display: none; }
-            .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; }
+            .page-container { width: 100%; padding: 0; margin: 0; box-shadow: none; min-height: auto; }
             
             .form-wrapper { 
-                height: 144mm; 
-                display: flex;
-                flex-direction: column;
-                page-break-inside: avoid;
-                margin-bottom: 0;
+                height: 144mm; display: flex; flex-direction: column;
+                page-break-inside: avoid; margin-bottom: 0;
             }
             
             .header { height: 8mm; margin: 0; } 
             .info-grid-3 { height: 9mm; margin: 0; margin-bottom: 1mm; } 
-            
-            /* POSISI BULAN & TAHUN MASA PRINT */
-            .top-right-info { 
-                top: 0; 
-                right: 15px; 
-                font-size: 11px; /* Kecilkan sikit masa print supaya tak terpotong */
-            }
+            .top-right-info { top: 0; right: 15px; font-size: 11px; }
             
             .calendar-wrapper { flex-grow: 1; }
             
             .grid-container { 
-                flex-grow: 1; 
-                display: grid;
+                flex-grow: 1; display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 22px; 
-                grid-auto-rows: 1.95cm; 
+                grid-template-rows: 22px; grid-auto-rows: 1.95cm; 
             }
             
             .day-header { height: 22px; padding: 0; }
@@ -196,87 +197,190 @@
             .day-cell { min-height: 0; height: 100%; } 
             .day-number { font-size: 10px; padding: 0px 4px; height: 13px; line-height: 13px; width: 100%; }
             
-            .cut-line { 
-                margin: 0.5mm 0; 
-                padding: 0;
-                height: 3mm; 
-                border-bottom: 1px dashed #000; 
-            }
+            .cut-line { margin: 0.5mm 0; padding: 0; height: 3mm; border-bottom: 1px dashed #000; }
             .cut-line span { display: none; } 
+            
+            /* Hilangkan highlight editable masa print */
+            [contenteditable="true"] {
+                outline: none !important;
+                background: transparent !important;
+            }
         }
     </style>
 </head>
 <body>
 
-    <div class="controls">
-        <label>Pilih Bulan: </label>
-        <select id="monthSelect"></select>
-        <label> Tahun: </label>
-        <input type="number" id="yearInput" style="width: 80px;">
-        <button onclick="window.print()">🖨️ Print (100% Scale)</button>
-    </div>
+    <!-- ================= PANEL CUSTOMIZER (KIRI) ================= -->
+    <div class="customizer-panel">
+        <h2>⚙️ Live Editor</h2>
 
-    <div class="page-container">
-        
-        <!-- FORM STAFF 1 -->
-        <div class="form-wrapper">
-            <!-- Bulan & Tahun di Kanan Atas (Tanpa label) -->
-            <div class="top-right-info">
-                <span class="displayMonthYear"></span>
+        <div class="panel-section">
+            <h3>📅 Bulan & Tahun</h3>
+            <div class="control-group">
+                <label>Bulan:</label>
+                <select id="monthSelect"></select>
             </div>
-
-            <div class="header">
-                <h2>PARKSON IOI CITY MALL</h2>
-                <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
-            </div>
-            
-            <div class="info-grid-3">
-                <div class="label">NAME:</div>
-                <div class="line"></div>
-                <div class="label">DEPT:</div>
-                <div class="line"></div>
-                <div class="label">BRAND:</div>
-                <div class="line"></div>
-            </div>
-            
-            <div class="calendar-wrapper">
-                <div class="watermark">PARKSON</div>
-                <div class="grid-container" id="grid1"></div>
+            <div class="control-group">
+                <label>Tahun:</label>
+                <input type="number" id="yearInput" value="2026">
             </div>
         </div>
 
-        <!-- GARISAN GUNTING -->
-        <div class="cut-line"><span>✂️ GUNTING DI SINI ✂️</span></div>
-
-        <!-- FORM STAFF 2 -->
-        <div class="form-wrapper">
-            <!-- Bulan & Tahun di Kanan Atas (Tanpa label) -->
-            <div class="top-right-info">
-                <span class="displayMonthYear"></span>
+        <div class="panel-section">
+            <h3>📏 Saiz & Jarak</h3>
+            <div class="control-group">
+                <label>Page Padding (mm):</label>
+                <input type="number" id="ctrlPagePadding" value="10" step="1">
             </div>
-
-            <div class="header">
-                <h2>PARKSON IOI CITY MALL</h2>
-                <h3>MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
+            <div class="control-group">
+                <label>Form Height (mm):</label>
+                <input type="number" id="ctrlFormHeight" value="144" step="1">
             </div>
-            
-            <div class="info-grid-3">
-                <div class="label">NAME:</div>
-                <div class="line"></div>
-                <div class="label">DEPT:</div>
-                <div class="line"></div>
-                <div class="label">BRAND:</div>
-                <div class="line"></div>
+            <div class="control-group">
+                <label>Header Height (mm):</label>
+                <input type="number" id="ctrlHeaderHeight" value="8" step="1">
             </div>
-            
-            <div class="calendar-wrapper">
-                <div class="watermark">PARKSON</div>
-                <div class="grid-container" id="grid2"></div>
+            <div class="control-group">
+                <label>Info Height (mm):</label>
+                <input type="number" id="ctrlInfoHeight" value="9" step="1">
+            </div>
+            <div class="control-group">
+                <label>Grid Cell (cm):</label>
+                <input type="number" id="ctrlGridCell" value="1.95" step="0.05">
+            </div>
+            <div class="control-group">
+                <label>Day Header (px):</label>
+                <input type="number" id="ctrlDayHeader" value="22" step="1">
+            </div>
+            <div class="control-group">
+                <label>Info Margin Bawah (mm):</label>
+                <input type="number" id="ctrlInfoMargin" value="1" step="0.5">
             </div>
         </div>
 
+        <div class="panel-section">
+            <h3>🔤 Saiz Tulisan</h3>
+            <div class="control-group">
+                <label>Title (px):</label>
+                <input type="number" id="ctrlTitleSize" value="15" step="0.5">
+            </div>
+            <div class="control-group">
+                <label>Subtitle (px):</label>
+                <input type="number" id="ctrlSubtitleSize" value="10" step="0.5">
+            </div>
+            <div class="control-group">
+                <label>Day Title (px):</label>
+                <input type="number" id="ctrlDayTitleSize" value="10" step="0.5">
+            </div>
+            <div class="control-group">
+                <label>Day Subtitle (px):</label>
+                <input type="number" id="ctrlDaySubSize" value="6.5" step="0.5">
+            </div>
+            <div class="control-group">
+                <label>Bulan/Tahun (px):</label>
+                <input type="number" id="ctrlMonthYearSize" value="12" step="0.5">
+            </div>
+        </div>
+
+        <div class="panel-section">
+            <h3>🎨 Warna</h3>
+            <div class="control-group">
+                <label>Isnin:</label>
+                <input type="color" id="ctrlColorMon" value="#ffe699">
+            </div>
+            <div class="control-group">
+                <label>Sabtu:</label>
+                <input type="color" id="ctrlColorSat" value="#b3d9ff">
+            </div>
+            <div class="control-group">
+                <label>Ahad:</label>
+                <input type="color" id="ctrlColorSun" value="#ffb3b3">
+            </div>
+            <div class="control-group">
+                <label>Header Hari:</label>
+                <input type="color" id="ctrlColorHeader" value="#333333">
+            </div>
+            <div class="control-group">
+                <label>Bar Nombor:</label>
+                <input type="color" id="ctrlColorNumBar" value="#d9d9d9">
+            </div>
+        </div>
+
+        <!-- BUTANG ACTION -->
+        <div class="btn-group">
+            <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
+            <button class="btn btn-secondary" onclick="saveSettings()">💾 Simpan</button>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-warning" onclick="loadDefaultText()">📄 Load Default Text</button>
+        </div>
+        <div class="btn-group">
+            <button class="btn btn-danger" onclick="resetSettings()">🔄 Reset Semua</button>
+        </div>
     </div>
 
+    <!-- ================= KAWASAN PREVIEW (KANAN) ================= -->
+    <div class="preview-area">
+        <div class="page-container" id="pageContainer">
+            
+            <!-- FORM STAFF 1 -->
+            <div class="form-wrapper" id="form1">
+                <div class="top-right-info">
+                    <span class="displayMonthYear"></span>
+                </div>
+
+                <div class="header">
+                    <h2 contenteditable="true">PARKSON IOI CITY MALL</h2>
+                    <h3 contenteditable="true">MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
+                </div>
+                
+                <div class="info-grid-3">
+                    <div class="label">NAME:</div>
+                    <div class="line"></div>
+                    <div class="label">DEPT:</div>
+                    <div class="line"></div>
+                    <div class="label">BRAND:</div>
+                    <div class="line"></div>
+                </div>
+                
+                <div class="calendar-wrapper">
+                    <div class="watermark">PARKSON</div>
+                    <div class="grid-container" id="grid1"></div>
+                </div>
+            </div>
+
+            <div class="cut-line"><span>✂️ GUNTING DI SINI ✂️</span></div>
+
+            <!-- FORM STAFF 2 -->
+            <div class="form-wrapper" id="form2">
+                <div class="top-right-info">
+                    <span class="displayMonthYear"></span>
+                </div>
+
+                <div class="header">
+                    <h2 contenteditable="true">PARKSON IOI CITY MALL</h2>
+                    <h3 contenteditable="true">MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST</h3>
+                </div>
+                
+                <div class="info-grid-3">
+                    <div class="label">NAME:</div>
+                    <div class="line"></div>
+                    <div class="label">DEPT:</div>
+                    <div class="line"></div>
+                    <div class="label">BRAND:</div>
+                    <div class="line"></div>
+                </div>
+                
+                <div class="calendar-wrapper">
+                    <div class="watermark">PARKSON</div>
+                    <div class="grid-container" id="grid2"></div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- ================= JAVASCRIPT ================= -->
     <script>
         const monthSelect = document.getElementById('monthSelect');
         const yearInput = document.getElementById('yearInput');
@@ -285,15 +389,23 @@
         
         const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
         
-        const daysData = [
-            { day: "ISNIN", text: "Ready for Service" },
-            { day: "SELASA", text: "Acknowledge & Greet" },
-            { day: "RABU", text: "Identify Needs" },
-            { day: "KHAMIS", text: "Advise Solution" },
-            { day: "JUMAAT", text: "Plus Selling" },
-            { day: "SABTU", text: "Close the Sale" },
-            { day: "AHAD", text: "Post Sale Service" }
-        ];
+        // DEFAULT TEXT (boleh ubah di sini)
+        const defaultTextData = {
+            title: "PARKSON IOI CITY MALL",
+            subtitle: "MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST",
+            days: [
+                { day: "ISNIN", text: "Ready for Service" },
+                { day: "SELASA", text: "Acknowledge & Greet" },
+                { day: "RABU", text: "Identify Needs" },
+                { day: "KHAMIS", text: "Advise Solution" },
+                { day: "JUMAAT", text: "Plus Selling" },
+                { day: "SABTU", text: "Close the Sale" },
+                { day: "AHAD", text: "Post Sale Service" }
+            ]
+        };
+
+        // daysData boleh diubah oleh admin, simpan sebagai variable
+        let daysData = JSON.parse(JSON.stringify(defaultTextData.days));
 
         months.forEach((m, index) => {
             let opt = document.createElement('option');
@@ -306,6 +418,7 @@
         monthSelect.value = today.getMonth();
         yearInput.value = today.getFullYear();
 
+        // ====== FUNGSI GENERATE KALENDAR ======
         function generateCalendar() {
             const month = parseInt(monthSelect.value);
             const year = parseInt(yearInput.value);
@@ -321,12 +434,13 @@
             grids.forEach(grid => {
                 grid.innerHTML = ""; 
 
-                daysData.forEach(data => {
+                daysData.forEach((data, index) => {
                     let header = document.createElement('div');
                     header.className = 'day-header';
+                    // Tambah contenteditable pada sub-teks dan day title
                     header.innerHTML = `
-                        <div class="day-title">${data.day}</div>
-                        <div class="day-subtitle">${data.text}</div>
+                        <div class="day-title" contenteditable="true" data-day-index="${index}" data-type="day">${data.day}</div>
+                        <div class="day-subtitle" contenteditable="true" data-day-index="${index}" data-type="text">${data.text}</div>
                     `;
                     grid.appendChild(header);
                 });
@@ -363,11 +477,207 @@
                     grid.appendChild(empty);
                 }
             });
+            
+            // Attach event listener untuk kemas kini daysData bila admin edit
+            attachEditableListeners();
         }
 
-        monthSelect.addEventListener('change', generateCalendar);
-        yearInput.addEventListener('input', generateCalendar);
+        // ====== FUNGSI UNTUK KEMAS KINI daysData BILA EDIT ======
+        function attachEditableListeners() {
+            document.querySelectorAll('.day-title[contenteditable], .day-subtitle[contenteditable]').forEach(el => {
+                el.addEventListener('input', function() {
+                    const index = parseInt(this.getAttribute('data-day-index'));
+                    const type = this.getAttribute('data-type');
+                    if (type === 'day') {
+                        daysData[index].day = this.innerText;
+                    } else {
+                        daysData[index].text = this.innerText;
+                    }
+                });
+            });
+        }
+
+        // ====== FUNGSI APPLY CUSTOM SETTING (PREVIEW) ======
+        function applySettings() {
+            const monthVal = parseInt(monthSelect.value);
+            const yearVal = parseInt(yearInput.value);
+            displayMonthYears.forEach(el => {
+                el.innerText = months[monthVal] + " " + yearVal;
+            });
+
+            const pagePadding = document.getElementById('ctrlPagePadding').value;
+            const formHeight = document.getElementById('ctrlFormHeight').value;
+            const headerHeight = document.getElementById('ctrlHeaderHeight').value;
+            const infoHeight = document.getElementById('ctrlInfoHeight').value;
+            const gridCell = document.getElementById('ctrlGridCell').value;
+            const dayHeader = document.getElementById('ctrlDayHeader').value;
+            const infoMargin = document.getElementById('ctrlInfoMargin').value;
+
+            document.getElementById('pageContainer').style.padding = pagePadding + 'mm';
+            
+            document.querySelectorAll('.form-wrapper').forEach(f => {
+                f.style.height = formHeight + 'mm';
+            });
+            document.querySelectorAll('.header').forEach(h => {
+                h.style.height = headerHeight + 'mm';
+            });
+            document.querySelectorAll('.info-grid-3').forEach(i => {
+                i.style.height = infoHeight + 'mm';
+                i.style.marginBottom = infoMargin + 'mm';
+            });
+            document.querySelectorAll('.grid-container').forEach(g => {
+                g.style.gridTemplateRows = dayHeader + 'px';
+                g.style.gridAutoRows = gridCell + 'cm';
+            });
+            document.querySelectorAll('.day-header').forEach(d => {
+                d.style.height = dayHeader + 'px';
+            });
+
+            const titleSize = document.getElementById('ctrlTitleSize').value;
+            const subtitleSize = document.getElementById('ctrlSubtitleSize').value;
+            const dayTitleSize = document.getElementById('ctrlDayTitleSize').value;
+            const daySubSize = document.getElementById('ctrlDaySubSize').value;
+            const monthYearSize = document.getElementById('ctrlMonthYearSize').value;
+
+            document.querySelectorAll('.header h2').forEach(h => h.style.fontSize = titleSize + 'px');
+            document.querySelectorAll('.header h3').forEach(h => h.style.fontSize = subtitleSize + 'px');
+            document.querySelectorAll('.day-title').forEach(d => d.style.fontSize = dayTitleSize + 'px');
+            document.querySelectorAll('.day-subtitle').forEach(d => d.style.fontSize = daySubSize + 'px');
+            document.querySelectorAll('.top-right-info').forEach(d => d.style.fontSize = monthYearSize + 'px');
+
+            const colorMon = document.getElementById('ctrlColorMon').value;
+            const colorSat = document.getElementById('ctrlColorSat').value;
+            const colorSun = document.getElementById('ctrlColorSun').value;
+            const colorHeader = document.getElementById('ctrlColorHeader').value;
+            const colorNumBar = document.getElementById('ctrlColorNumBar').value;
+
+            let styleTag = document.getElementById('dynamic-style');
+            if (!styleTag) {
+                styleTag = document.createElement('style');
+                styleTag.id = 'dynamic-style';
+                document.head.appendChild(styleTag);
+            }
+            styleTag.innerHTML = `
+                .col-monday { background-color: ${colorMon} !important; }
+                .col-saturday { background-color: ${colorSat} !important; }
+                .col-sunday { background-color: ${colorSun} !important; }
+                .day-header { background-color: ${colorHeader} !important; }
+                .day-number { background-color: ${colorNumBar} !important; }
+            `;
+        }
+
+        // ====== SAVE & LOAD SETTINGS ======
+        function saveSettings() {
+            // Kumpul teks editable semasa
+            const titles = document.querySelectorAll('.header h2');
+            const subtitles = document.querySelectorAll('.header h3');
+
+            const settings = {
+                month: monthSelect.value,
+                year: yearInput.value,
+                pagePadding: document.getElementById('ctrlPagePadding').value,
+                formHeight: document.getElementById('ctrlFormHeight').value,
+                headerHeight: document.getElementById('ctrlHeaderHeight').value,
+                infoHeight: document.getElementById('ctrlInfoHeight').value,
+                gridCell: document.getElementById('ctrlGridCell').value,
+                dayHeader: document.getElementById('ctrlDayHeader').value,
+                infoMargin: document.getElementById('ctrlInfoMargin').value,
+                titleSize: document.getElementById('ctrlTitleSize').value,
+                subtitleSize: document.getElementById('ctrlSubtitleSize').value,
+                dayTitleSize: document.getElementById('ctrlDayTitleSize').value,
+                daySubSize: document.getElementById('ctrlDaySubSize').value,
+                monthYearSize: document.getElementById('ctrlMonthYearSize').value,
+                colorMon: document.getElementById('ctrlColorMon').value,
+                colorSat: document.getElementById('ctrlColorSat').value,
+                colorSun: document.getElementById('ctrlColorSun').value,
+                colorHeader: document.getElementById('ctrlColorHeader').value,
+                colorNumBar: document.getElementById('ctrlColorNumBar').value,
+                // Simpan teks editable
+                customTitle: titles[0] ? titles[0].innerText : defaultTextData.title,
+                customSubtitle: subtitles[0] ? subtitles[0].innerText : defaultTextData.subtitle,
+                customDays: daysData
+            };
+            localStorage.setItem('parksonTemplateSettings', JSON.stringify(settings));
+            alert('✅ Setting & teks berjaya disimpan! Bila buka semula, semua ini akan digunakan.');
+        }
+
+        function loadSettings() {
+            const saved = localStorage.getItem('parksonTemplateSettings');
+            if (saved) {
+                const s = JSON.parse(saved);
+                monthSelect.value = s.month;
+                yearInput.value = s.year;
+                document.getElementById('ctrlPagePadding').value = s.pagePadding;
+                document.getElementById('ctrlFormHeight').value = s.formHeight;
+                document.getElementById('ctrlHeaderHeight').value = s.headerHeight;
+                document.getElementById('ctrlInfoHeight').value = s.infoHeight;
+                document.getElementById('ctrlGridCell').value = s.gridCell;
+                document.getElementById('ctrlDayHeader').value = s.dayHeader;
+                document.getElementById('ctrlInfoMargin').value = s.infoMargin;
+                document.getElementById('ctrlTitleSize').value = s.titleSize;
+                document.getElementById('ctrlSubtitleSize').value = s.subtitleSize;
+                document.getElementById('ctrlDayTitleSize').value = s.dayTitleSize;
+                document.getElementById('ctrlDaySubSize').value = s.daySubSize;
+                document.getElementById('ctrlMonthYearSize').value = s.monthYearSize;
+                document.getElementById('ctrlColorMon').value = s.colorMon;
+                document.getElementById('ctrlColorSat').value = s.colorSat;
+                document.getElementById('ctrlColorSun').value = s.colorSun;
+                document.getElementById('ctrlColorHeader').value = s.colorHeader;
+                document.getElementById('ctrlColorNumBar').value = s.colorNumBar;
+                
+                // Apply custom text
+                if (s.customTitle) {
+                    document.querySelectorAll('.header h2').forEach(el => el.innerText = s.customTitle);
+                }
+                if (s.customSubtitle) {
+                    document.querySelectorAll('.header h3').forEach(el => el.innerText = s.customSubtitle);
+                }
+                if (s.customDays) {
+                    daysData = s.customDays;
+                }
+            }
+        }
+
+        // ====== LOAD DEFAULT TEXT (RESET TEKS SAHAJA) ======
+        function loadDefaultText() {
+            if (confirm('Kembalikan semua teks (tajuk, hari, sub-teks) ke default asal?')) {
+                // Reset teks header
+                document.querySelectorAll('.header h2').forEach(el => el.innerText = defaultTextData.title);
+                document.querySelectorAll('.header h3').forEach(el => el.innerText = defaultTextData.subtitle);
+                
+                // Reset daysData
+                daysData = JSON.parse(JSON.stringify(defaultTextData.days));
+                
+                // Regenerate calendar untuk apply teks asal
+                generateCalendar();
+                
+                // Update juga text dalam localStorage
+                saveSettings();
+            }
+        }
+
+        function resetSettings() {
+            if (confirm('Reset SEMUA setting (termasuk teks, warna, dan saiz) ke default?')) {
+                localStorage.removeItem('parksonTemplateSettings');
+                location.reload();
+            }
+        }
+
+        // ====== EVENT LISTENERS ======
+        const inputs = document.querySelectorAll('.customizer-panel input, .customizer-panel select');
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                if (input.id === 'monthSelect' || input.id === 'yearInput') {
+                    generateCalendar();
+                }
+                applySettings();
+            });
+        });
+
+        // ====== INIT ======
+        loadSettings();
         generateCalendar();
+        applySettings();
     </script>
 </body>
 </html>
