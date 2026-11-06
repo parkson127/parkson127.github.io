@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Checklist - Live Editor</title>
+    <title>Attendance Checklist - Customizer</title>
     <style>
         /* --- LAYOUT UTAMA --- */
         body { 
@@ -16,7 +16,7 @@
 
         /* --- PANEL CUSTOMIZER (KIRI) --- */
         .customizer-panel {
-            width: 320px; background: #fff; height: 100vh;
+            width: 300px; background: #fff; height: 100vh;
             overflow-y: auto; padding: 15px;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
             z-index: 200; box-sizing: border-box; font-size: 12px;
@@ -47,8 +47,6 @@
         .btn-secondary:hover { background: #0b7dda; }
         .btn-danger { background: #f44336; color: white; }
         .btn-danger:hover { background: #da190b; }
-        .btn-warning { background: #ff9800; color: white; }
-        .btn-warning:hover { background: #e68900; }
 
         /* --- KAWASAN PREVIEW (KANAN) --- */
         .preview-area {
@@ -56,11 +54,16 @@
             display: flex; justify-content: center; box-sizing: border-box;
         }
 
+        /* --- KAWASAN CETAKAN (A4 SIMULATION) --- */
         .page-container { 
-            width: 210mm; min-height: 297mm; background: white; 
-            padding: 10mm; box-shadow: 0 0 15px rgba(0,0,0,0.3); 
-            box-sizing: border-box; transform-origin: top center;
-            margin-bottom: 20px;
+            max-width: 210mm; 
+            min-height: 297mm;
+            margin: 0 auto; 
+            background: white; 
+            padding: 10mm; 
+            box-shadow: 0 0 15px rgba(0,0,0,0.3); 
+            box-sizing: border-box;
+            position: relative;
         }
 
         .form-wrapper { margin-bottom: 10mm; position: relative; }
@@ -73,67 +76,107 @@
         .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } 
         
         .top-right-info {
-            position: absolute; top: 0; right: 20px; 
-            font-size: 12px; font-weight: bold;
-            text-align: right; white-space: nowrap;
+            position: absolute;
+            top: 0; right: 20px; 
+            font-size: 12px;
+            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
         }
 
         .info-grid-3 { 
             display: grid; 
             grid-template-columns: auto 4fr auto 2fr auto 2fr; 
-            gap: 4px 8px; margin-bottom: 4px; 
-            font-size: 10px; font-weight: bold;
+            gap: 4px 8px; 
+            margin-bottom: 4px; 
+            font-size: 10px; 
+            font-weight: bold;
             align-items: center; 
         }
         .info-grid-3 .label { white-space: nowrap; }
         .info-grid-3 .line {
-            border-bottom: 1px solid black; height: 15px; 
-            display: flex; align-items: flex-end; 
-            padding-left: 4px; font-weight: normal;
-            overflow: hidden; white-space: nowrap; font-size: 12px; 
+            border-bottom: 1px solid black;
+            height: 15px; 
+            display: flex;
+            align-items: flex-end; 
+            padding-left: 4px;
+            font-weight: normal;
+            overflow: hidden; 
+            white-space: nowrap;
+            font-size: 12px; 
         }
         
         .calendar-wrapper { position: relative; flex-grow: 1; display: flex; flex-direction: column;}
         
         .watermark {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute;
+            top: 50%; left: 50%;
             transform: translate(-50%, -50%) rotate(-25deg);
-            font-size: 80px; font-weight: 900; color: #000;
-            opacity: 0.04; z-index: 0; pointer-events: none;
-            letter-spacing: 5px; white-space: nowrap;
+            font-size: 80px;
+            font-weight: 900;
+            color: #000;
+            opacity: 0.04;
+            z-index: 0;
+            pointer-events: none;
+            letter-spacing: 5px;
+            white-space: nowrap;
         }
 
         .grid-container { 
-            display: grid; grid-template-columns: repeat(7, 1fr); 
-            border: 2px solid black; width: 100%; 
-            background-color: transparent; box-sizing: border-box;
-            position: relative; z-index: 1;
+            display: grid; 
+            grid-template-columns: repeat(7, 1fr); 
+            border: 2px solid black; 
+            width: 100%; 
+            background-color: transparent;
+            box-sizing: border-box;
+            position: relative;
+            z-index: 1;
         }
         
         .day-header {
-            background-color: #333; color: white; text-align: center;
-            font-weight: bold; border: 1px solid black; box-sizing: border-box;
-            display: flex; flex-direction: column; justify-content: center;
-            line-height: 1.1; padding: 2px 1px;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            border: 1px solid black;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            line-height: 1.1;
+            padding: 2px 1px;
         }
         .day-title { font-size: 10px; font-weight: bold; }
         
         .day-subtitle { 
-            font-size: 6.5px; font-weight: bold; color: #fff; 
-            margin-top: 1px; text-transform: uppercase;
+            font-size: 6.5px; 
+            font-weight: bold; 
+            color: #fff; 
+            margin-top: 1px;
+            text-transform: uppercase;
         }
 
         .day-cell { 
-            display: flex; flex-direction: column; border: 1px solid black; 
-            min-height: 55px; position: relative; box-sizing: border-box;
+            display: flex; 
+            flex-direction: column; 
+            border: 1px solid black; 
+            min-height: 55px; 
+            position: relative;
+            box-sizing: border-box;
             background-color: rgba(255, 255, 255, 0.7); 
         }
         
         .day-number { 
-            background-color: #d9d9d9; text-align: left; 
-            font-weight: bold; font-size: 10px; padding: 0px 4px; 
-            height: 13px; line-height: 13px;
-            border-bottom: 1px solid black; box-sizing: border-box; width: 100%; 
+            background-color: #d9d9d9; 
+            text-align: left; 
+            font-weight: bold; 
+            font-size: 10px; 
+            padding: 0px 4px; 
+            height: 13px; 
+            line-height: 13px;
+            border-bottom: 1px solid black; 
+            box-sizing: border-box;
+            width: 100%; 
         }
         
         .stamp-space { flex-grow: 1; } 
@@ -158,38 +201,34 @@
             outline: 2px solid #2196F3;
         }
 
-        /* --- AMARAN PRINT --- */
-        .print-warning {
-            display: none;
-            background: #ffeb3b;
-            color: #333;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            font-weight: bold;
-            font-size: 12px;
-        }
-        .print-warning.active { display: block; }
-
         /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
             body { display: block; height: auto; overflow: visible; background: white;}
             .customizer-panel { display: none !important; }
             .preview-area { padding: 0; display: block; overflow: visible; }
-            .print-warning { display: none !important; }
 
             @page { size: A4 portrait; margin: 0; }
             
             html, body { 
-                width: 210mm; height: 297mm; margin: 0; padding: 2mm 4mm; 
-                background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; box-sizing: border-box;
+                width: 210mm; 
+                height: 297mm;
+                margin: 0; 
+                padding: 2mm 4mm; 
+                background: white; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+                box-sizing: border-box;
             }
             
-            .page-container { width: 100%; padding: 0; margin: 0; box-shadow: none; min-height: auto; }
+            .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; min-height: auto;}
             
+            /* Setting Default Asal Anda */
             .form-wrapper { 
-                height: 144mm; display: flex; flex-direction: column;
-                page-break-inside: avoid; margin-bottom: 0;
+                height: 144mm; 
+                display: flex;
+                flex-direction: column;
+                page-break-inside: avoid;
+                margin-bottom: 0;
             }
             
             .header { height: 8mm; margin: 0; } 
@@ -199,9 +238,11 @@
             .calendar-wrapper { flex-grow: 1; }
             
             .grid-container { 
-                flex-grow: 1; display: grid;
+                flex-grow: 1; 
+                display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 22px; grid-auto-rows: 1.95cm; 
+                grid-template-rows: 22px; 
+                grid-auto-rows: 1.95cm; 
             }
             
             .day-header { height: 22px; padding: 0; }
@@ -225,7 +266,7 @@
 
     <!-- ================= PANEL CUSTOMIZER (KIRI) ================= -->
     <div class="customizer-panel">
-        <h2>⚙️ Live Editor</h2>
+        <h2>⚙️ Customizer</h2>
 
         <div class="panel-section">
             <h3>📅 Bulan & Tahun</h3>
@@ -240,14 +281,10 @@
         </div>
 
         <div class="panel-section">
-            <h3>📏 Saiz & Jarak</h3>
-            <div class="control-group">
-                <label>Page Padding (mm):</label>
-                <input type="number" id="ctrlPagePadding" value="10" step="1">
-            </div>
+            <h3>📏 Saiz & Jarak (Print)</h3>
             <div class="control-group">
                 <label>Form Height (mm):</label>
-                <input type="number" id="ctrlFormHeight" value="144" step="1" max="147">
+                <input type="number" id="ctrlFormHeight" value="144" step="1">
             </div>
             <div class="control-group">
                 <label>Header Height (mm):</label>
@@ -264,10 +301,6 @@
             <div class="control-group">
                 <label>Day Header (px):</label>
                 <input type="number" id="ctrlDayHeader" value="22" step="1">
-            </div>
-            <div class="control-group">
-                <label>Info Margin Bawah (mm):</label>
-                <input type="number" id="ctrlInfoMargin" value="1" step="0.5">
             </div>
         </div>
 
@@ -319,20 +352,12 @@
             </div>
         </div>
 
-        <!-- AMARAN PRINT -->
-        <div class="print-warning" id="printWarning">
-            ⚠️ <strong>Amaran:</strong> Form Height melebihi 147mm. 2 form akan terkeluar ke page kedua. Turunkan nilai ke 147mm atau bawah.
-        </div>
-
         <div class="btn-group">
             <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
             <button class="btn btn-secondary" onclick="saveSettings()">💾 Simpan</button>
         </div>
         <div class="btn-group">
-            <button class="btn btn-warning" onclick="loadDefaultText()">📄 Load Default</button>
-        </div>
-        <div class="btn-group">
-            <button class="btn btn-danger" onclick="resetSettings()">🔄 Reset Semua</button>
+            <button class="btn btn-danger" onclick="resetSettings()">🔄 Reset</button>
         </div>
     </div>
 
@@ -341,7 +366,7 @@
         <div class="page-container" id="pageContainer">
             
             <!-- FORM STAFF 1 -->
-            <div class="form-wrapper" id="form1">
+            <div class="form-wrapper">
                 <div class="top-right-info">
                     <span class="displayMonthYear"></span>
                 </div>
@@ -369,7 +394,7 @@
             <div class="cut-line"><span>✂️ GUNTING DI SINI ✂️</span></div>
 
             <!-- FORM STAFF 2 -->
-            <div class="form-wrapper" id="form2">
+            <div class="form-wrapper">
                 <div class="top-right-info">
                     <span class="displayMonthYear"></span>
                 </div>
@@ -433,7 +458,6 @@
         monthSelect.value = today.getMonth();
         yearInput.value = today.getFullYear();
 
-        // ====== FUNGSI GENERATE KALENDAR ======
         function generateCalendar() {
             const month = parseInt(monthSelect.value);
             const year = parseInt(yearInput.value);
@@ -509,7 +533,6 @@
             });
         }
 
-        // ====== FUNGSI APPLY CUSTOM SETTING (PREVIEW) ======
         function applySettings() {
             const monthVal = parseInt(monthSelect.value);
             const yearVal = parseInt(yearInput.value);
@@ -517,25 +540,13 @@
                 el.innerText = months[monthVal] + " " + yearVal;
             });
 
-            const pagePadding = document.getElementById('ctrlPagePadding').value;
-            const formHeight = parseFloat(document.getElementById('ctrlFormHeight').value);
+            const formHeight = document.getElementById('ctrlFormHeight').value;
             const headerHeight = document.getElementById('ctrlHeaderHeight').value;
             const infoHeight = document.getElementById('ctrlInfoHeight').value;
             const gridCell = document.getElementById('ctrlGridCell').value;
             const dayHeader = document.getElementById('ctrlDayHeader').value;
-            const infoMargin = document.getElementById('ctrlInfoMargin').value;
 
-            // ===== SAFETY CHECK =====
-            // 2 form mesti muat dalam A4 (297mm). Setiap form = 147mm max.
-            const printWarning = document.getElementById('printWarning');
-            if (formHeight > 147) {
-                printWarning.classList.add('active');
-            } else {
-                printWarning.classList.remove('active');
-            }
-
-            document.getElementById('pageContainer').style.padding = pagePadding + 'mm';
-            
+            // Preview guna inline style (untuk simulation)
             document.querySelectorAll('.form-wrapper').forEach(f => {
                 f.style.height = formHeight + 'mm';
             });
@@ -544,7 +555,6 @@
             });
             document.querySelectorAll('.info-grid-3').forEach(i => {
                 i.style.height = infoHeight + 'mm';
-                i.style.marginBottom = infoMargin + 'mm';
             });
             document.querySelectorAll('.grid-container').forEach(g => {
                 g.style.gridTemplateRows = dayHeader + 'px';
@@ -566,6 +576,7 @@
             document.querySelectorAll('.day-subtitle').forEach(d => d.style.fontSize = daySubSize + 'px');
             document.querySelectorAll('.top-right-info').forEach(d => d.style.fontSize = monthYearSize + 'px');
 
+            // Warna - guna dynamic style tag
             const colorMon = document.getElementById('ctrlColorMon').value;
             const colorSat = document.getElementById('ctrlColorSat').value;
             const colorSun = document.getElementById('ctrlColorSun').value;
@@ -578,16 +589,34 @@
                 styleTag.id = 'dynamic-style';
                 document.head.appendChild(styleTag);
             }
+            // Tambah @media print supaya warna kekal masa print
             styleTag.innerHTML = `
                 .col-monday { background-color: ${colorMon} !important; }
                 .col-saturday { background-color: ${colorSat} !important; }
                 .col-sunday { background-color: ${colorSun} !important; }
                 .day-header { background-color: ${colorHeader} !important; }
                 .day-number { background-color: ${colorNumBar} !important; }
+                
+                @media print {
+                    .form-wrapper { height: ${formHeight}mm !important; }
+                    .header { height: ${headerHeight}mm !important; }
+                    .info-grid-3 { height: ${infoHeight}mm !important; }
+                    .grid-container { grid-template-rows: ${dayHeader}px !important; grid-auto-rows: ${gridCell}cm !important; }
+                    .day-header { height: ${dayHeader}px !important; }
+                    .header h2 { font-size: ${titleSize}px !important; }
+                    .header h3 { font-size: ${subtitleSize}px !important; }
+                    .day-title { font-size: ${dayTitleSize}px !important; }
+                    .day-subtitle { font-size: ${daySubSize}px !important; }
+                    .top-right-info { font-size: ${monthYearSize}px !important; }
+                    .col-monday { background-color: ${colorMon} !important; }
+                    .col-saturday { background-color: ${colorSat} !important; }
+                    .col-sunday { background-color: ${colorSun} !important; }
+                    .day-header { background-color: ${colorHeader} !important; }
+                    .day-number { background-color: ${colorNumBar} !important; }
+                }
             `;
         }
 
-        // ====== SAVE & LOAD SETTINGS ======
         function saveSettings() {
             const titles = document.querySelectorAll('.header h2');
             const subtitles = document.querySelectorAll('.header h3');
@@ -595,13 +624,11 @@
             const settings = {
                 month: monthSelect.value,
                 year: yearInput.value,
-                pagePadding: document.getElementById('ctrlPagePadding').value,
                 formHeight: document.getElementById('ctrlFormHeight').value,
                 headerHeight: document.getElementById('ctrlHeaderHeight').value,
                 infoHeight: document.getElementById('ctrlInfoHeight').value,
                 gridCell: document.getElementById('ctrlGridCell').value,
                 dayHeader: document.getElementById('ctrlDayHeader').value,
-                infoMargin: document.getElementById('ctrlInfoMargin').value,
                 titleSize: document.getElementById('ctrlTitleSize').value,
                 subtitleSize: document.getElementById('ctrlSubtitleSize').value,
                 dayTitleSize: document.getElementById('ctrlDayTitleSize').value,
@@ -617,7 +644,7 @@
                 customDays: daysData
             };
             localStorage.setItem('parksonTemplateSettings', JSON.stringify(settings));
-            alert('✅ Setting & teks berjaya disimpan!');
+            alert('✅ Setting berjaya disimpan!');
         }
 
         function loadSettings() {
@@ -626,13 +653,11 @@
                 const s = JSON.parse(saved);
                 monthSelect.value = s.month;
                 yearInput.value = s.year;
-                document.getElementById('ctrlPagePadding').value = s.pagePadding;
                 document.getElementById('ctrlFormHeight').value = s.formHeight;
                 document.getElementById('ctrlHeaderHeight').value = s.headerHeight;
                 document.getElementById('ctrlInfoHeight').value = s.infoHeight;
                 document.getElementById('ctrlGridCell').value = s.gridCell;
                 document.getElementById('ctrlDayHeader').value = s.dayHeader;
-                document.getElementById('ctrlInfoMargin').value = s.infoMargin;
                 document.getElementById('ctrlTitleSize').value = s.titleSize;
                 document.getElementById('ctrlSubtitleSize').value = s.subtitleSize;
                 document.getElementById('ctrlDayTitleSize').value = s.dayTitleSize;
@@ -656,24 +681,13 @@
             }
         }
 
-        function loadDefaultText() {
-            if (confirm('Kembalikan semua teks ke default asal?')) {
-                document.querySelectorAll('.header h2').forEach(el => el.innerText = defaultTextData.title);
-                document.querySelectorAll('.header h3').forEach(el => el.innerText = defaultTextData.subtitle);
-                daysData = JSON.parse(JSON.stringify(defaultTextData.days));
-                generateCalendar();
-                saveSettings();
-            }
-        }
-
         function resetSettings() {
-            if (confirm('Reset SEMUA setting (termasuk teks, warna, dan saiz) ke default?')) {
+            if (confirm('Reset semua setting ke default asal?')) {
                 localStorage.removeItem('parksonTemplateSettings');
                 location.reload();
             }
         }
 
-        // ====== EVENT LISTENERS ======
         const inputs = document.querySelectorAll('.customizer-panel input, .customizer-panel select');
         inputs.forEach(input => {
             input.addEventListener('input', () => {
