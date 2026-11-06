@@ -2,7 +2,7 @@
 <html lang="ms">
 <head>
     <meta charset="UTF-8">
-    <title>Attendance Checklist (2 Per Page)</title>
+    <title>Attendance Checklist</title>
     <style>
         /* --- SETTING UNTUK PAPARAN SKRIN (BROWSER) --- */
         body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; }
@@ -19,50 +19,42 @@
         .cut-line span { position: relative; top: 8px; background: white; padding: 0 10px; }
 
         /* --- REKA BENTUK FORM --- */
-        .header { text-align: center; margin-bottom: 8px; }
-        .header h2 { margin: 0; font-size: 16px; font-weight: 900; letter-spacing: 0.5px; } 
-        .header h3 { margin: 2px 0 0 0; font-size: 11px; font-weight: bold; }
+        .header { text-align: center; margin-bottom: 4px; }
+        .header h2 { margin: 0; font-size: 15px; font-weight: 900; letter-spacing: 0.3px; } 
+        .header h3 { margin: 1px 0 0 0; font-size: 10px; font-weight: bold; } 
         
-        /* --- MONTH/YEAR DI SUDUT KANAN ATAS --- */
+        /* --- BULAN & TAHUN DI KANAN ATAS --- */
         .top-right-info {
             position: absolute;
-            top: 0;
-            right: 0;
-            font-size: 11px;
+            top: 0; 
+            right: 20px; 
+            font-size: 12px;
             font-weight: bold;
-            display: flex;
-            align-items: flex-end;
-            gap: 5px;
-        }
-        .top-right-info .line {
-            border-bottom: 1px solid black;
-            min-width: 100px;
-            text-align: center;
-            font-size: 13px;
-            font-weight: bold;
+            text-align: right;
+            white-space: nowrap;
         }
 
-        /* --- GARISAN NAME, DEPT, BRAND (1 BARIS) --- */
+        /* --- NAME, DEPT, BRAND (1 BARIS) --- */
         .info-grid-3 { 
             display: grid; 
             grid-template-columns: auto 4fr auto 2fr auto 2fr; 
-            gap: 8px 10px; 
+            gap: 4px 8px; 
             margin-bottom: 4px; 
-            font-size: 11px; 
+            font-size: 10px; 
             font-weight: bold;
             align-items: center; 
         }
         .info-grid-3 .label { white-space: nowrap; }
         .info-grid-3 .line {
             border-bottom: 1px solid black;
-            height: 18px; 
+            height: 15px; 
             display: flex;
             align-items: flex-end; 
-            padding-left: 5px;
+            padding-left: 4px;
             font-weight: normal;
             overflow: hidden; 
             white-space: nowrap;
-            font-size: 13px; 
+            font-size: 12px; 
         }
         
         /* --- KAWASAN GRID KALENDAR --- */
@@ -108,11 +100,13 @@
             line-height: 1.1;
             padding: 2px 1px;
         }
-        .day-title { font-size: 11px; }
+        .day-title { font-size: 10px; font-weight: bold; }
+        
+        /* SUB-TEXT FOKUS */
         .day-subtitle { 
-            font-size: 7px; 
-            font-weight: normal; 
-            color: #ddd; 
+            font-size: 6.5px; 
+            font-weight: bold; 
+            color: #fff; 
             margin-top: 1px;
             text-transform: uppercase;
         }
@@ -122,7 +116,7 @@
             display: flex; 
             flex-direction: column; 
             border: 1px solid black; 
-            min-height: 60px; 
+            min-height: 55px; 
             position: relative;
             box-sizing: border-box;
             background-color: rgba(255, 255, 255, 0.7); 
@@ -133,16 +127,15 @@
             text-align: left; 
             font-weight: bold; 
             font-size: 10px; 
-            padding: 1px 4px; 
-            height: 14px; 
-            line-height: 12px;
+            padding: 0px 4px; 
+            height: 13px; 
+            line-height: 13px;
             border-bottom: 1px solid black; 
             box-sizing: border-box;
             width: 100%; 
         }
         
         .stamp-space { flex-grow: 1; } 
-
         .empty-cell { background-color: #f9f9f9; border: 1px solid black; box-sizing: border-box; }
 
         /* Highlight Warna */
@@ -152,17 +145,13 @@
 
         /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
-            /* ARAHAN KEPADA BROWSER UNTUK PRINT TANPA MARGIN */
-            @page { 
-                size: A4 portrait; 
-                margin: 0; /* <--- Memaksa margin 0 */
-            }
+            @page { size: A4 portrait; margin: 0; }
             
             html, body { 
                 width: 210mm; 
                 height: 297mm;
                 margin: 0; 
-                padding: 2mm 4mm; /* 4mm adalah 'safe zone' untuk printer yang tak boleh print hujung kertas */
+                padding: 2mm 4mm; 
                 background: white; 
                 -webkit-print-color-adjust: exact; 
                 print-color-adjust: exact; 
@@ -173,21 +162,23 @@
             .page-container { padding: 0; margin: 0; box-shadow: none; width: 100%; max-width: 100%; }
             
             .form-wrapper { 
-                height: 146mm; 
+                height: 142mm; /* KURANGKAN DARI 144MM -> 142MM */
                 display: flex;
                 flex-direction: column;
                 page-break-inside: avoid;
                 margin-bottom: 0;
             }
             
-            .header { height: 10mm; margin: 0; } 
+            /* BESARKAN HEADER & INFO UNTUK BAGI RUANG TULISAN */
+            .header { height: 10mm; margin: 0; } /* DARI 8MM -> 10MM */
+            .info-grid-3 { height: 11mm; margin: 0; margin-bottom: 1.5mm; } /* DARI 9MM -> 11MM */
             
-            .info-grid-3 { 
-                height: 10mm; 
-                margin: 0; 
-                margin-bottom: 1mm; /* Jarak sikit supaya tak melekat sangat */
+            /* POSISI BULAN & TAHUN MASA PRINT */
+            .top-right-info { 
+                top: 0; 
+                right: 15px; 
+                font-size: 11px; 
             }
-            .top-right-info { top: 2mm; right: 0; }
             
             .calendar-wrapper { flex-grow: 1; }
             
@@ -195,21 +186,21 @@
                 flex-grow: 1; 
                 display: grid;
                 grid-template-columns: repeat(7, 1fr);
-                grid-template-rows: 24px; 
-                grid-auto-rows: 2cm; 
+                grid-template-rows: 22px; 
+                grid-auto-rows: 1fr; 
             }
             
-            .day-header { height: 24px; padding: 0; }
+            .day-header { height: 22px; padding: 0; }
             .day-title { font-size: 9px; }
-            .day-subtitle { font-size: 7px; margin-top: 0;} 
+            .day-subtitle { font-size: 6px; margin-top: 0; line-height: 1; font-weight: bold;} 
             
             .day-cell { min-height: 0; height: 100%; } 
-            .day-number { font-size: 10px; padding: 1px 4px; height: 14px; line-height: 12px; width: 100%; }
+            .day-number { font-size: 10px; padding: 0px 4px; height: 13px; line-height: 13px; width: 100%; }
             
             .cut-line { 
-                margin: 1mm 0; 
+                margin: 0.5mm 0; 
                 padding: 0;
-                height: 2mm; 
+                height: 3mm; 
                 border-bottom: 1px dashed #000; 
             }
             .cut-line span { display: none; } 
@@ -218,13 +209,12 @@
 </head>
 <body>
 
-    <!-- Kawalan -->
     <div class="controls">
         <label>Pilih Bulan: </label>
         <select id="monthSelect"></select>
         <label> Tahun: </label>
         <input type="number" id="yearInput" style="width: 80px;">
-        <button onclick="window.print()">🖨️ Print (2 Form 1 Page)</button>
+        <button onclick="window.print()">🖨️ Print (100% Scale)</button>
     </div>
 
     <div class="page-container">
@@ -232,8 +222,7 @@
         <!-- FORM STAFF 1 -->
         <div class="form-wrapper">
             <div class="top-right-info">
-                <span>MONTH/YEAR:</span>
-                <div class="line"><span class="displayMonthYear"></span></div>
+                <span class="displayMonthYear"></span>
             </div>
 
             <div class="header">
@@ -262,8 +251,7 @@
         <!-- FORM STAFF 2 -->
         <div class="form-wrapper">
             <div class="top-right-info">
-                <span>MONTH/YEAR:</span>
-                <div class="line"><span class="displayMonthYear"></span></div>
+                <span class="displayMonthYear"></span>
             </div>
 
             <div class="header">
