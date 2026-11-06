@@ -158,11 +158,25 @@
             outline: 2px solid #2196F3;
         }
 
+        /* --- AMARAN PRINT --- */
+        .print-warning {
+            display: none;
+            background: #ffeb3b;
+            color: #333;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            font-size: 12px;
+        }
+        .print-warning.active { display: block; }
+
         /* --- SETTING UNTUK PRINT (A4) --- */
         @media print {
             body { display: block; height: auto; overflow: visible; background: white;}
             .customizer-panel { display: none !important; }
             .preview-area { padding: 0; display: block; overflow: visible; }
+            .print-warning { display: none !important; }
 
             @page { size: A4 portrait; margin: 0; }
             
@@ -200,7 +214,6 @@
             .cut-line { margin: 0.5mm 0; padding: 0; height: 3mm; border-bottom: 1px dashed #000; }
             .cut-line span { display: none; } 
             
-            /* Hilangkan highlight editable masa print */
             [contenteditable="true"] {
                 outline: none !important;
                 background: transparent !important;
@@ -234,7 +247,7 @@
             </div>
             <div class="control-group">
                 <label>Form Height (mm):</label>
-                <input type="number" id="ctrlFormHeight" value="144" step="1">
+                <input type="number" id="ctrlFormHeight" value="144" step="1" max="147">
             </div>
             <div class="control-group">
                 <label>Header Height (mm):</label>
@@ -306,13 +319,17 @@
             </div>
         </div>
 
-        <!-- BUTANG ACTION -->
+        <!-- AMARAN PRINT -->
+        <div class="print-warning" id="printWarning">
+            ⚠️ <strong>Amaran:</strong> Form Height melebihi 147mm. 2 form akan terkeluar ke page kedua. Turunkan nilai ke 147mm atau bawah.
+        </div>
+
         <div class="btn-group">
             <button class="btn btn-primary" onclick="window.print()">🖨️ Print</button>
             <button class="btn btn-secondary" onclick="saveSettings()">💾 Simpan</button>
         </div>
         <div class="btn-group">
-            <button class="btn btn-warning" onclick="loadDefaultText()">📄 Load Default Text</button>
+            <button class="btn btn-warning" onclick="loadDefaultText()">📄 Load Default</button>
         </div>
         <div class="btn-group">
             <button class="btn btn-danger" onclick="resetSettings()">🔄 Reset Semua</button>
@@ -389,7 +406,6 @@
         
         const months = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
         
-        // DEFAULT TEXT (boleh ubah di sini)
         const defaultTextData = {
             title: "PARKSON IOI CITY MALL",
             subtitle: "MONTHLY BRIEFING ATTENDANCE AND GROOMING CHECKLIST",
@@ -404,7 +420,6 @@
             ]
         };
 
-        // daysData boleh diubah oleh admin, simpan sebagai variable
         let daysData = JSON.parse(JSON.stringify(defaultTextData.days));
 
         months.forEach((m, index) => {
@@ -437,7 +452,6 @@
                 daysData.forEach((data, index) => {
                     let header = document.createElement('div');
                     header.className = 'day-header';
-                    // Tambah contenteditable pada sub-teks dan day title
                     header.innerHTML = `
                         <div class="day-title" contenteditable="true" data-day-index="${index}" data-type="day">${data.day}</div>
                         <div class="day-subtitle" contenteditable="true" data-day-index="${index}" data-type="text">${data.text}</div>
@@ -478,11 +492,9 @@
                 }
             });
             
-            // Attach event listener untuk kemas kini daysData bila admin edit
             attachEditableListeners();
         }
 
-        // ====== FUNGSI UNTUK KEMAS KINI daysData BILA EDIT ======
         function attachEditableListeners() {
             document.querySelectorAll('.day-title[contenteditable], .day-subtitle[contenteditable]').forEach(el => {
                 el.addEventListener('input', function() {
@@ -506,12 +518,21 @@
             });
 
             const pagePadding = document.getElementById('ctrlPagePadding').value;
-            const formHeight = document.getElementById('ctrlFormHeight').value;
+            const formHeight = parseFloat(document.getElementById('ctrlFormHeight').value);
             const headerHeight = document.getElementById('ctrlHeaderHeight').value;
             const infoHeight = document.getElementById('ctrlInfoHeight').value;
             const gridCell = document.getElementById('ctrlGridCell').value;
             const dayHeader = document.getElementById('ctrlDayHeader').value;
             const infoMargin = document.getElementById('ctrlInfoMargin').value;
+
+            // ===== SAFETY CHECK =====
+            // 2 form mesti muat dalam A4 (297mm). Setiap form = 147mm max.
+            const printWarning = document.getElementById('printWarning');
+            if (formHeight > 147) {
+                printWarning.classList.add('active');
+            } else {
+                printWarning.classList.remove('active');
+            }
 
             document.getElementById('pageContainer').style.padding = pagePadding + 'mm';
             
@@ -568,7 +589,6 @@
 
         // ====== SAVE & LOAD SETTINGS ======
         function saveSettings() {
-            // Kumpul teks editable semasa
             const titles = document.querySelectorAll('.header h2');
             const subtitles = document.querySelectorAll('.header h3');
 
@@ -592,13 +612,12 @@
                 colorSun: document.getElementById('ctrlColorSun').value,
                 colorHeader: document.getElementById('ctrlColorHeader').value,
                 colorNumBar: document.getElementById('ctrlColorNumBar').value,
-                // Simpan teks editable
                 customTitle: titles[0] ? titles[0].innerText : defaultTextData.title,
                 customSubtitle: subtitles[0] ? subtitles[0].innerText : defaultTextData.subtitle,
                 customDays: daysData
             };
             localStorage.setItem('parksonTemplateSettings', JSON.stringify(settings));
-            alert('✅ Setting & teks berjaya disimpan! Bila buka semula, semua ini akan digunakan.');
+            alert('✅ Setting & teks berjaya disimpan!');
         }
 
         function loadSettings() {
@@ -625,7 +644,6 @@
                 document.getElementById('ctrlColorHeader').value = s.colorHeader;
                 document.getElementById('ctrlColorNumBar').value = s.colorNumBar;
                 
-                // Apply custom text
                 if (s.customTitle) {
                     document.querySelectorAll('.header h2').forEach(el => el.innerText = s.customTitle);
                 }
@@ -638,20 +656,12 @@
             }
         }
 
-        // ====== LOAD DEFAULT TEXT (RESET TEKS SAHAJA) ======
         function loadDefaultText() {
-            if (confirm('Kembalikan semua teks (tajuk, hari, sub-teks) ke default asal?')) {
-                // Reset teks header
+            if (confirm('Kembalikan semua teks ke default asal?')) {
                 document.querySelectorAll('.header h2').forEach(el => el.innerText = defaultTextData.title);
                 document.querySelectorAll('.header h3').forEach(el => el.innerText = defaultTextData.subtitle);
-                
-                // Reset daysData
                 daysData = JSON.parse(JSON.stringify(defaultTextData.days));
-                
-                // Regenerate calendar untuk apply teks asal
                 generateCalendar();
-                
-                // Update juga text dalam localStorage
                 saveSettings();
             }
         }
