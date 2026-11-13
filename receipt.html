@@ -3,15 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt Auto-Populate (With Print Margin Control)</title>
+  <title>Multi-Receipt (A4 - Multiple Receipts Per Page)</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     /* ======================================================== */
     /* UBAH SAIZ FONT DI SINI (UNTUK SEMUA BARIS) */
     /* ======================================================== */
     :root {
-      --body-font-size: 9.7pt;
-      --body-font-size-print: 9.7pt;
+      --body-font-size: 8.8pt;
+      --body-font-size-print: 8.8pt;
       
       --header-main-size: 2rem;
       --header-main-size-print: 20pt;
@@ -20,7 +20,7 @@
       --header-branch-size-print: 20pt;
       
       --barcode-text-size: 0.9rem;
-      --barcode-text-size-print: 8.5pt;
+      --barcode-text-size-print: 7.5pt;
       
       /* ======================================================== */
       /* MAX WIDTH SETIAP KUMPULAN BARIS */
@@ -31,9 +31,9 @@
       --max-width-barcode-last: 6.5cm;
       
       /* ======================================================== */
-      /* PRINT MARGIN (DIK AWAL OLEH SLIDER) */
+      /* PRINT MARGIN */
       /* ======================================================== */
-      --print-margin: 0mm;
+      --print-margin: 10mm;
     }
     /* ======================================================== */
     
@@ -233,7 +233,21 @@
       font-family: sans-serif;
     }
     
-    /* RESIT STYLE - KERTAS 3 INCI */
+    /* === A4 PAGE CONTAINER === */
+    .a4-page-container {
+      background: #fff;
+      width: 210mm;
+      min-height: 297mm;
+      margin: 0 auto;
+      padding: 10mm;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5mm;
+      align-content: flex-start;
+    }
+    
+    /* === RECEIPT ITEM (3 INCI) === */
     .receipt-preview-item {
       background: #fff;
       padding: 10px 5px;
@@ -245,17 +259,10 @@
       width: 3in;
       min-width: 3in;
       max-width: 3in;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      letter-spacing: -1.2px; 
-      margin-bottom: 20px;
-      border-bottom: 2px dashed #94a3b8;
+      border: 1px dashed #94a3b8;
       padding-bottom: 10px;
       text-align: left;
-    }
-    .receipt-preview-item:last-child {
-      margin-bottom: 0;
-      border-bottom: none;
-      padding-bottom: 0;
+      page-break-inside: avoid;
     }
     
     /* Gaya resit Parkson */
@@ -361,7 +368,7 @@
 
     /* TARIKH - LEFT, COMPRESSED */
     .r-date-left {
-      font-size: 9pt;
+      font-size: 8pt;
       font-weight: 400;
       letter-spacing: -0.3px;
       text-align: left;
@@ -405,15 +412,15 @@
     /* === PRINT STYLES === */
     @media print {
       @page { 
-        size: 3in auto; 
-        margin: var(--print-margin); /* GUNA CSS VARIABLE UNTUK MARGIN */
+        size: A4; 
+        margin: var(--print-margin);
       }
       
       html, body { 
         background: white !important; 
         padding: 0 !important; 
         margin: 0 !important;
-        width: 3in !important;
+        width: 100% !important;
         -webkit-print-color-adjust: exact; 
         print-color-adjust: exact;
       }
@@ -432,23 +439,32 @@
         display: none !important; 
       }
       
+      .a4-page-container {
+        width: 100% !important;
+        min-height: auto !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        box-shadow: none !important;
+        gap: 5mm;
+        display: flex;
+        flex-wrap: wrap;
+        align-content: flex-start;
+      }
+      
       .receipt-preview-item { 
         width: 3in !important;
+        min-width: 3in !important;
         max-width: 3in !important;
         font-size: var(--body-font-size-print) !important;
         font-weight: 600 !important; 
         padding: 0.01in 0.05in !important; 
-        margin: 0 0 10px 0 !important; 
+        margin: 0 !important; 
         line-height: 1.05 !important; 
         box-shadow: none !important;
+        border: none !important;
         letter-spacing: -1.2px; 
-        page-break-after: always;
         page-break-inside: avoid;
         text-align: left !important;
-      }
-      
-      .receipt-preview-item:last-child {
-        page-break-after: auto;
       }
       
       .r-header-main { font-size: var(--header-main-size-print) !important; line-height: 1 !important; margin-top: 0 !important; text-align: center !important; }
@@ -526,7 +542,7 @@
 <body>
 
 <div class="container">
-  <h1>🧾 Multi-Receipt Auto-Populate</h1>
+  <h1>🧾 Multi-Receipt (A4 - Multiple Per Page)</h1>
   
   <div class="receipt-wrapper">
     <!-- FORM INPUT LOG -->
@@ -543,13 +559,13 @@
 
       <!-- === MARGIN SETTINGS === -->
       <div class="margin-settings">
-        <label>Print Margin <span class="value-display" id="marginValue">0mm</span></label>
-        <input type="range" id="marginRange" min="0" max="10" step="0.5" value="0">
-        <div class="hint">Ubah margin kertas semasa print (0mm = tiada margin).</div>
+        <label>Print Margin <span class="value-display" id="marginValue">10mm</span></label>
+        <input type="range" id="marginRange" min="0" max="20" step="1" value="10">
+        <div class="hint">Ubah margin kertas A4 semasa print.</div>
       </div>
 
       <div class="print-warning">
-        ⚠️ <strong>Notis Print:</strong> Pastikan anda pilih saiz kertas <strong>"3 inch"</strong> dan set <strong>Scale: 100%</strong>.
+        ⚠️ <strong>Notis Print:</strong> Pastikan anda pilih saiz kertas <strong>A4</strong> dan set <strong>Scale: 100%</strong>.
       </div>
 
       <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here...">***BEGIN SALES***
@@ -593,10 +609,10 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
       <button class="btn-generate" id="generateBtn">🖨️ CONVERT & PRINT</button>
     </div>
 
-    <!-- PREVIEW -->
+    <!-- PREVIEW (A4 PAGE) -->
     <div class="preview-panel">
-      <div class="preview-label">🔍 Live Receipt Preview</div>
-      <div id="receiptPreviewContainer" style="display: flex; flex-direction: column; align-items: center; width: 100%;">
+      <div class="preview-label">🔍 Live Receipt Preview (A4)</div>
+      <div id="receiptPreviewContainer" class="a4-page-container">
         <!-- Resit akan dimasukkan di sini -->
       </div>
     </div>
@@ -612,7 +628,6 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
   const marginRange = document.getElementById('marginRange');
   const marginValue = document.getElementById('marginValue');
 
-  // Update margin variable bila slider ubah
   marginRange.addEventListener('input', function() {
     const val = this.value;
     marginValue.textContent = val + 'mm';
@@ -844,16 +859,13 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     // SECTION 1: HEADER → TRX# (MAX WIDTH 6.5CM)
     // ========================================================
     html += `<div class="r-section-header-trx">`;
-    // Header - CENTER
     html += `<div class="r-center r-header-main">${escapeHtml(data.storeName)}</div>`;
     html += `<div class="r-center r-header-branch">${escapeHtml(data.branchName)}</div>`;
     
-    // Alamat - CENTER
     data.addressLines.forEach(line => {
       html += `<div class="r-center r-normal">${escapeHtml(line)}</div>`;
     });
 
-    // Company - CENTER (kecuali WWW yang center)
     html += `<div class="r-center r-normal" style="margin-top:2px;">`;
     data.companyLines.forEach(line => {
       if (line.includes('WWW.')) {
@@ -864,18 +876,16 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     });
     html += `</div>`;
 
-    // TARIKH - LEFT, COMPRESSED
     if (data.dateLine) {
       html += `<div class="r-date-left">${escapeHtml(data.dateLine)}</div>`;
     }
 
-    // TRX# - LEFT
     let trxDisplay = data.trxNo;
     if(trxDisplay.startsWith(':')) {
         trxDisplay = trxDisplay.substring(1);
     }
     html += `<div class="r-trx-normal">Trx#:${escapeHtml(trxDisplay)}</div>`;
-    html += `</div>`; // TUTUP SECTION HEADER-TRX
+    html += `</div>`;
     
     html += `<div style="margin-bottom:2px;"></div>`;
 
@@ -889,15 +899,11 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     });
     
     if (!data.hasFooterNote) {
-        // NOTA KAKI - JUSTIFY
         html += `<div class="r-justify r-normal" style="width: 100%;">Purchases may be exchanged or returned within 7 days (product exclusion applies). Any vouchers redeemed must be surrendered else the amount will be deducted from the refund. Terms apply.</div>`;
-        // EMAIL - CENTER
         html += `<div class="r-center r-normal">customerservice@parkson.com.my</div>`;
-        // THANK YOU - CENTER
         html += `<div class="r-center r-normal">THANK YOU FOR YOUR PATRONAGE</div>`;
     }
 
-    // PROMO - LEFT
     html += `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
     html += `<div class="r-bold" style="width: 100%; text-align: left;">* YOU ORDER, WE DELIVER!</div>`;
     html += `<div class="r-bold" style="width: 100%; text-align: left;">* Shop NOW at parksononline.com.my</div>`;
@@ -907,10 +913,9 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     html += `<div class="r-normal" style="width: 100%; text-align: left;">Terms Apply</div>`;
     html += `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
 
-    // CASHIER - LEFT
     html += `<div class="r-normal">Cashier Name : ${escapeHtml(cashier)}</div>`;
     html += `<div class="r-normal">${escapeHtml(pmy)}</div>`;
-    html += `</div>`; // TUTUP SECTION ITEM-NUMBER
+    html += `</div>`;
 
     // BARCODE
     let barcodeDisplayText = data.trxNo;
@@ -935,11 +940,10 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     html += `<div class="barcode-container">`;
     html += `<svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg>`;
     html += `</div>`;
-    // TEKS BAWAH BARCODE - CENTER
     html += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}</div>`;
-    html += `</div>`; // TUTUP SECTION BARCODE-LAST
+    html += `</div>`;
 
-    html += `</div>`; // TUTUP RECEIPT ITEM
+    html += `</div>`;
 
     return html;
   }
@@ -962,7 +966,7 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
             }
         });
     } else {
-        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px;">❌ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
+        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px; width: 100%;">❌ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
     }
 
     setTimeout(() => {
@@ -996,7 +1000,6 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     setTimeout(() => window.print(), 300); 
   });
 
-  // Set margin awal
   marginValue.textContent = marginRange.value + 'mm';
   document.documentElement.style.setProperty('--print-margin', marginRange.value + 'mm');
 
