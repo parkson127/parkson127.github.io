@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt (A4 - Multiple Receipts Per Page)</title>
+  <title>Multi-Receipt (A4 - Per-Receipt Cashier)</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     /* ======================================================== */
@@ -93,13 +93,16 @@
       font-family: sans-serif;
     }
     
-    .cashier-settings {
+    /* === CASHIER PER RECEIPT === */
+    .cashier-per-receipt {
       background: #e2e8f0;
       padding: 12px;
       border-radius: 10px;
       margin-bottom: 15px;
+      max-height: 200px;
+      overflow-y: auto;
     }
-    .cashier-settings label {
+    .cashier-per-receipt label {
       display: block;
       font-size: 0.75rem;
       font-weight: 700;
@@ -107,16 +110,29 @@
       margin-bottom: 4px;
       font-family: sans-serif;
     }
-    .cashier-settings input {
-      width: 100%;
-      padding: 6px 10px;
-      border: 1px solid #cbd5e1;
+    .cashier-receipt-item {
+      background: #fff;
+      padding: 8px;
       border-radius: 6px;
-      font-family: 'Consolas', 'Lucida Console', monospace;
-      font-size: 0.85rem;
       margin-bottom: 8px;
+      border: 1px solid #cbd5e1;
     }
-    .cashier-settings input:last-child { margin-bottom: 0; }
+    .cashier-receipt-item .receipt-label {
+      font-size: 0.7rem;
+      font-weight: 700;
+      color: #3b82f6;
+      margin-bottom: 4px;
+    }
+    .cashier-receipt-item input {
+      width: 100%;
+      padding: 4px 8px;
+      border: 1px solid #cbd5e1;
+      border-radius: 4px;
+      font-family: 'Consolas', 'Lucida Console', monospace;
+      font-size: 0.8rem;
+      margin-bottom: 4px;
+    }
+    .cashier-receipt-item input:last-child { margin-bottom: 0; }
 
     /* === MARGIN SETTINGS === */
     .margin-settings {
@@ -155,7 +171,7 @@
     .log-textarea {
       width: 100%;
       flex: 1;
-      min-height: 400px;
+      min-height: 300px;
       padding: 15px;
       border: 1px solid #cbd5e1;
       border-radius: 12px;
@@ -542,27 +558,12 @@
 <body>
 
 <div class="container">
-  <h1>🧾 Multi-Receipt (A4 - Multiple Per Page)</h1>
+  <h1>🧾 Multi-Receipt (A4 - Per-Receipt Cashier)</h1>
   
   <div class="receipt-wrapper">
     <!-- FORM INPUT LOG -->
     <div class="form-panel">
       <h2>📋 Paste Log E-Journal:</h2>
-      
-      <div class="cashier-settings">
-        <label>Cashier Name</label>
-        <input type="text" id="cashierNameInput" value="SURIATI" placeholder="Contoh: SURIATI">
-        
-        <label>PMY / Terminal Code</label>
-        <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
-      </div>
-
-      <!-- === MARGIN SETTINGS === -->
-      <div class="margin-settings">
-        <label>Print Margin <span class="value-display" id="marginValue">10mm</span></label>
-        <input type="range" id="marginRange" min="0" max="20" step="1" value="10">
-        <div class="hint">Ubah margin kertas A4 semasa print.</div>
-      </div>
 
       <div class="print-warning">
         ⚠️ <strong>Notis Print:</strong> Pastikan anda pilih saiz kertas <strong>A4</strong> dan set <strong>Scale: 100%</strong>.
@@ -605,6 +606,19 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
 	|NPARKSON CARD : 101.00
 	|N----------------------------------------
 	***END SALES***</textarea>
+
+      <!-- === CASHIER PER RECEIPT === -->
+      <div class="cashier-per-receipt" id="cashierPerReceipt">
+        <label>Cashier & PMY Per Receipt:</label>
+        <!-- Akan diisi oleh JavaScript -->
+      </div>
+
+      <!-- === MARGIN SETTINGS === -->
+      <div class="margin-settings">
+        <label>Print Margin <span class="value-display" id="marginValue">10mm</span></label>
+        <input type="range" id="marginRange" min="0" max="20" step="1" value="10">
+        <div class="hint">Ubah margin kertas A4 semasa print.</div>
+      </div>
       
       <button class="btn-generate" id="generateBtn">🖨️ CONVERT & PRINT</button>
     </div>
@@ -623,8 +637,7 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
   const logInput = document.getElementById('logInput');
   const generateBtn = document.getElementById('generateBtn');
   const previewContainer = document.getElementById('receiptPreviewContainer');
-  const cashierNameInput = document.getElementById('cashierNameInput');
-  const pmyCodeInput = document.getElementById('pmyCodeInput');
+  const cashierPerReceipt = document.getElementById('cashierPerReceipt');
   const marginRange = document.getElementById('marginRange');
   const marginValue = document.getElementById('marginValue');
 
@@ -638,6 +651,59 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     if (!text) return '';
     const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return text.replace(/[&<>"']/g, m => map[m]);
+  }
+
+  // === UPDATE CASHIER INPUTS ===
+  function updateCashierInputs() {
+    const log = logInput.value;
+    const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g) || [];
+    
+    // Simpan nilai semasa (jika ada)
+    const currentValues = {};
+    const existingInputs = cashierPerReceipt.querySelectorAll('.cashier-receipt-item');
+    existingInputs.forEach((item, index) => {
+      const nameInput = item.querySelector('input[name="cashierName"]');
+      const pmyInput = item.querySelector('input[name="pmy"]');
+      if (nameInput && pmyInput) {
+        currentValues[index] = {
+          name: nameInput.value,
+          pmy: pmyInput.value
+        };
+      }
+    });
+    
+    cashierPerReceipt.innerHTML = '<label>Cashier & PMY Per Receipt:</label>';
+    
+    matches.forEach((chunk, index) => {
+      const item = document.createElement('div');
+      item.className = 'cashier-receipt-item';
+      
+      const label = document.createElement('div');
+      label.className = 'receipt-label';
+      label.textContent = `Resit #${index + 1}`;
+      
+      const nameInput = document.createElement('input');
+      nameInput.type = 'text';
+      nameInput.name = 'cashierName';
+      nameInput.placeholder = 'Cashier Name';
+      nameInput.value = currentValues[index] ? currentValues[index].name : 'SURIATI';
+      nameInput.setAttribute('data-receipt-index', index);
+      
+      const pmyInput = document.createElement('input');
+      pmyInput.type = 'text';
+      pmyInput.name = 'pmy';
+      pmyInput.placeholder = 'PMY Code';
+      pmyInput.value = currentValues[index] ? currentValues[index].pmy : 'PMY LS6.2 20141230';
+      pmyInput.setAttribute('data-receipt-index', index);
+      
+      nameInput.addEventListener('input', updatePreview);
+      pmyInput.addEventListener('input', updatePreview);
+      
+      item.appendChild(label);
+      item.appendChild(nameInput);
+      item.appendChild(pmyInput);
+      cashierPerReceipt.appendChild(item);
+    });
   }
 
   function parseSingleReceipt(receiptText, cashier, pmy) {
@@ -950,8 +1016,10 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
 
   function updatePreview() {
     const log = logInput.value;
-    const cashier = cashierNameInput.value;
-    const pmy = pmyCodeInput.value;
+    
+    // Ambil semua cashier input (per receipt)
+    const cashierInputs = cashierPerReceipt.querySelectorAll('input[name="cashierName"]');
+    const pmyInputs = cashierPerReceipt.querySelectorAll('input[name="pmy"]');
     
     previewContainer.innerHTML = '';
     
@@ -959,7 +1027,10 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     const matches = log.match(regex);
 
     if (matches && matches.length > 0) {
-        matches.forEach(chunk => {
+        matches.forEach((chunk, index) => {
+            const cashier = cashierInputs[index] ? cashierInputs[index].value : 'SURIATI';
+            const pmy = pmyInputs[index] ? pmyInputs[index].value : 'PMY LS6.2 20141230';
+            
             const html = parseSingleReceipt(chunk, cashier, pmy);
             if (html) {
                 previewContainer.innerHTML += html;
@@ -990,10 +1061,12 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
     }, 50);
   }
 
-  logInput.addEventListener('input', updatePreview);
-  cashierNameInput.addEventListener('input', updatePreview);
-  pmyCodeInput.addEventListener('input', updatePreview);
-  
+  // Update cashier inputs bila log berubah
+  logInput.addEventListener('input', function() {
+    updateCashierInputs();
+    updatePreview();
+  });
+
   generateBtn.addEventListener('click', (e) => {
     e.preventDefault();
     updatePreview();
@@ -1003,6 +1076,8 @@ Terminal No.: 127-316, Receipt No.: *245906, Log Date: 08/11/26..08/11/26
   marginValue.textContent = marginRange.value + 'mm';
   document.documentElement.style.setProperty('--print-margin', marginRange.value + 'mm');
 
+  // Initialize
+  updateCashierInputs();
   updatePreview();
 </script>
 </body>
