@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt — A4 Side-by-Side (Universal Payment)</title>
+  <title>Multi-Receipt — A4 Auto Split (Fixed)</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     :root {
       --body-font-size: 9.5pt;
       --header-main-size: 2rem;
       --header-branch-size: 2rem;
-      --barcode-text-size: 0.8rem;
+      --barcode-text-size: 1.1rem;
       --max-width-header-trx: 6.5cm;
       --max-width-item-number: 6.0cm;
       --max-width-membership-pmy: 6.5cm;
@@ -20,8 +20,6 @@
       --a4-height: 11.69in;
       --a4-padding: 0.4in;
       --col-gap: 0.5in;
-      --a4-usable-height: 1045px;
-      --split-threshold: 1400px;
       --print-margin: 0mm;
     }
     
@@ -34,107 +32,99 @@
     .form-panel { flex: 1; min-width: 380px; background: #f8fafc; border-radius: 18px; padding: 20px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; }
     .form-panel h2 { font-size: 1.1rem; margin-bottom: 10px; color: #0f172a; font-family: sans-serif; }
     
-    .cashier-settings { background: #e2e8f0; padding: 12px; border-radius: 10px; margin-bottom: 15px; }
-    .cashier-settings label { display: block; font-size: 0.75rem; font-weight: 700; color: #334155; margin-bottom: 4px; font-family: sans-serif; }
-    .cashier-settings input { width: 100%; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 6px; font-family: 'Consolas', monospace; font-size: 0.85rem; margin-bottom: 8px; }
-    .cashier-settings input:last-child { margin-bottom: 0; }
-    
     .per-receipt-cashier {
-      background: #dbeafe;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 10px;
-      border-left: 4px solid #3b82f6;
+      background: #dbeafe; padding: 10px; border-radius: 8px;
+      margin-bottom: 10px; border-left: 4px solid #3b82f6;
     }
     .per-receipt-cashier .r-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #1e40af;
-      margin-bottom: 4px;
-      font-family: sans-serif;
+      display: flex; justify-content: space-between; align-items: center;
+      font-size: 0.75rem; font-weight: 700; color: #1e40af;
+      margin-bottom: 4px; font-family: sans-serif;
     }
     .per-receipt-cashier .r-label .trx-tag {
-      font-size: 0.65rem;
-      color: #64748b;
-      font-weight: 400;
+      font-size: 0.65rem; color: #64748b; font-weight: 400;
       font-family: 'Consolas', monospace;
     }
     .per-receipt-cashier input {
-      width: 100%;
-      padding: 6px 10px;
-      border: 1px solid #93c5fd;
-      border-radius: 6px;
-      font-family: 'Consolas', monospace;
-      font-size: 0.85rem;
-      background: white;
+      width: 100%; padding: 6px 10px; border: 1px solid #93c5fd;
+      border-radius: 6px; font-family: 'Consolas', monospace;
+      font-size: 0.85rem; background: white;
     }
     
     .pmy-global {
-      background: #fef3c7;
-      padding: 10px;
-      border-radius: 8px;
-      margin-bottom: 15px;
-      border-left: 4px solid #f59e0b;
+      background: #fef3c7; padding: 10px; border-radius: 8px;
+      margin-bottom: 15px; border-left: 4px solid #f59e0b;
     }
     .pmy-global label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #92400e;
-      margin-bottom: 4px;
-      font-family: sans-serif;
+      display: block; font-size: 0.75rem; font-weight: 700;
+      color: #92400e; margin-bottom: 4px; font-family: sans-serif;
     }
     .pmy-global input {
-      width: 100%;
-      padding: 6px 10px;
-      border: 1px solid #fcd34d;
-      border-radius: 6px;
-      font-family: 'Consolas', monospace;
-      font-size: 0.85rem;
-      background: white;
+      width: 100%; padding: 6px 10px; border: 1px solid #fcd34d;
+      border-radius: 6px; font-family: 'Consolas', monospace;
+      font-size: 0.85rem; background: white;
     }
 
     .margin-control {
-      background: #e2e8f0;
-      padding: 10px;
-      border-radius: 8px;
+      background: #e2e8f0; padding: 10px; border-radius: 8px;
       margin-bottom: 15px;
     }
     .margin-control label {
-      display: block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #334155;
-      margin-bottom: 4px;
-      font-family: sans-serif;
+      display: block; font-size: 0.75rem; font-weight: 700;
+      color: #334155; margin-bottom: 4px; font-family: sans-serif;
     }
     .margin-control .value-display {
-      display: inline-block;
-      background: #cbd5e1;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      margin-left: 8px;
-      font-weight: 600;
+      display: inline-block; background: #cbd5e1;
+      padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;
+      margin-left: 8px; font-weight: 600;
     }
-    .margin-control input[type="range"] {
-      width: 100%;
-    }
+    .margin-control input[type="range"] { width: 100%; }
     
-    .log-textarea { width: 100%; flex: 1; min-height: 400px; padding: 15px; border: 1px solid #cbd5e1; border-radius: 12px; font-family: 'Consolas', monospace; font-size: 0.85rem; background: #0f172a; color: #38bdf8; resize: vertical; line-height: 1.4; margin-bottom: 15px; }
+    .log-textarea {
+      width: 100%; flex: 1; min-height: 400px; padding: 15px;
+      border: 1px solid #cbd5e1; border-radius: 12px;
+      font-family: 'Consolas', monospace; font-size: 0.85rem;
+      background: #0f172a; color: #38bdf8; resize: vertical;
+      line-height: 1.4; margin-bottom: 15px;
+    }
     .log-textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
     
-    .print-warning { background: #fffbeb; border: 1px solid #fcd34d; color: #b45309; padding: 10px; border-radius: 8px; font-size: 0.8rem; margin-bottom: 15px; display: flex; align-items: flex-start; gap: 8px; font-family: sans-serif; line-height: 1.4; }
-    .btn-generate { width: 100%; background: #10b981; color: white; border: none; padding: 15px; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-family: sans-serif; }
+    .print-warning {
+      background: #fffbeb; border: 1px solid #fcd34d; color: #b45309;
+      padding: 10px; border-radius: 8px; font-size: 0.8rem;
+      margin-bottom: 15px; display: flex; align-items: flex-start;
+      gap: 8px; font-family: sans-serif; line-height: 1.4;
+    }
+    .btn-generate {
+      width: 100%; background: #10b981; color: white; border: none;
+      padding: 15px; border-radius: 12px; font-weight: 700;
+      font-size: 1rem; cursor: pointer; transition: 0.2s;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px; font-family: sans-serif;
+    }
     .btn-generate:hover { background: #059669; transform: translateY(-2px); }
     
-    .preview-panel { flex: 1.5; min-width: 350px; background: white; border-radius: 12px; padding: 15px; border: 2px dashed #cbd5e1; display: flex; flex-direction: column; align-items: center; overflow-x: auto; max-height: 85vh; }
-    .preview-label { font-size: 0.8rem; text-transform: uppercase; color: #64748b; margin-bottom: 10px; font-weight: 600; text-align: center; font-family: sans-serif; }
+    .preview-panel {
+      flex: 1.5; min-width: 350px; background: white;
+      border-radius: 12px; padding: 15px; border: 2px dashed #cbd5e1;
+      display: flex; flex-direction: column; align-items: center;
+      overflow-x: auto; max-height: 85vh;
+    }
+    .preview-label {
+      font-size: 0.8rem; text-transform: uppercase; color: #64748b;
+      margin-bottom: 10px; font-weight: 600; text-align: center;
+      font-family: sans-serif;
+    }
     
-    .receipt-preview-item { background: #fff; padding: 10px 5px; font-family: 'Consolas', monospace; font-weight: 600; font-size: var(--body-font-size); line-height: 1.05; color: #000; width: 3in; min-width: 3in; max-width: 3in; box-shadow: 0 0 10px rgba(0,0,0,0.05); letter-spacing: -1.2px; margin-bottom: 20px; border-bottom: 2px dashed #94a3b8; padding-bottom: 10px; text-align: left; }
+    .receipt-preview-item {
+      background: #fff; padding: 10px 5px;
+      font-family: 'Consolas', monospace; font-weight: 400;
+      font-size: var(--body-font-size); line-height: 1.05;
+      color: #000; width: 3in; min-width: 3in; max-width: 3in;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05); letter-spacing: -1.2px;
+      margin-bottom: 20px; border-bottom: 2px dashed #94a3b8;
+      padding-bottom: 10px; text-align: left;
+    }
     .receipt-preview-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
     
     .r-center { text-align: center !important; }
@@ -163,51 +153,72 @@
     
     .r-www { text-align: center; width: 100%; letter-spacing: normal; }
     .r-membership-justify { display: flex; align-items: flex-start; gap: 0px; width: 100%; font-size: var(--body-font-size); font-weight: 600; white-space: nowrap; letter-spacing: -1px; text-align: left; }
-    .r-date-left { font-size: 9pt; font-weight: 400; letter-spacing: 0.1px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
+    .r-date-left { font-size: 8.3pt; font-weight: 400; letter-spacing: 0.1px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
     .r-trx-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
+    
+    .r-trx-flex {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; gap: 5px; width: 100%;
+      font-size: var(--body-font-size); font-weight: 900;
+      letter-spacing: normal;
+    }
+    .r-trx-flex .r-trx-label { text-align: left; flex: 1; white-space: nowrap; }
+    .r-trx-flex .r-trx-star { text-align: right; white-space: nowrap; }
+    
     .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
     .r-price-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; font-weight: 900; }
     .r-price-row .r-label { text-align: left; flex: 1; }
     .r-price-row .r-value { text-align: right; white-space: nowrap; }
 
+    .r-returned-title {
+      font-size: var(--body-font-size); letter-spacing: -0.3px;
+      white-space: nowrap; text-align: left; width: 100%;
+      overflow: hidden; font-weight: 900; line-height: 1.1;
+    }
+    .r-returned-detail {
+      font-size: var(--body-font-size); letter-spacing: -0.3px;
+      white-space: nowrap; text-align: left; width: 100%;
+      overflow: hidden; font-weight: 400; line-height: 1.1;
+    }
+
+    .r-einvoice-remark-log {
+      font-size: var(--body-font-size); font-weight: 900;
+      text-align: left; width: 100%; margin-top: 3px;
+      line-height: 1.1; color: #000;
+    }
+
+    .r-einvoice-remark {
+      font-size: 10.1pt; font-weight: 400; text-align: left;
+      width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
+    }
+
     .a4-preview-page {
-      width: 8.27in;
-      height: 11.69in;
-      background: #fff;
+      width: 8.27in; height: 11.69in; background: #fff;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      padding: 0.4in;
-      margin: 0 auto 20px auto;
-      box-sizing: border-box;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 0.5in;
-      overflow: hidden;
-      position: relative;
+      padding: 0.4in; margin: 0 auto 20px auto;
+      box-sizing: border-box; display: grid;
+      grid-template-columns: 1fr 1fr; gap: 0.5in;
+      overflow: hidden; position: relative;
     }
     .a4-preview-page::after {
-      content: "A4";
-      position: absolute;
-      top: 4px;
-      right: 6px;
-      font-size: 9px;
-      color: #94a3b8;
-      font-family: sans-serif;
+      content: "A4"; position: absolute; top: 4px; right: 6px;
+      font-size: 9px; color: #94a3b8; font-family: sans-serif;
       letter-spacing: 1px;
     }
     .a4-single-col { grid-template-columns: 1fr; }
     .split-part {
       width: 100%;
       height: 100%;
+      min-height: calc(11.69in - 0.8in);
       overflow: hidden;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
     }
     .split-part > .receipt-preview-item {
-      margin: 0 !important;
-      padding-bottom: 0 !important;
-      border-bottom: none !important;
-      box-shadow: none !important;
+      margin: 0 !important; padding-bottom: 0 !important;
+      border-bottom: none !important; box-shadow: none !important;
+      padding-top: 0 !important;
     }
 
     @media print {
@@ -250,51 +261,26 @@
       .r-membership-justify { letter-spacing: -1px !important; gap: 0px !important; text-align: left !important; }
       .r-card-normal { text-align: left !important; }
       .r-trx-normal { text-align: left !important; }
-      .r-date-left { font-size: 8pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-trx-flex { display: flex !important; justify-content: space-between !important; }
+      .r-date-left { font-size: 8.3pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; }
+      .r-einvoice-remark-log { font-size: var(--body-font-size) !important; text-align: left !important; }
+      .r-returned-title { font-size: 9.5pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-returned-detail { font-size: 8.5pt !important; text-align: left !important; white-space: nowrap !important; }
+      .split-part { min-height: 0 !important; }
     }
   </style>
 </head>
 <body>
 
 <div class="container">
-  <h1>🖨️ Multi-Receipt → A4 (Universal Payment)</h1>
+  <h1>🖨️ Multi-Receipt → A4 (Auto Split Fixed)</h1>
   
   <div class="receipt-wrapper">
     <div class="form-panel">
       <h2>📋 Paste Log E-Journal:</h2>
 
-      <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here...">***BEGIN SALES***
-	|4C PARKSON
-	|4C IOI CITY MALL
-	|N LOT AT-3, IOI CITY MALL,
-	|N LEBUH IRC, SEPANG,62502 PUTRAJAYA
-	 
-	|N PARKSON CORPORATION SDN BHD
-	|N 198601007838(157029-X)
-	|N WWW.PARKSON.COM.MY
-	 
-	|N0068217 262163 323 01 12/11/26 12:50 127
-	|BCTRX#:127-323-0068217
-	 
-	|N602297 CANNON TOWELS - N
-	|N 1.00 X 39.90RM 39.90
-	|N DISC:(NET 27.93)30.00% -11.97
-	|N600903 VINITION TOWELS - BB
-	|N 1.00 X 15.90RM 15.90
-	|N----------------------------------------
-	|BCTOTAL RM 43.83
-	|BCVISA -30.00
-	|BC VISA CARD NO. 463225******6747
-	|BCAMEX -13.83
-	|BC ALIPAY -10.00
-	|BCBOOST -3.83
-	|NNUMBER OF ITEMS: 2
-	|BCROUNDING UP 0.02
-	|N----------------------------------------
-	***END SALES***
-POSTTRANS
-	
-	YOUR STAFF DISCOUNT IS AS FOLLOWS:</textarea>
+      <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here..."></textarea>
 
       <div id="cashierInputsContainer"></div>
 
@@ -338,7 +324,6 @@ POSTTRANS
   const marginRange = document.getElementById('marginRange');
   const marginValue = document.getElementById('marginValue');
 
-  // Senarai jenis payment yang dikenali (universal)
   const PAYMENT_TYPES = [
     'VISA', 'MASTER', 'MASTERCARD', 'AMEX', 'AMERICAN EXPRESS',
     'CASH', 'BOOST', 'GRABPAY', 'TNG', 'TOUCH N GO', 'TNG EWALLET',
@@ -347,12 +332,21 @@ POSTTRANS
     'ALIPAY', 'WECHAT', 'UNIONPAY', 'JCB', 'PAYPAL', 'SHOPEEPAY',
     'MAE', 'CIMB', 'MAYBANK', 'PUBLIC BANK', 'RHB', 'HONG LEONG',
     'INSTALLMENT', 'EPP', 'BNPL', 'ATOME', 'SPAYLATER', 'HUTANG',
-    'SHOPEEPAY', 'LAZADA', 'ZALORA', 'FOODPANDA', 'GRABFOOD'
+    'SHOPEEPAY', 'LAZADA', 'ZALORA', 'FOODPANDA', 'GRABFOOD',
+    'DEBIT CARD', 'CREDIT CARD'
   ];
 
-  // Simpan nilai cashier per-resit supaya kekal bila log berubah
   let cashierNames = [];
   const DEFAULT_CASHIER = 'SURIATI';
+
+  // Override style untuk ukur — sama dengan render dalam .split-part
+  const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
+
+  function toTitleCase(str) {
+    return str.replace(/\w\S*/g, function(txt) {
+      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
+    });
+  }
 
   function escapeHtml(text) {
     if (!text) return '';
@@ -360,9 +354,6 @@ POSTTRANS
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
-  // ============================================================
-  // DETECT bilangan resit & generate kotak cashier
-  // ============================================================
   function rebuildCashierInputs() {
     const log = logInput.value;
     const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
@@ -403,9 +394,6 @@ POSTTRANS
     });
   }
 
-  // ============================================================
-  // PARSE satu resit
-  // ============================================================
   function parseSingleReceipt(receiptText, cashier, pmy) {
     let cleanText = receiptText.replace(/[•\x1b]/g, '');
     
@@ -425,11 +413,17 @@ POSTTRANS
 
     let data = {
       storeName: '', branchName: '', addressLines: [], companyLines: [],
-      dateLine: '', trxNo: '', bodyItems: [],
-      hasFooterNote: false
+      dateLine: '', trxNo: '', trxStars: '',
+      bodyItems: [],
+      hasFooterNote: false,
+      hasEInvoiceRemark: false,
+      eInvoiceRemarkText: '',
+      returnedItemTitle: '',
+      returnedItemDetail: ''
     };
 
     let isAddress = true;
+    let inEInvoiceRemark = false;
 
     lines.forEach(line => {
       if (!line) return;
@@ -442,6 +436,11 @@ POSTTRANS
       else if (line.startsWith('|BCTRX#')) {
         let rawTrx = line.substring(7).trim(); 
         rawTrx = rawTrx.replace(/^:/, ''); 
+        const starMatch = rawTrx.match(/\s*\*+\s*$/);
+        if (starMatch) {
+          data.trxStars = starMatch[0].trim();
+          rawTrx = rawTrx.replace(/\s*\*+\s*$/, '').trim();
+        }
         data.trxNo = rawTrx;
       }
       else if (line.startsWith('|N')) {
@@ -561,27 +560,42 @@ POSTTRANS
         const txt = line.substring(3).trim();
         const bcClass = 'r-bold';
 
-        // ============================================================
-        // UNIVERSAL PAYMENT HANDLER
-        // ============================================================
-        
-        // 1. TOTAL RM
+        if (txt.startsWith('RETURNED ITEM(S)')) {
+          data.returnedItemTitle = txt;
+          return;
+        }
+        if (txt.startsWith('(ORG TRX#')) {
+          data.returnedItemDetail = txt;
+          return;
+        }
+
+        if (txt.startsWith('(PLEASE PROCEED TO THE CUSTOMER SERVICE') ||
+            txt.startsWith('(PLEASE PROCEED') ||
+            txt.includes('REDEEM YOUR VOUCHERS') ||
+            txt.includes('PURCHASE EXCEEDING RM10,000')) {
+          data.hasEInvoiceRemark = true;
+          if (!inEInvoiceRemark) {
+            data.eInvoiceRemarkText = txt;
+            inEInvoiceRemark = true;
+          } else {
+            data.eInvoiceRemarkText += ' ' + txt;
+          }
+          return;
+        }
+
         if (txt.startsWith('TOTAL RM')) {
           const amount = txt.replace('TOTAL RM', '').trim();
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         } 
-        // 2. ROUNDING DOWN / ROUNDING UP
         else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) {
           const parts = txt.split(' ');
           const amount = parts.pop();
           const label = parts.join(' ');
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         }
-        // 3. CARD NO (VISA CARD NO. / MASTER CARD NO. / AMEX CARD NO. / dll.)
         else if (txt.match(/CARD NO\./i) || txt.match(/CARD NUMBER/i)) {
           data.bodyItems.push(`<div class="r-card-normal">${escapeHtml(txt)}</div>`);
         }
-        // 4. ED* (diskaun voucher)
         else if (txt.startsWith('ED*:')) {
           const lastSpace = txt.lastIndexOf(' ');
           if (lastSpace !== -1) {
@@ -592,13 +606,11 @@ POSTTRANS
             data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
           }
         }
-        // 5. EV (e-voucher)
         else if (txt.startsWith('EV:')) {
           let cleanEv = txt.replace(/^EV:\s*/, 'EV: ');
           cleanEv = cleanEv.replace(/(\w+):(\d+)/, '$1 : $2');
           data.bodyItems.push(`<div class="r-nowrap ${bcClass}">${escapeHtml(cleanEv)}</div>`);
         }
-        // 6. SEMUA JENIS PAYMENT LAIN (VISA, MASTER, AMEX, ALIPAY, BOOST, QR, TNG, dll.)
         else {
           let foundPayment = false;
           for (const pt of PAYMENT_TYPES) {
@@ -609,29 +621,37 @@ POSTTRANS
           }
 
           if (foundPayment) {
-            // Cuba pecahkan: label, amount (amount adalah perkataan terakhir)
             const lastSpace = txt.lastIndexOf(' ');
             if (lastSpace !== -1) {
               const label = txt.substring(0, lastSpace).trim();
               const amount = txt.substring(lastSpace + 1).trim();
-              // Pastikan amount adalah nombor (boleh negatif)
-              if (/^-?[\d\.,]+$/.test(amount)) {
+              if (/^[+-]?[\d\.,]+$/.test(amount)) {
                 data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
               } else {
-                // Amount bukan nombor, papar sebagai teks biasa
                 data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
               }
             } else {
-              // Tiada ruang, papar sebagai teks biasa
               data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
             }
           } else {
-            // Bukan payment dikenali, papar sebagai teks biasa
             data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
           }
         }
       }
     });
+
+    if (data.returnedItemDetail) {
+      data.bodyItems.unshift(`<div class="r-returned-detail">${escapeHtml(data.returnedItemDetail)}</div>`);
+    }
+    if (data.returnedItemTitle) {
+      data.bodyItems.unshift(`<div class="r-returned-title">${escapeHtml(data.returnedItemTitle)}</div>`);
+    }
+
+    if (data.eInvoiceRemarkText) {
+      const cleanText = data.eInvoiceRemarkText.trim();
+      const titleCaseText = toTitleCase(cleanText);
+      data.bodyItems.push(`<div class="r-einvoice-remark-log">${escapeHtml(titleCaseText)}</div>`);
+    }
 
     if (!data.storeName) data.storeName = 'PARKSON';
     if (!data.branchName) data.branchName = 'IOI CITY MALL';
@@ -658,7 +678,12 @@ POSTTRANS
     }
     let trxDisplay = data.trxNo;
     if(trxDisplay.startsWith(':')) trxDisplay = trxDisplay.substring(1);
-    headerHtml += `<div class="r-trx-normal">Trx#:${escapeHtml(trxDisplay)}</div>`;
+    
+    if (data.trxStars) {
+      headerHtml += `<div class="r-trx-flex"><span class="r-trx-label">Trx#:${escapeHtml(trxDisplay)}</span><span class="r-trx-star">${escapeHtml(data.trxStars)}</span></div>`;
+    } else {
+      headerHtml += `<div class="r-trx-normal">Trx#:${escapeHtml(trxDisplay)}</div>`;
+    }
     headerHtml += `</div>`;
     headerHtml += `<div style="margin-bottom:2px;"></div>`;
 
@@ -682,6 +707,11 @@ POSTTRANS
     footerHtml += `<svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg>`;
     footerHtml += `</div>`;
     footerHtml += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}</div>`;
+    
+    if (data.hasEInvoiceRemark) {
+      footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000 require a mandatory e-invoice issuance at Customer Service</div>`;
+    }
+    
     footerHtml += `</div>`;
 
     let footerNoteHtml = '';
@@ -706,9 +736,127 @@ POSTTRANS
     return { headerHtml, bodyItems: data.bodyItems, footerNoteHtml, promoHtml, cashierHtml, footerHtml, barcodeDisplayText };
   }
 
-  // ============================================================
-  // UPDATE PREVIEW
-  // ============================================================
+  function buildFullHtml(r) {
+    return `<div class="receipt-preview-item">
+      ${r.headerHtml}
+      <div class="r-section-item-number">
+        ${r.bodyItems.join('')}
+        ${r.footerNoteHtml}
+        ${r.promoHtml}
+        ${r.cashierHtml}
+      </div>
+      ${r.footerHtml}
+    </div>`;
+  }
+
+  /* =========================================================================
+     A4 COLUMN HEIGHT — NILAI TETAP (dikira dari CSS)
+     A4 = 11.69in, padding 0.4in × 2 = 0.8in
+     Usable = 10.89in × 96dpi = 1045px
+     ========================================================================= */
+  function getA4ColumnHeight() {
+    const A4_IN = 11.69;
+    const PADDING_IN = 0.4;   // .a4-preview-page padding
+    const PX_PER_IN = 96;
+    const usable = (A4_IN - PADDING_IN * 2) * PX_PER_IN;
+    return Math.floor(usable) - 4; // 1041px, -4px safety
+  }
+
+  /* =========================================================================
+     SPLIT RECEIPT IKUT TINGGI COLUMN A4 SEBENAR
+     - Ukur guna style override (padding/margin 0) supaya sama dengan render
+     - Header hanya di part pertama
+     - Footer (barcode + remark) hanya di part terakhir
+     - Footer note / promo / cashier dianggap tail items
+     ========================================================================= */
+  function splitReceiptIntoParts(r, columnHeight) {
+    const tailItems = [
+      ...r.bodyItems.map(html => ({ html })),
+      { html: r.footerNoteHtml },
+      { html: r.promoHtml },
+      { html: r.cashierHtml },
+    ].filter(x => x.html);
+
+    const temp = document.createElement('div');
+    temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3in;';
+    document.body.appendChild(temp);
+
+    // Ukur header (padding/margin 0 override)
+    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.headerHtml}</div>`;
+    const headerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
+
+    // Ukur setiap item (padding/margin 0 override)
+    const itemHeights = tailItems.map(it => {
+      temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}"><div class="r-section-item-number">${it.html}</div></div>`;
+      return temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
+    });
+
+    // Ukur footer (padding/margin 0 override)
+    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.footerHtml}</div>`;
+    const footerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
+
+    temp.remove();
+
+    const MAX = columnHeight;
+    const parts = [];
+    let current = [];
+    let currentH = headerH;
+    let isFirstPart = true;
+
+    for (let i = 0; i < tailItems.length; i++) {
+      const h = itemHeights[i];
+
+      // Item tak muat → tutup part, mula part baru
+      if (currentH + h > MAX && current.length > 0) {
+        parts.push({ items: current, includeHeader: isFirstPart });
+        isFirstPart = false;
+        current = [];
+        currentH = 0;
+      }
+
+      current.push(tailItems[i].html);
+      currentH += h;
+    }
+
+    // Part terakhir perlu ruang untuk footer
+    if (current.length > 0) {
+      if (currentH + footerH > MAX && current.length > 1) {
+        const last = current.pop();
+        parts.push({ items: current, includeHeader: isFirstPart });
+        isFirstPart = false;
+        current = [last];
+      }
+      parts.push({ items: current, includeHeader: isFirstPart, includeFooter: true });
+    } else if (parts.length > 0) {
+      parts[parts.length - 1].includeFooter = true;
+    } else {
+      parts.push({ items: [], includeHeader: true, includeFooter: true });
+    }
+
+    // Debug log
+    console.log('[SPLIT]', {
+      trx: r.barcodeDisplayText,
+      columnHeight,
+      headerH: Math.round(headerH),
+      footerH: Math.round(footerH),
+      itemCount: itemHeights.length,
+      totalItemH: Math.round(itemHeights.reduce((a, b) => a + b, 0)),
+      partsCount: parts.length,
+      partsItemCounts: parts.map(p => p.items.length)
+    });
+
+    // Warning kalau 1 item sahaja melebihi 1 column (tak boleh split lagi)
+    if (parts.length === 1 && (headerH + itemHeights.reduce((a, b) => a + b, 0) + footerH) > MAX) {
+      console.warn('[SPLIT] Item tunggal lebih tinggi dari column A4 — akan overflow.');
+    }
+
+    return parts.map(p => `<div class="receipt-preview-item">
+      ${p.includeHeader ? r.headerHtml : ''}
+      <div class="r-section-item-number">${p.items.join('')}</div>
+      ${p.includeFooter ? r.footerHtml : ''}
+    </div>`);
+  }
+
   function updatePreview() {
     const log = logInput.value;
     const pmy = pmyCodeInput.value;
@@ -730,87 +878,45 @@ POSTTRANS
       if (r) receipts.push(r);
     });
 
-    function buildFullHtml(r) {
-      return `<div class="receipt-preview-item">
-        ${r.headerHtml}
-        <div class="r-section-item-number">
-          ${r.bodyItems.join('')}
-          ${r.footerNoteHtml}
-          ${r.promoHtml}
-          ${r.cashierHtml}
-        </div>
-        ${r.footerHtml}
-      </div>`;
-    }
+    const A4_COLUMN_H = getA4ColumnHeight();
 
+    // Ukur tinggi setiap receipt penuh (hidden, guna MEASURE_STYLE)
     const hiddenWrap = document.createElement('div');
     hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3in;';
     document.body.appendChild(hiddenWrap);
-    hiddenWrap.innerHTML = receipts.map(buildFullHtml).join('');
+    hiddenWrap.innerHTML = receipts.map(r => buildFullHtml(r).replace('class="receipt-preview-item"', `class="receipt-preview-item" style="${MEASURE_STYLE}"`)).join('');
     const fullItems = hiddenWrap.querySelectorAll('.receipt-preview-item');
     const heights = Array.from(fullItems).map(el => el.getBoundingClientRect().height);
     hiddenWrap.remove();
 
-    const SPLIT_THRESHOLD = 1400;
-    const A4_USABLE = 1045;
-
-    function splitReceipt(r) {
-      const temp = document.createElement('div');
-      temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3in;';
-      temp.innerHTML = `<div class="receipt-preview-item">
-        ${r.headerHtml}
-        <div class="r-section-item-number">${r.bodyItems.map((html, i) => `<div data-idx="${i}">${html}</div>`).join('')}</div>
-      </div>`;
-      document.body.appendChild(temp);
-
-      const tempItem = temp.querySelector('.receipt-preview-item');
-      const itemWrappers = temp.querySelectorAll('.r-section-item-number > div[data-idx]');
-
-      let cutIdx = r.bodyItems.length;
-      for (let i = 0; i < itemWrappers.length; i++) {
-        const rect = itemWrappers[i].getBoundingClientRect();
-        const bottom = rect.bottom - tempItem.getBoundingClientRect().top;
-        if (bottom > A4_USABLE) {
-          cutIdx = i;
-          break;
-        }
-      }
-      temp.remove();
-
-      const part1Body = r.bodyItems.slice(0, cutIdx);
-      const part2Body = r.bodyItems.slice(cutIdx);
-
-      const part1Html = `<div class="receipt-preview-item">
-        ${r.headerHtml}
-        <div class="r-section-item-number">${part1Body.join('')}</div>
-      </div>`;
-
-      const part2Html = `<div class="receipt-preview-item">
-        <div class="r-section-item-number">
-          ${part2Body.join('')}
-          ${r.footerNoteHtml}
-          ${r.promoHtml}
-          ${r.cashierHtml}
-        </div>
-        ${r.footerHtml}
-      </div>`;
-
-      return { part1Html, part2Html };
-    }
+    /* =======================================================================
+       PAGINATION
+       - Receipt ≤ A4_COLUMN_H → "short", pair 2-per-page
+       - Receipt > A4_COLUMN_H → "split" jadi N part ikut A4_COLUMN_H
+       - Split parts dipair 2-per-page → auto new page
+       ======================================================================= */
+    const SHORT_THRESHOLD = A4_COLUMN_H;
 
     const pages = [];
     let shortQueue = [];
 
-    heights.forEach((h, i) => {
-      if (h > SPLIT_THRESHOLD) {
-        while (shortQueue.length > 0) {
-          if (shortQueue.length >= 2) {
-            pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
-          } else {
-            pages.push({ type: 'single', indices: [shortQueue.shift()] });
-          }
+    function flushShortQueue() {
+      while (shortQueue.length > 0) {
+        if (shortQueue.length >= 2) {
+          pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
+        } else {
+          pages.push({ type: 'single', indices: [shortQueue.shift()] });
         }
-        pages.push({ type: 'split', indices: [i] });
+      }
+    }
+
+    heights.forEach((h, i) => {
+      if (h > SHORT_THRESHOLD) {
+        flushShortQueue();
+        const partsHtml = splitReceiptIntoParts(receipts[i], A4_COLUMN_H);
+        for (let k = 0; k < partsHtml.length; k += 2) {
+          pages.push({ type: 'parts', htmls: partsHtml.slice(k, k + 2) });
+        }
       } else {
         shortQueue.push(i);
         if (shortQueue.length === 2) {
@@ -818,23 +924,23 @@ POSTTRANS
         }
       }
     });
-    while (shortQueue.length > 0) {
-      if (shortQueue.length >= 2) {
-        pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
-      } else {
-        pages.push({ type: 'single', indices: [shortQueue.shift()] });
-      }
-    }
+    flushShortQueue();
 
+    // Render pages
     let finalHtml = '';
     pages.forEach(page => {
-      if (page.type === 'split') {
-        const idx = page.indices[0];
-        const { part1Html, part2Html } = splitReceipt(receipts[idx]);
-        finalHtml += `<div class="a4-preview-page">`;
-        finalHtml += `<div class="split-part">${part1Html}</div>`;
-        finalHtml += `<div class="split-part">${part2Html}</div>`;
-        finalHtml += `</div>`;
+      if (page.type === 'parts') {
+        const cols = page.htmls;
+        if (cols.length === 2) {
+          finalHtml += `<div class="a4-preview-page">`;
+          finalHtml += `<div class="split-part">${cols[0]}</div>`;
+          finalHtml += `<div class="split-part">${cols[1]}</div>`;
+          finalHtml += `</div>`;
+        } else {
+          finalHtml += `<div class="a4-preview-page a4-single-col">`;
+          finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${cols[0]}</div>`;
+          finalHtml += `</div>`;
+        }
       } else if (page.type === 'pair') {
         const [a, b] = page.indices;
         finalHtml += `<div class="a4-preview-page">`;
@@ -851,6 +957,14 @@ POSTTRANS
 
     previewContainer.innerHTML = finalHtml;
 
+    console.log('[PAGE]', {
+      A4_COLUMN_H,
+      receiptCount: receipts.length,
+      receiptHeights: heights.map(h => Math.round(h)),
+      pageCount: pages.length
+    });
+
+    // Render barcode
     setTimeout(() => {
         document.querySelectorAll('.barcode-svg').forEach(svg => {
           const val = svg.getAttribute('data-value');
@@ -863,9 +977,6 @@ POSTTRANS
     }, 50);
   }
 
-  // ============================================================
-  // EVENT LISTENERS
-  // ============================================================
   logInput.addEventListener('input', () => {
     rebuildCashierInputs();
     updatePreview();
@@ -884,9 +995,16 @@ POSTTRANS
     document.documentElement.style.setProperty('--print-margin', val + 'mm');
   });
 
-  // Init
-  rebuildCashierInputs();
-  updatePreview();
+  // Init — tunggu DOM + CSS ready
+  if (document.readyState === 'complete') {
+    rebuildCashierInputs();
+    updatePreview();
+  } else {
+    window.addEventListener('load', () => {
+      rebuildCashierInputs();
+      updatePreview();
+    });
+  }
 </script>
 </body>
 </html>
