@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt — A4 Side-by-Side (Per-Receipt Cashier)</title>
+  <title>Multi-Receipt — A4 Side-by-Side (Universal Payment)</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     :root {
@@ -22,6 +22,7 @@
       --col-gap: 0.5in;
       --a4-usable-height: 1045px;
       --split-threshold: 1400px;
+      --print-margin: 0mm;
     }
     
     * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace; }
@@ -94,6 +95,33 @@
       font-family: 'Consolas', monospace;
       font-size: 0.85rem;
       background: white;
+    }
+
+    .margin-control {
+      background: #e2e8f0;
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+    }
+    .margin-control label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 4px;
+      font-family: sans-serif;
+    }
+    .margin-control .value-display {
+      display: inline-block;
+      background: #cbd5e1;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      margin-left: 8px;
+      font-weight: 600;
+    }
+    .margin-control input[type="range"] {
+      width: 100%;
     }
     
     .log-textarea { width: 100%; flex: 1; min-height: 400px; padding: 15px; border: 1px solid #cbd5e1; border-radius: 12px; font-family: 'Consolas', monospace; font-size: 0.85rem; background: #0f172a; color: #38bdf8; resize: vertical; line-height: 1.4; margin-bottom: 15px; }
@@ -229,7 +257,7 @@
 <body>
 
 <div class="container">
-  <h1>🖨️ Multi-Receipt → A4 (Per-Receipt Cashier)</h1>
+  <h1>🖨️ Multi-Receipt → A4 (Universal Payment)</h1>
   
   <div class="receipt-wrapper">
     <div class="form-panel">
@@ -253,70 +281,14 @@
 	|N DISC:(NET 27.93)30.00% -11.97
 	|N600903 VINITION TOWELS - BB
 	|N 1.00 X 15.90RM 15.90
-	|N600903 VINITION TOWELS - BB
-	|N 1.00 X 15.90RM 15.90
-	|N600903 VINITION TOWELS - BB
-	|N 1.00 X 15.90RM 15.90
-	|N600408 CANOPY TOWELS - N
-	|N 1.00 X 20.00RM 20.00
-	|N600408 CANOPY TOWELS - N
-	|N 1.00 X 20.00RM 20.00
-	|N600408 CANOPY TOWELS - N
-	|N 1.00 X 20.00RM 20.00
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 76.30RM 76.30
-	|N602297 CANNON TOWELS - N
-	|N 1.00 X 39.90RM 39.90
-	|N DISC:(NET 27.93)30.00% -11.97
-	|N602297 CANNON TOWELS - N
-	|N 1.00 X 39.90RM 39.90
-	|N DISC:(NET 27.93)30.00% -11.97
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 76.30RM 76.30
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 90.30RM 90.30
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 199.00RM 199.00
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 118.30RM 118.30
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 118.30RM 118.30
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 118.30RM 118.30
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 118.30RM 118.30
-	|N602280 CANNON TOWELS - BB
-	|N 1.00 X 199.00RM 199.00
-	|N602969 FAVORITA - BB
-	|N 1.00 X 89.00RM 89.00
-	|N620215 AKEMI PROMO
-	|N 1.00 X 299.00RM 299.00
-	|N620062 AKEMI (BB)
-	|N 1.00 X 269.73RM 269.73
-	|N620062 AKEMI (BB)
-	|N 1.00 X 269.73RM 269.73
-	|N620062 AKEMI (BB)
-	|N 1.00 X 535.08RM 535.08
-	|N615099 AKEMI ACCS (BB)
-	|N 1.00 X 199.50RM 199.50
-	|N615716 AKEMI PROMO ACCS
-	|N 1.00 X 69.00RM 69.00
-	|N615716 AKEMI PROMO ACCS
-	|N 1.00 X 69.00RM 69.00
-	|N615716 AKEMI PROMO ACCS
-	|N 1.00 X 69.00RM 69.00
-	|N615716 AKEMI PROMO ACCS
-	|N 1.00 X 69.00RM 69.00
 	|N----------------------------------------
-	|BCTOTAL RM 3,243.63
-	|BCVISA -1,500.00
+	|BCTOTAL RM 43.83
+	|BCVISA -30.00
 	|BC VISA CARD NO. 463225******6747
-	|BCVISA -1,000.00
-	|BC VISA CARD NO. 463225******6747
-	|BCVISA -743.65
-	|BC VISA CARD NO. 405998******5024
-	|NNUMBER OF ITEMS: 28
-	 
+	|BCAMEX -13.83
+	|BC ALIPAY -10.00
+	|BCBOOST -3.83
+	|NNUMBER OF ITEMS: 2
 	|BCROUNDING UP 0.02
 	|N----------------------------------------
 	***END SALES***
@@ -329,6 +301,11 @@ POSTTRANS
       <div class="pmy-global">
         <label>PMY Code (sama untuk semua resit)</label>
         <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
+      </div>
+
+      <div class="margin-control">
+        <label>Print Margin <span class="value-display" id="marginValue">0mm</span></label>
+        <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
       </div>
 
       <div class="print-warning">
@@ -358,6 +335,20 @@ POSTTRANS
   const previewContainer = document.getElementById('receiptPreviewContainer');
   const cashierInputsContainer = document.getElementById('cashierInputsContainer');
   const pmyCodeInput = document.getElementById('pmyCodeInput');
+  const marginRange = document.getElementById('marginRange');
+  const marginValue = document.getElementById('marginValue');
+
+  // Senarai jenis payment yang dikenali (universal)
+  const PAYMENT_TYPES = [
+    'VISA', 'MASTER', 'MASTERCARD', 'AMEX', 'AMERICAN EXPRESS',
+    'CASH', 'BOOST', 'GRABPAY', 'TNG', 'TOUCH N GO', 'TNG EWALLET',
+    'QR', 'QRPAY', 'DUITNOW', 'FPX', 'ONLINE BANKING',
+    'VOUCHER', 'PGV', 'EV', 'ED', 'CARD', 'DEBIT', 'CREDIT',
+    'ALIPAY', 'WECHAT', 'UNIONPAY', 'JCB', 'PAYPAL', 'SHOPEEPAY',
+    'MAE', 'CIMB', 'MAYBANK', 'PUBLIC BANK', 'RHB', 'HONG LEONG',
+    'INSTALLMENT', 'EPP', 'BNPL', 'ATOME', 'SPAYLATER', 'HUTANG',
+    'SHOPEEPAY', 'LAZADA', 'ZALORA', 'FOODPANDA', 'GRABFOOD'
+  ];
 
   // Simpan nilai cashier per-resit supaya kekal bila log berubah
   let cashierNames = [];
@@ -377,17 +368,14 @@ POSTTRANS
     const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
     const count = matches ? matches.length : 0;
 
-    // Kekalkan nilai lama, tambah default untuk resit baru
     const newNames = [];
     for (let i = 0; i < count; i++) {
       newNames.push(cashierNames[i] !== undefined ? cashierNames[i] : DEFAULT_CASHIER);
     }
     cashierNames = newNames;
 
-    // Render kotak
     cashierInputsContainer.innerHTML = '';
     for (let i = 0; i < count; i++) {
-      // Cuba detect trx no untuk label
       let trxTag = '';
       if (matches && matches[i]) {
         const trxMatch = matches[i].match(/\|BCTRX#:\s*([^\s\n]+)/);
@@ -406,7 +394,6 @@ POSTTRANS
       cashierInputsContainer.appendChild(div);
     }
 
-    // Pasang event listener
     cashierInputsContainer.querySelectorAll('input[data-index]').forEach(input => {
       input.addEventListener('input', (e) => {
         const idx = parseInt(e.target.getAttribute('data-index'), 10);
@@ -420,7 +407,7 @@ POSTTRANS
   // PARSE satu resit
   // ============================================================
   function parseSingleReceipt(receiptText, cashier, pmy) {
-    let cleanText = receiptText.replace(/[â€¢\x1b]/g, '');
+    let cleanText = receiptText.replace(/[•\x1b]/g, '');
     
     const salesMatch = cleanText.match(/\*\*\*BEGIN SALES\*\*\*([\s\S]*?)\*\*\*END SALES\*\*\*/);
     if (!salesMatch) return null;
@@ -574,54 +561,74 @@ POSTTRANS
         const txt = line.substring(3).trim();
         const bcClass = 'r-bold';
 
+        // ============================================================
+        // UNIVERSAL PAYMENT HANDLER
+        // ============================================================
+        
+        // 1. TOTAL RM
         if (txt.startsWith('TOTAL RM')) {
           const amount = txt.replace('TOTAL RM', '').trim();
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         } 
-        else if (txt.startsWith('PGV:')) {
-          const parts = txt.split(' ');
-          const amount = parts.pop();
-          const label = parts.join(' ');
-          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
-        }
+        // 2. ROUNDING DOWN / ROUNDING UP
         else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) {
           const parts = txt.split(' ');
           const amount = parts.pop();
           const label = parts.join(' ');
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         }
-        else if (txt.startsWith('MASTER CARD NO.') || txt.startsWith('VISA CARD NO.')) {
+        // 3. CARD NO (VISA CARD NO. / MASTER CARD NO. / AMEX CARD NO. / dll.)
+        else if (txt.match(/CARD NO\./i) || txt.match(/CARD NUMBER/i)) {
           data.bodyItems.push(`<div class="r-card-normal">${escapeHtml(txt)}</div>`);
         }
-        else if (txt.startsWith('CASH')) {
-          const amount = txt.replace('CASH', '').trim();
-          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">CASH</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
-        }
-        else if (txt.startsWith('MASTER')) {
-          const amount = txt.replace('MASTER', '').trim();
-          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">MASTER</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
-        }
-        else if (txt.startsWith('VISA')) {
-          const amount = txt.replace('VISA', '').trim();
-          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">VISA</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
-        }
+        // 4. ED* (diskaun voucher)
         else if (txt.startsWith('ED*:')) {
           const lastSpace = txt.lastIndexOf(' ');
           if (lastSpace !== -1) {
-             const ref = txt.substring(0, lastSpace);
-             const amount = txt.substring(lastSpace + 1);
-             data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(ref)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
+            const ref = txt.substring(0, lastSpace);
+            const amount = txt.substring(lastSpace + 1);
+            data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(ref)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
           } else {
-             data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
           }
         }
+        // 5. EV (e-voucher)
         else if (txt.startsWith('EV:')) {
           let cleanEv = txt.replace(/^EV:\s*/, 'EV: ');
           cleanEv = cleanEv.replace(/(\w+):(\d+)/, '$1 : $2');
           data.bodyItems.push(`<div class="r-nowrap ${bcClass}">${escapeHtml(cleanEv)}</div>`);
         }
+        // 6. SEMUA JENIS PAYMENT LAIN (VISA, MASTER, AMEX, ALIPAY, BOOST, QR, TNG, dll.)
         else {
-           data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
+          let foundPayment = false;
+          for (const pt of PAYMENT_TYPES) {
+            if (txt.toUpperCase().startsWith(pt)) {
+              foundPayment = true;
+              break;
+            }
+          }
+
+          if (foundPayment) {
+            // Cuba pecahkan: label, amount (amount adalah perkataan terakhir)
+            const lastSpace = txt.lastIndexOf(' ');
+            if (lastSpace !== -1) {
+              const label = txt.substring(0, lastSpace).trim();
+              const amount = txt.substring(lastSpace + 1).trim();
+              // Pastikan amount adalah nombor (boleh negatif)
+              if (/^-?[\d\.,]+$/.test(amount)) {
+                data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
+              } else {
+                // Amount bukan nombor, papar sebagai teks biasa
+                data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
+              }
+            } else {
+              // Tiada ruang, papar sebagai teks biasa
+              data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
+            }
+          } else {
+            // Bukan payment dikenali, papar sebagai teks biasa
+            data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
+          }
         }
       }
     });
@@ -716,7 +723,6 @@ POSTTRANS
         return;
     }
 
-    // Parse setiap resit dengan cashier masing-masing
     const receipts = [];
     matches.forEach((chunk, i) => {
       const cashier = cashierNames[i] !== undefined ? cashierNames[i] : DEFAULT_CASHIER;
@@ -870,6 +876,12 @@ POSTTRANS
     e.preventDefault();
     updatePreview();
     setTimeout(() => window.print(), 400); 
+  });
+
+  marginRange.addEventListener('input', function() {
+    const val = this.value;
+    marginValue.textContent = val + 'mm';
+    document.documentElement.style.setProperty('--print-margin', val + 'mm');
   });
 
   // Init
