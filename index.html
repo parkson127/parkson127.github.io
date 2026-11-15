@@ -5,101 +5,233 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>PARKSON</title>
 
-    <!-- ===== CSS TERPUSAT ===== -->
     <link rel="stylesheet" href="common.css">
     <link rel="stylesheet" href="ui1.css">
 
-    <!-- ===== CSS KHUSUS INDEX (GRID) ===== -->
     <style>
-        /* ===== HEADER ===== */
+        /* ===== CSS VARIABLES (LIGHT) ===== */
+        :root {
+            --bg-body: linear-gradient(135deg, #f5f7fa 0%, #e8ecf3 50%, #f0f2f8 100%);
+            --bg-card: rgba(255, 255, 255, 0.85);
+            --bg-header: rgba(255, 255, 255, 0.6);
+            --bg-input: #faf8f4;
+            --text-primary: #1a1a2e;
+            --text-muted: #6c757d;
+            --border-color: #e8e0d5;
+            --border-soft: rgba(232, 224, 213, 0.6);
+            --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.04);
+            --shadow-hover: 0 16px 40px rgba(0, 0, 0, 0.10);
+            --gold: #C9A84C;
+            --gold-light: #E8D5A5;
+            --gradient-gold: linear-gradient(135deg, #C9A84C, #E8D5A5);
+        }
+
+        /* ===== DARK MODE ===== */
+        body.dark {
+            --bg-body: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 50%, #14141f 100%);
+            --bg-card: rgba(30, 30, 48, 0.7);
+            --bg-header: rgba(20, 20, 32, 0.6);
+            --bg-input: rgba(40, 40, 60, 0.5);
+            --text-primary: #f0f0f5;
+            --text-muted: #9ca3af;
+            --border-color: rgba(201, 168, 76, 0.2);
+            --border-soft: rgba(255, 255, 255, 0.08);
+            --shadow-card: 0 2px 10px rgba(0, 0, 0, 0.3);
+            --shadow-hover: 0 16px 40px rgba(201, 168, 76, 0.15);
+        }
+
+        /* ===== RESET ===== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        html, body {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-body);
+            background-attachment: fixed;
+            display: flex;
+            flex-direction: column;
+            padding: 16px 24px;
+            gap: 12px;
+            color: var(--text-primary);
+            transition: background 0.4s ease, color 0.3s ease;
+        }
+
+        /* Animated gradient orbs (subtle) */
+        body::before,
+        body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.15;
+            pointer-events: none;
+            z-index: 0;
+            transition: opacity 0.4s;
+        }
+        body::before {
+            width: 400px; height: 400px;
+            background: radial-gradient(circle, #C9A84C, transparent);
+            top: -150px; left: -100px;
+        }
+        body::after {
+            width: 500px; height: 500px;
+            background: radial-gradient(circle, #6c63ff, transparent);
+            bottom: -200px; right: -150px;
+        }
+        body.dark::before { opacity: 0.12; }
+        body.dark::after { opacity: 0.1; }
+
+        /* ===== HEADER GLASS ===== */
         .dashboard-header {
-            max-width: 1200px;
-            margin: 0 auto 32px;
             width: 100%;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding-bottom: 20px;
-            border-bottom: 2px solid var(--border-color, #e8ecf0);
+            padding: 10px 18px;
+            border-radius: 14px;
+            background: var(--bg-header);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 5;
+            transition: background 0.3s, border-color 0.3s;
         }
 
         .header-left {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 12px;
         }
 
         .logo-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--gradient-gold, linear-gradient(135deg, #C9A84C, #E8D5A5));
-            border-radius: 12px;
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-gold);
+            border-radius: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            color: white;
-            font-size: 20px;
+            color: #fff;
+            font-size: 18px;
             font-weight: 700;
-            cursor: pointer;
-            transition: transform 0.2s;
             text-decoration: none;
+            transition: transform 0.25s, box-shadow 0.25s;
+            box-shadow: 0 4px 12px rgba(201, 168, 76, 0.3);
         }
 
         .logo-icon:hover {
-            transform: scale(1.05);
+            transform: scale(1.08) rotate(-4deg);
+            box-shadow: 0 6px 20px rgba(201, 168, 76, 0.45);
         }
 
         .header-title h1 {
-            font-size: 26px;
+            font-size: 18px;
             font-weight: 700;
-            color: var(--text-primary, #1a1a2e);
-            letter-spacing: -0.5px;
+            letter-spacing: -0.4px;
         }
 
         .header-title p {
-            font-size: 14px;
-            color: var(--text-muted, #6c757d);
-            margin-top: 2px;
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 1px;
         }
 
         .header-right {
             display: flex;
             align-items: center;
-            gap: 16px;
+            gap: 8px;
+        }
+
+        .home-btn {
+            background: var(--gradient-gold);
+            color: #1a1a2e;
+            padding: 7px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 3px 10px rgba(201, 168, 76, 0.25);
+        }
+        .home-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(201, 168, 76, 0.4);
         }
 
         .header-badge {
-            background: var(--bg-input, #faf8f4);
-            padding: 6px 16px;
+            background: var(--bg-input);
+            padding: 5px 12px;
             border-radius: 20px;
-            font-size: 12px;
+            font-size: 11px;
             font-weight: 600;
-            color: var(--text-primary, #1a1a2e);
-            border: 1px solid var(--border-color, #e8e0d5);
+            border: 1px solid var(--border-color);
+        }
+        .header-badge span { color: var(--gold); }
+
+        /* ===== DARK MODE TOGGLE ===== */
+        .theme-toggle {
+            width: 38px;
+            height: 38px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: var(--bg-input);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
         }
 
-        .header-badge span {
-            color: var(--secondary, #C9A84C);
+        .theme-toggle:hover {
+            transform: scale(1.08);
+            border-color: var(--gold);
+            box-shadow: 0 0 0 3px rgba(201, 168, 76, 0.15);
         }
 
-        /* ===== GRID 9 KOTAK ===== */
+        .theme-toggle .icon-sun,
+        .theme-toggle .icon-moon {
+            position: absolute;
+            transition: transform 0.4s, opacity 0.3s;
+        }
+
+        .theme-toggle .icon-sun { transform: translateY(0) rotate(0); opacity: 1; }
+        .theme-toggle .icon-moon { transform: translateY(30px) rotate(90deg); opacity: 0; }
+
+        body.dark .theme-toggle .icon-sun { transform: translateY(-30px) rotate(-90deg); opacity: 0; }
+        body.dark .theme-toggle .icon-moon { transform: translateY(0) rotate(0); opacity: 1; }
+
+        /* ===== GRID ===== */
         .grid-container {
-            max-width: 1200px;
-            margin: 0 auto;
+            flex: 1;
             width: 100%;
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 24px;
-            flex: 1;
+            grid-template-rows: repeat(3, 1fr);
+            gap: 12px;
+            min-height: 0;
+            position: relative;
+            z-index: 1;
         }
 
-        /* ===== KOTAK (CARD) ===== */
+        /* ===== KOTAK GLASS ===== */
         .grid-item {
-            background: var(--bg-card, #ffffff);
-            border-radius: 20px;
-            padding: 32px 24px;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.04);
-            border: 1px solid var(--border-color, #e8e0d5);
+            background: var(--bg-card);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 14px;
+            padding: 14px 16px;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
             cursor: pointer;
             text-decoration: none;
             color: inherit;
@@ -108,35 +240,69 @@
             align-items: center;
             justify-content: center;
             text-align: center;
-            min-height: 200px;
             transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             position: relative;
             overflow: hidden;
+            opacity: 0;
+            animation: fadeUp 0.5s ease forwards;
+        }
+
+        /* Staggered animation */
+        .grid-item:nth-child(1) { animation-delay: 0.05s; }
+        .grid-item:nth-child(2) { animation-delay: 0.10s; }
+        .grid-item:nth-child(3) { animation-delay: 0.15s; }
+        .grid-item:nth-child(4) { animation-delay: 0.20s; }
+        .grid-item:nth-child(5) { animation-delay: 0.25s; }
+        .grid-item:nth-child(6) { animation-delay: 0.30s; }
+        .grid-item:nth-child(7) { animation-delay: 0.35s; }
+        .grid-item:nth-child(8) { animation-delay: 0.40s; }
+        .grid-item:nth-child(9) { animation-delay: 0.45s; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(12px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Shine effect on hover */
+        .grid-item::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                115deg,
+                transparent 40%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 60%
+            );
+            transform: translateX(-100%);
+            transition: transform 0.6s;
+            pointer-events: none;
+        }
+
+        .grid-item:hover::after {
+            transform: translateX(100%);
         }
 
         .grid-item:hover {
-            transform: scale(1.05);
-            box-shadow: 0 16px 48px rgba(0, 0, 0, 0.10);
-            border-color: var(--secondary, #C9A84C);
+            transform: translateY(-4px) scale(1.02);
+            box-shadow: var(--shadow-hover);
             z-index: 10;
         }
 
         .grid-item::before {
             content: '';
             position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            height: 4px;
-            border-radius: 20px 20px 0 0;
-            transition: height 0.3s;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            transition: height 0.25s;
         }
 
-        .grid-item:hover::before {
-            height: 6px;
-        }
+        .grid-item:hover::before { height: 4px; }
 
-        /* ===== WARNA BERBEZA UNTUK SETIAP KOTAK ===== */
+        /* Warna accent per kotak */
         .grid-item:nth-child(1)::before { background: #007aff; }
         .grid-item:nth-child(2)::before { background: #34c759; }
         .grid-item:nth-child(3)::before { background: #ff9500; }
@@ -147,7 +313,6 @@
         .grid-item:nth-child(8)::before { background: #5856d6; }
         .grid-item:nth-child(9)::before { background: #34c759; }
 
-        /* Hover effect untuk setiap warna */
         .grid-item:nth-child(1):hover { border-color: #007aff; }
         .grid-item:nth-child(2):hover { border-color: #34c759; }
         .grid-item:nth-child(3):hover { border-color: #ff9500; }
@@ -159,183 +324,150 @@
         .grid-item:nth-child(9):hover { border-color: #34c759; }
 
         .grid-icon {
-            font-size: 48px;
-            margin-bottom: 12px;
+            font-size: clamp(24px, 3.5vh, 36px);
+            margin-bottom: 6px;
             transition: transform 0.3s;
+            line-height: 1;
+            display: inline-block;
+        }
+
+        .grid-icon img {
+            width: 1em;
+            height: 1em;
+            object-fit: contain;
+            vertical-align: middle;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
         }
 
         .grid-item:hover .grid-icon {
-            transform: scale(1.1) rotate(-4deg);
+            transform: scale(1.15) rotate(-6deg);
         }
 
         .grid-item h3 {
-            font-size: 18px;
+            font-size: clamp(12px, 1.5vh, 15px);
             font-weight: 600;
-            color: var(--text-primary, #1a1a2e);
-            margin-bottom: 4px;
+            margin-bottom: 2px;
+            line-height: 1.2;
         }
 
         .grid-item p {
-            font-size: 13px;
-            color: var(--text-muted, #6c757d);
+            font-size: clamp(10px, 1.2vh, 12px);
+            color: var(--text-muted);
             margin: 0;
+            line-height: 1.2;
         }
 
         .grid-item .badge {
             display: inline-block;
-            margin-top: 10px;
-            padding: 3px 14px;
-            background: var(--bg-input, #faf8f4);
-            border-radius: 12px;
-            font-size: 11px;
+            margin-top: 6px;
+            padding: 2px 10px;
+            background: var(--bg-input);
+            border-radius: 10px;
+            font-size: clamp(8px, 1vh, 10px);
             font-weight: 500;
-            color: var(--text-muted, #6c757d);
-            border: 1px solid var(--border-color, #e8e0d5);
-            transition: all 0.3s;
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            transition: all 0.25s;
         }
 
         .grid-item:hover .badge {
-            background: var(--gradient-gold, linear-gradient(135deg, #C9A84C, #E8D5A5));
+            background: var(--gradient-gold);
             color: #1a1a2e;
-            border-color: var(--secondary, #C9A84C);
+            border-color: var(--gold);
+            box-shadow: 0 2px 8px rgba(201, 168, 76, 0.3);
         }
 
         .grid-arrow {
             position: absolute;
-            bottom: 16px;
-            right: 20px;
-            font-size: 18px;
-            color: var(--border-color, #d0d4d8);
+            bottom: 10px;
+            right: 14px;
+            font-size: 14px;
+            color: var(--text-muted);
             transition: all 0.3s;
             opacity: 0;
-            transform: translateX(-8px);
+            transform: translateX(-6px);
         }
 
         .grid-item:hover .grid-arrow {
             opacity: 1;
             transform: translateX(0);
-            color: var(--secondary, #C9A84C);
+            color: var(--gold);
         }
 
-        /* ===== FOOTER ===== */
+        /* ===== FOOTER GLASS ===== */
         .dashboard-footer {
-            max-width: 1200px;
-            margin: 40px auto 0;
             width: 100%;
-            padding-top: 20px;
-            border-top: 1px solid var(--border-color, #e8ecf0);
             display: flex;
             justify-content: space-between;
-            font-size: 13px;
-            color: var(--text-muted, #6c757d);
+            font-size: 11px;
+            color: var(--text-muted);
+            padding: 8px 18px;
+            border-radius: 12px;
+            background: var(--bg-header);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--border-soft);
+            flex-shrink: 0;
+            position: relative;
+            z-index: 5;
         }
 
         .dashboard-footer a {
-            color: var(--text-primary, #1a1a2e);
+            color: var(--text-primary);
             text-decoration: none;
             font-weight: 500;
+            transition: color 0.2s;
         }
 
         .dashboard-footer a:hover {
-            text-decoration: underline;
-            color: var(--secondary, #C9A84C);
+            color: var(--gold);
         }
 
         /* ===== RESPONSIVE ===== */
-        @media (max-width: 1024px) {
-            .grid-container {
-                gap: 18px;
-            }
-            .grid-item {
-                min-height: 170px;
-                padding: 24px 18px;
-            }
-            .grid-icon {
-                font-size: 40px;
-            }
+        @media (max-width: 900px) {
+            body { padding: 12px 14px; gap: 10px; }
+            .grid-container { gap: 10px; }
+            .grid-item { padding: 10px 12px; border-radius: 12px; }
+            .header-title h1 { font-size: 16px; }
+            .dashboard-header, .dashboard-footer { padding: 8px 14px; }
         }
 
-        @media (max-width: 768px) {
-            body {
-                padding: 20px 16px;
-            }
-
-            .dashboard-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 12px;
-                padding-bottom: 16px;
-            }
-
-            .header-right {
-                width: 100%;
-                justify-content: flex-start;
-                flex-wrap: wrap;
-            }
-
-            .grid-container {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 14px;
-            }
-
-            .grid-item {
-                min-height: 150px;
-                padding: 20px 14px;
-            }
-
-            .grid-icon {
-                font-size: 34px;
-            }
-            .grid-item h3 {
-                font-size: 15px;
-            }
-            .grid-item p {
-                font-size: 12px;
-            }
-
-            .dashboard-footer {
-                flex-direction: column;
-                gap: 6px;
-                text-align: center;
-            }
+        @media (max-width: 600px) {
+            body { padding: 10px 12px; gap: 8px; }
+            .logo-icon { width: 32px; height: 32px; font-size: 14px; }
+            .header-title h1 { font-size: 14px; }
+            .header-title p { display: none; }
+            .home-btn { padding: 5px 10px; font-size: 10px; }
+            .header-badge { display: none; }
+            .theme-toggle { width: 32px; height: 32px; font-size: 13px; }
+            .grid-container { gap: 8px; }
+            .grid-item { padding: 8px 6px; border-radius: 10px; }
+            .grid-icon { font-size: 22px; margin-bottom: 3px; }
+            .grid-item h3 { font-size: 10px; }
+            .grid-item p { display: none; }
+            .grid-item .badge { font-size: 8px; padding: 1px 6px; margin-top: 3px; }
+            .grid-arrow { display: none; }
+            .dashboard-footer { font-size: 9px; }
+            .dashboard-footer span:last-child { display: none; }
         }
 
-        @media (max-width: 480px) {
-            .grid-container {
-                grid-template-columns: 1fr 1fr;
-                gap: 12px;
-            }
-            .grid-item {
-                min-height: 130px;
-                padding: 16px 12px;
-            }
-            .grid-icon {
-                font-size: 28px;
-                margin-bottom: 6px;
-            }
-            .grid-item h3 {
-                font-size: 13px;
-            }
-            .grid-item p {
-                font-size: 11px;
-            }
-            .grid-item .badge {
-                font-size: 9px;
-                padding: 2px 10px;
-                margin-top: 6px;
-            }
-            .grid-arrow {
-                display: none;
-            }
-            .header-title h1 {
-                font-size: 20px;
+        @media (max-width: 400px) {
+            .grid-icon { font-size: 18px; }
+            .grid-item h3 { font-size: 9px; }
+            .grid-item .badge { font-size: 7px; }
+        }
+
+        /* Respect reduced motion */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- ===== HEADER ===== -->
     <header class="dashboard-header">
         <div class="header-left">
             <a href="https://parkson127.github.io/" class="logo-icon">✦</a>
@@ -345,17 +477,17 @@
             </div>
         </div>
         <div class="header-right">
-            <a href="https://parkson127.github.io/" class="home-btn">
-                🏠 Home
-            </a>
-            <span class="header-badge">📊 <span id="appCount">9</span> Applications</span>
+            <button class="theme-toggle" id="themeToggle" aria-label="Toggle theme">
+                <span class="icon-sun">☀️</span>
+                <span class="icon-moon">🌙</span>
+            </button>
+            <a href="https://parkson127.github.io/" class="home-btn">🏠 Home</a>
+            <span class="header-badge">📊 <span id="appCount">9</span> Apps</span>
         </div>
     </header>
 
-    <!-- ===== GRID 9 KOTAK ===== -->
     <div class="grid-container">
 
-        <!-- 1. BARCODE -->
         <a href="https://parkson127.github.io/barcode" class="grid-item">
             <span class="grid-icon">📱</span>
             <h3>Barcode System</h3>
@@ -364,7 +496,6 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 2. RANKING -->
         <a href="https://parkson127.github.io/ranking" class="grid-item">
             <span class="grid-icon">📊</span>
             <h3>Ranking Analytics</h3>
@@ -373,7 +504,6 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 3. STOCKTAKE -->
         <a href="https://parkson127.github.io/stocktake" class="grid-item">
             <span class="grid-icon">📦</span>
             <h3>Stocktake System</h3>
@@ -382,20 +512,16 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 4. TRANSACTION PC -->
         <a href="https://parkson127.github.io/member" class="grid-item">
             <span class="grid-icon">
-            <img src="https://cdn-icons-png.flaticon.com/512/1041/1041914.png" 
-             alt="VIP Card" 
-             style="width: 32px; height: 32px; object-fit: contain;">
+                <img src="https://cdn-icons-png.flaticon.com/512/1041/1041914.png" alt="VIP Card">
             </span>
             <h3>Transaction Dashboard</h3>
-            <p>% Parkson & Bonuslink</p>
+            <p>% Parkson &amp; Bonuslink</p>
             <span class="badge">Member</span>
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 5. 7 Step -->
         <a href="https://parkson127.github.io/7step" class="grid-item">
             <span class="grid-icon">✏️</span>
             <h3>Complete Modul</h3>
@@ -404,7 +530,6 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 6. HR PORTAL -->
         <a href="https://parkson127.github.io/kehadiran" class="grid-item">
             <span class="grid-icon">👤</span>
             <h3>HR Portal</h3>
@@ -413,7 +538,6 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 7. PRINT RECEIPT -->
         <a href="https://parkson127.github.io/receipt" class="grid-item">
             <span class="grid-icon">📋</span>
             <h3>E-journal</h3>
@@ -422,7 +546,6 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 8. REPORT CENTER -->
         <a href="https://parkson127.github.io/reports" class="grid-item">
             <span class="grid-icon">📄</span>
             <h3>Report Center</h3>
@@ -431,7 +554,6 @@
             <span class="grid-arrow">→</span>
         </a>
 
-        <!-- 9. SETTINGS -->
         <a href="https://parkson127.github.io/drive" class="grid-item">
             <span class="grid-icon">⚙️</span>
             <h3>Wormhole Link</h3>
@@ -442,7 +564,6 @@
 
     </div>
 
-    <!-- ===== FOOTER ===== -->
     <footer class="dashboard-footer">
         <span>© 2026 Corporate Hub • All rights reserved</span>
         <span>
@@ -451,6 +572,27 @@
             <a href="#">Contact</a>
         </span>
     </footer>
+
+    <script>
+        // ===== THEME TOGGLE =====
+        const toggle = document.getElementById('themeToggle');
+        const saved = localStorage.getItem('parkson-theme');
+
+        if (saved === 'dark') {
+            document.body.classList.add('dark');
+        }
+
+        toggle.addEventListener('click', () => {
+            document.body.classList.toggle('dark');
+            const isDark = document.body.classList.contains('dark');
+            localStorage.setItem('parkson-theme', isDark ? 'dark' : 'light');
+        });
+
+        // ===== KOSONGKAN BADGE COUNT (auto) =====
+        // (optional) kira bilangan .grid-item automatik
+        // const count = document.querySelectorAll('.grid-item').length;
+        // document.getElementById('appCount').textContent = count;
+    </script>
 
 </body>
 </html>
