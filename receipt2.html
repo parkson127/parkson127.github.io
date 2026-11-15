@@ -723,8 +723,9 @@
     }
     
     footerHtml += `</div>`;
-
-   if (!data.hasFooterNote) {
+  
+    let footerNoteHtml = '';
+    if (!data.hasFooterNote) {
     footerNoteHtml += `<div class="r-justify r-normal" style="width: 100%;">Purchases may be exchanged or returned within 7 days (product exclusion applies). Any vouchers redeemed must be surrendered else the amount will be deducted from the refund. Terms apply.</div>`;
     footerNoteHtml += `<div class="r-center r-normal">customerservice@parkson.com.my</div>`;
     footerNoteHtml += `<div class="r-center r-normal">THANK YOU FOR YOUR PATRONAGE</div>`;
