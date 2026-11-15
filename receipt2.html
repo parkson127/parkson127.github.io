@@ -769,8 +769,8 @@
   function splitReceiptIntoParts(r, columnHeight) {
     const tailItems = [
       ...r.bodyItems.map(html => ({ html })),
-      { html: r.promoHtml },
       { html: r.footerNoteHtml },
+      { html: r.promoHtml },
       { html: r.cashierHtml },
     ].filter(x => x.html);
 
