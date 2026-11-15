@@ -724,7 +724,11 @@
     
     footerHtml += `</div>`;
 
-    // Footnote lama dibuang â€” tiada footerNoteHtml
+    if (!data.hasFooterNote) {
+    html += `<div class="r-justify r-normal" style="width: 100%;">Purchases may be exchanged or returned within 7 days (product exclusion applies). Any vouchers redeemed must be surrendered else the amount will be deducted from the refund. Terms apply.</div>`;
+    html += `<div class="r-center r-normal">customerservice@parkson.com.my</div>`;
+    html += `<div class="r-center r-normal">THANK YOU FOR YOUR PATRONAGE</div>`;
+}
 
     let promoHtml = `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
     promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* YOU ORDER, WE DELIVER!</div>`;
@@ -738,7 +742,7 @@
     let cashierHtml = `<div class="r-normal">Cashier Name : ${escapeHtml(cashier)}</div>`;
     cashierHtml += `<div class="r-normal">${escapeHtml(pmy)}</div>`;
 
-    return { headerHtml, bodyItems: data.bodyItems, footerNoteHtml: '', promoHtml, cashierHtml, footerHtml, barcodeDisplayText };
+    return { headerHtml, bodyItems: data.bodyItems, footerNoteHtml, promoHtml, cashierHtml, footerHtml, barcodeDisplayText };
   }
 
   function buildFullHtml(r) {
@@ -746,6 +750,7 @@
       ${r.headerHtml}
       <div class="r-section-item-number">
         ${r.bodyItems.join('')}
+        ${r.footerNoteHtml}
         ${r.promoHtml}
         ${r.cashierHtml}
       </div>
