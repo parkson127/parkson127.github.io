@@ -3,18 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt — A4 Auto Split (Fixed)</title>
+  <title>Multi-Receipt â€” A4 Auto Split (Fixed)</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     :root {
-      --body-font-size: 9.5pt;
-      --header-main-size: 2rem;
-      --header-branch-size: 2rem;
-      --barcode-text-size: 1.1rem;
-      --max-width-header-trx: 6.5cm;
-      --max-width-item-number: 6.0cm;
+      --body-font-size: 9.7pt;
+      --header-main-size: 2.0rem;
+      --header-branch-size: 2.0rem;
+      --barcode-text-size: 1.0rem;
+      --max-width-header-trx: 6.7cm;
+      --max-width-item-number: 6.1cm;
       --max-width-membership-pmy: 6.5cm;
-      --max-width-barcode-last: 6.5cm;
+      --max-width-barcode-last: 6.6cm;
       --receipt-width: 3in;
       --a4-width: 8.27in;
       --a4-height: 11.69in;
@@ -117,7 +117,7 @@
     }
     
     .receipt-preview-item {
-      background: #fff; padding: 10px 5px;
+      background: #fafafa; padding: 10px 5px;
       font-family: 'Consolas', monospace; font-weight: 400;
       font-size: var(--body-font-size); line-height: 1.05;
       color: #000; width: 3in; min-width: 3in; max-width: 3in;
@@ -144,16 +144,16 @@
     .r-section-membership-pmy { max-width: var(--max-width-membership-pmy); width: 100%; margin: 0; }
     .r-section-barcode-last { max-width: var(--max-width-barcode-last); width: 100%; margin: 0; }
     
-    .r-header-main { font-size: var(--header-main-size); font-weight: 900; letter-spacing: 1px; line-height: 1; margin-top: 0; margin-bottom: 0; text-align: center; }
-    .r-header-branch { font-size: var(--header-branch-size); font-weight: 900; letter-spacing: 1px; margin-bottom: 2px; margin-top: 0; text-align: center; }
+    .r-header-main { font-size: var(--header-main-size); font-weight: 900; letter-spacing: 0.8px; line-height: 1; margin-top: 0; margin-bottom: 0; text-align: center; }
+    .r-header-branch { font-size: var(--header-branch-size); font-weight: 900; letter-spacing: 0.8px; margin-bottom: 2px; margin-top: 0; text-align: center; }
     
     .barcode-container { text-align: left; margin-top: 0px; margin-bottom: 0; line-height: 0; }
     .barcode-container svg { max-width: 100%; height: auto; display: block; margin: 0; }
-    .barcode-text { text-align: center; font-size: var(--barcode-text-size); letter-spacing: 3px; font-weight: 400 !important; margin-top: 0; padding-top: 0; white-space: nowrap; display: block; width: 100%; line-height: 1; }
+    .barcode-text { text-align: center; font-size: var(--barcode-text-size); letter-spacing: 3.2px; font-weight: 400 !important; margin-top: 0; padding-top: 0; white-space: nowrap; display: block; width: 100%; line-height: 1; }
     
     .r-www { text-align: center; width: 100%; letter-spacing: normal; }
     .r-membership-justify { display: flex; align-items: flex-start; gap: 0px; width: 100%; font-size: var(--body-font-size); font-weight: 600; white-space: nowrap; letter-spacing: -1px; text-align: left; }
-    .r-date-left { font-size: 8.3pt; font-weight: 400; letter-spacing: 0.1px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
+    .r-date-left { font-size: 8.6pt; font-weight: 400; letter-spacing: 0.1px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
     .r-trx-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
     
     .r-trx-flex {
@@ -256,13 +256,13 @@
       .r-dash { margin: 2px 0 !important; }
       .barcode-container { margin-top: 0 !important; margin-bottom: 0 !important; line-height: 0 !important; text-align: left !important; }
       .barcode-container svg { width: 100% !important; display: block !important; margin: 0 !important; }
-      .barcode-text { font-size: var(--barcode-text-size) !important; letter-spacing: 6px !important; display: block; width: 100%; margin-top: 0 !important; padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; text-align: center !important; }
+      .barcode-text { font-size: var(--barcode-text-size) !important; letter-spacing: 3.2px !important; display: block; width: 100%; margin-top: 0 !important; padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; text-align: center !important; }
       .r-www { text-align: center !important; }
       .r-membership-justify { letter-spacing: -1px !important; gap: 0px !important; text-align: left !important; }
       .r-card-normal { text-align: left !important; }
       .r-trx-normal { text-align: left !important; }
       .r-trx-flex { display: flex !important; justify-content: space-between !important; }
-      .r-date-left { font-size: 8.3pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-date-left { font-size: 8.6pt !important; text-align: left !important; white-space: nowrap !important; }
       .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; }
       .r-einvoice-remark-log { font-size: var(--body-font-size) !important; text-align: left !important; }
       .r-returned-title { font-size: 9.5pt !important; text-align: left !important; white-space: nowrap !important; }
@@ -274,11 +274,11 @@
 <body>
 
 <div class="container">
-  <h1>🖨️ Multi-Receipt → A4 (Auto Split Fixed)</h1>
+  <h1>ðŸ–¨ï¸ Multi-Receipt â†’ A4 (Auto Split Fixed)</h1>
   
   <div class="receipt-wrapper">
     <div class="form-panel">
-      <h2>📋 Paste Log E-Journal:</h2>
+      <h2>ðŸ“‹ Paste Log E-Journal:</h2>
 
       <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here..."></textarea>
 
@@ -295,21 +295,21 @@
       </div>
 
       <div class="print-warning">
-        <span>⚠️</span>
+        <span>âš ï¸</span>
         <div>
           <strong>Notis Print A4:</strong><br>
-          • Paper: <strong>A4</strong><br>
-          • Scale: <strong>100%</strong> (jangan "Fit to page")<br>
-          • Margin: <strong>None / 0</strong><br>
-          • Background graphics: <strong>ON</strong>
+          â€¢ Paper: <strong>A4</strong><br>
+          â€¢ Scale: <strong>100%</strong> (jangan "Fit to page")<br>
+          â€¢ Margin: <strong>None / 0</strong><br>
+          â€¢ Background graphics: <strong>ON</strong>
         </div>
       </div>
 
-      <button class="btn-generate" id="generateBtn">🖨️ CONVERT & PRINT</button>
+      <button class="btn-generate" id="generateBtn">ðŸ–¨ï¸ CONVERT & PRINT</button>
     </div>
 
     <div class="preview-panel">
-      <div class="preview-label">🔍 Live A4 Preview</div>
+      <div class="preview-label">ðŸ” Live A4 Preview</div>
       <div id="receiptPreviewContainer" style="display: flex; flex-direction: column; align-items: center; width: 100%;"></div>
     </div>
   </div>
@@ -339,7 +339,7 @@
   let cashierNames = [];
   const DEFAULT_CASHIER = 'SURIATI';
 
-  // Override style untuk ukur — sama dengan render dalam .split-part
+  // Override style untuk ukur â€” sama dengan render dalam .split-part
   const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
 
   function toTitleCase(str) {
@@ -377,7 +377,7 @@
       div.className = 'per-receipt-cashier';
       div.innerHTML = `
         <label class="r-label">
-          <span>Resit ${i + 1} — Cashier</span>
+          <span>Resit ${i + 1} â€” Cashier</span>
           <span class="trx-tag">${escapeHtml(trxTag)}</span>
         </label>
         <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama cashier resit ${i + 1}">
@@ -395,7 +395,7 @@
   }
 
   function parseSingleReceipt(receiptText, cashier, pmy) {
-    let cleanText = receiptText.replace(/[•\x1b]/g, '');
+    let cleanText = receiptText.replace(/[â€¢\x1b]/g, '');
     
     const salesMatch = cleanText.match(/\*\*\*BEGIN SALES\*\*\*([\s\S]*?)\*\*\*END SALES\*\*\*/);
     if (!salesMatch) return null;
@@ -419,7 +419,8 @@
       hasEInvoiceRemark: false,
       eInvoiceRemarkText: '',
       returnedItemTitle: '',
-      returnedItemDetail: ''
+      returnedItemDetail: '',
+      totalAmount: 0
     };
 
     let isAddress = true;
@@ -585,6 +586,9 @@
 
         if (txt.startsWith('TOTAL RM')) {
           const amount = txt.replace('TOTAL RM', '').trim();
+          // â† Parse amount untuk check > RM10,000
+          const parsed = parseFloat(amount.replace(/[,]/g, ''));
+          if (!isNaN(parsed)) data.totalAmount = parsed;
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         } 
         else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) {
@@ -639,6 +643,11 @@
         }
       }
     });
+
+    // â† Force e-invoice remark jika total > RM10,000
+    if (data.totalAmount > 10000) {
+      data.hasEInvoiceRemark = true;
+    }
 
     if (data.returnedItemDetail) {
       data.bodyItems.unshift(`<div class="r-returned-detail">${escapeHtml(data.returnedItemDetail)}</div>`);
@@ -709,7 +718,7 @@
     footerHtml += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}</div>`;
     
     if (data.hasEInvoiceRemark) {
-      footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000 require a mandatory e-invoice issuance at Customer Service</div>`;
+      footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000    require a mandatory e-invoice issuance at Customer Service.</div>`;
     }
     
     footerHtml += `</div>`;
@@ -750,13 +759,13 @@
   }
 
   /* =========================================================================
-     A4 COLUMN HEIGHT — NILAI TETAP (dikira dari CSS)
-     A4 = 11.69in, padding 0.4in × 2 = 0.8in
-     Usable = 10.89in × 96dpi = 1045px
+     A4 COLUMN HEIGHT â€” NILAI TETAP (dikira dari CSS)
+     A4 = 11.69in, padding 0.4in Ã— 2 = 0.8in
+     Usable = 10.89in Ã— 96dpi = 1045px
      ========================================================================= */
   function getA4ColumnHeight() {
     const A4_IN = 11.69;
-    const PADDING_IN = 0.4;   // .a4-preview-page padding
+    const PADDING_IN = 0.4;
     const PX_PER_IN = 96;
     const usable = (A4_IN - PADDING_IN * 2) * PX_PER_IN;
     return Math.floor(usable) - 4; // 1041px, -4px safety
@@ -764,10 +773,6 @@
 
   /* =========================================================================
      SPLIT RECEIPT IKUT TINGGI COLUMN A4 SEBENAR
-     - Ukur guna style override (padding/margin 0) supaya sama dengan render
-     - Header hanya di part pertama
-     - Footer (barcode + remark) hanya di part terakhir
-     - Footer note / promo / cashier dianggap tail items
      ========================================================================= */
   function splitReceiptIntoParts(r, columnHeight) {
     const tailItems = [
@@ -781,17 +786,17 @@
     temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3in;';
     document.body.appendChild(temp);
 
-    // Ukur header (padding/margin 0 override)
+    // Ukur header
     temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.headerHtml}</div>`;
     const headerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
 
-    // Ukur setiap item (padding/margin 0 override)
+    // Ukur setiap item
     const itemHeights = tailItems.map(it => {
       temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}"><div class="r-section-item-number">${it.html}</div></div>`;
       return temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
     });
 
-    // Ukur footer (padding/margin 0 override)
+    // Ukur footer
     temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.footerHtml}</div>`;
     const footerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
 
@@ -806,7 +811,6 @@
     for (let i = 0; i < tailItems.length; i++) {
       const h = itemHeights[i];
 
-      // Item tak muat → tutup part, mula part baru
       if (currentH + h > MAX && current.length > 0) {
         parts.push({ items: current, includeHeader: isFirstPart });
         isFirstPart = false;
@@ -818,7 +822,6 @@
       currentH += h;
     }
 
-    // Part terakhir perlu ruang untuk footer
     if (current.length > 0) {
       if (currentH + footerH > MAX && current.length > 1) {
         const last = current.pop();
@@ -833,7 +836,6 @@
       parts.push({ items: [], includeHeader: true, includeFooter: true });
     }
 
-    // Debug log
     console.log('[SPLIT]', {
       trx: r.barcodeDisplayText,
       columnHeight,
@@ -845,9 +847,8 @@
       partsItemCounts: parts.map(p => p.items.length)
     });
 
-    // Warning kalau 1 item sahaja melebihi 1 column (tak boleh split lagi)
     if (parts.length === 1 && (headerH + itemHeights.reduce((a, b) => a + b, 0) + footerH) > MAX) {
-      console.warn('[SPLIT] Item tunggal lebih tinggi dari column A4 — akan overflow.');
+      console.warn('[SPLIT] Item tunggal lebih tinggi dari column A4 â€” akan overflow.');
     }
 
     return parts.map(p => `<div class="receipt-preview-item">
@@ -867,7 +868,7 @@
     const matches = log.match(regex);
 
     if (!matches || matches.length === 0) {
-        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px;">❌ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
+        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px;">âŒ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
         return;
     }
 
@@ -880,7 +881,6 @@
 
     const A4_COLUMN_H = getA4ColumnHeight();
 
-    // Ukur tinggi setiap receipt penuh (hidden, guna MEASURE_STYLE)
     const hiddenWrap = document.createElement('div');
     hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3in;';
     document.body.appendChild(hiddenWrap);
@@ -889,12 +889,6 @@
     const heights = Array.from(fullItems).map(el => el.getBoundingClientRect().height);
     hiddenWrap.remove();
 
-    /* =======================================================================
-       PAGINATION
-       - Receipt ≤ A4_COLUMN_H → "short", pair 2-per-page
-       - Receipt > A4_COLUMN_H → "split" jadi N part ikut A4_COLUMN_H
-       - Split parts dipair 2-per-page → auto new page
-       ======================================================================= */
     const SHORT_THRESHOLD = A4_COLUMN_H;
 
     const pages = [];
@@ -926,7 +920,6 @@
     });
     flushShortQueue();
 
-    // Render pages
     let finalHtml = '';
     pages.forEach(page => {
       if (page.type === 'parts') {
@@ -964,7 +957,6 @@
       pageCount: pages.length
     });
 
-    // Render barcode
     setTimeout(() => {
         document.querySelectorAll('.barcode-svg').forEach(svg => {
           const val = svg.getAttribute('data-value');
@@ -995,7 +987,6 @@
     document.documentElement.style.setProperty('--print-margin', val + 'mm');
   });
 
-  // Init — tunggu DOM + CSS ready
   if (document.readyState === 'complete') {
     rebuildCashierInputs();
     updatePreview();
