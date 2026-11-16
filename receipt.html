@@ -4,11 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Multi-Receipt â€” A4 Auto Split (Fixed)</title>
-  <script 
-
-src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></scr
-
-ipt>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <link rel="stylesheet" href="/info-box.css">
 <script src="/notes.js" defer></script>
   <style>
@@ -29,30 +25,14 @@ ipt>
       --print-margin: 0mm;
     }
     
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 
-
-'Lucida Console', 'Courier New', monospace; }
-    body { background: #f3f4f6; min-height: 100vh; display: flex; align-items: 
-
-flex-start; justify-content: center; padding: 20px; }
-    .container { max-width: 1400px; width: 100%; background: white; border-radius: 
-
-24px; box-shadow: 0 20px 35px rgba(0,0,0,0.1); padding: 30px; }
-    h1 { font-size: 1.5rem; font-weight: 600; color: #1e293b; text-align: center; 
-
-margin-bottom: 25px; border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; 
-
-font-family: sans-serif; }
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace; }
+    body { background: #f3f4f6; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 20px; }
+    .container { max-width: 1400px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 20px 35px rgba(0,0,0,0.1); padding: 30px; }
+    h1 { font-size: 1.5rem; font-weight: 600; color: #1e293b; text-align: center; margin-bottom: 25px; border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; font-family: sans-serif; }
     .receipt-wrapper { display: flex; flex-wrap: wrap; gap: 30px; }
     
-    .form-panel { flex: 1; min-width: 380px; background: #f8fafc; border-radius: 
-
-18px; padding: 20px; border: 1px solid #e2e8f0; display: flex; flex-direction: 
-
-column; position: relative; }
-    .form-panel h2 { font-size: 1.1rem; margin-bottom: 10px; color: #0f172a; font-
-
-family: sans-serif; }
+    .form-panel { flex: 1; min-width: 380px; background: #f8fafc; border-radius: 18px; padding: 20px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; }
+    .form-panel h2 { font-size: 1.1rem; margin-bottom: 10px; color: #0f172a; font-family: sans-serif; }
     
     .per-receipt-cashier {
       background: #dbeafe; padding: 10px; border-radius: 8px;
@@ -109,9 +89,7 @@ family: sans-serif; }
       background: #0f172a; color: #38bdf8; resize: vertical;
       line-height: 1.4; margin-bottom: 15px;
     }
-    .log-textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 
-
-3px rgba(59,130,246,0.2); }
+    .log-textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
     
     .print-warning {
       background: #fffbeb; border: 1px solid #fcd34d; color: #b45309;
@@ -151,9 +129,7 @@ family: sans-serif; }
       margin-bottom: 20px; border-bottom: 2px dashed #94a3b8;
       padding-bottom: 10px; text-align: left;
     }
-    .receipt-preview-item:last-child { margin-bottom: 0; border-bottom: none; 
-
-padding-bottom: 0; }
+    .receipt-preview-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
     
     .r-center { text-align: center !important; }
     .r-left { text-align: left !important; }
@@ -162,61 +138,27 @@ padding-bottom: 0; }
     .r-normal { font-weight: 400; text-align: left; }
     .r-dash { border-top: 1px dashed #000; margin: 3px 0; }
     
-    .r-item-row { display: flex; justify-content: space-between; align-items: 
-
-flex-start; gap: 5px; width: 100%; }
+    .r-item-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; }
     .r-item-name { flex: 1; text-align: left; }
     .r-item-price { white-space: nowrap; text-align: right; }
-    .r-nowrap { white-space: nowrap !important; display: block; width: 100%; text-
-
-align: left; }
+    .r-nowrap { white-space: nowrap !important; display: block; width: 100%; text-align: left; }
     
-    .r-section-header-trx { max-width: var(--max-width-header-trx); width: 100%; 
-
-margin: 0; }
-    .r-section-item-number { max-width: var(--max-width-item-number); width: 100%; 
-
-margin: 0; }
-    .r-section-membership-pmy { max-width: var(--max-width-membership-pmy); width: 
-
-100%; margin: 0; }
-    .r-section-barcode-last { max-width: var(--max-width-barcode-last); width: 
-
-100%; margin: 0; }
+    .r-section-header-trx { max-width: var(--max-width-header-trx); width: 100%; margin: 0; }
+    .r-section-item-number { max-width: var(--max-width-item-number); width: 100%; margin: 0; }
+    .r-section-membership-pmy { max-width: var(--max-width-membership-pmy); width: 100%; margin: 0; }
+    .r-section-barcode-last { max-width: var(--max-width-barcode-last); width: 100%; margin: 0; }
     
-    .r-header-main { font-size: var(--header-main-size); font-weight: 500; letter-
-
-spacing: -1.5px; line-height: 1; margin-top: 0; margin-bottom: 0; text-align: 
-
-center; }
-    .r-header-branch { font-size: var(--header-branch-size); font-weight: 500; 
-
-letter-spacing: -1.5px; margin-bottom: 2px; margin-top: 0; text-align: center; }
+    .r-header-main { font-size: var(--header-main-size); font-weight: 500; letter-spacing: -1.5px; line-height: 1; margin-top: 0; margin-bottom: 0; text-align: center; }
+    .r-header-branch { font-size: var(--header-branch-size); font-weight: 500; letter-spacing: -1.5px; margin-bottom: 2px; margin-top: 0; text-align: center; }
     
-    .barcode-container { text-align: left; margin-top: 0px; margin-bottom: 0; 
-
-line-height: 0; }
-    .barcode-container svg { max-width: 100%; height: auto; display: block; margin: 
-
-0; }
-    .barcode-text { text-align: center; font-size: var(--barcode-text-size); 
-
-letter-spacing: 4.5px; font-weight: 400 !important; margin-top: 0; padding-top: 0; 
-
-white-space: nowrap; display: block; width: 100%; line-height: 1; }
+    .barcode-container { text-align: left; margin-top: 0px; margin-bottom: 0; line-height: 0; }
+    .barcode-container svg { max-width: 100%; height: auto; display: block; margin: 0; }
+    .barcode-text { text-align: center; font-size: var(--barcode-text-size); letter-spacing: 4.5px; font-weight: 400 !important; margin-top: 0; padding-top: 0; white-space: nowrap; display: block; width: 100%; line-height: 1; }
     
     .r-www { text-align: center; width: 100%; letter-spacing: normal; }
-    .r-membership-justify { display: flex; align-items: flex-start; gap: 0px; 
-
-width: 100%; font-size: var(--body-font-size); font-weight: 600; white-space: 
-
-nowrap; letter-spacing: 3px; text-align: left; }
-    .r-date-left { font-size: 10pt; font-weight: 400; letter-spacing: -1px; text-
-
-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
-    .r-trx-normal { font-size: var(--body-font-size); font-weight: 900; letter-
-
-spacing: normal; width: 100%; text-align: left; }
+    .r-membership-justify { display: flex; align-items: flex-start; gap: 0px; width: 100%; font-size: var(--body-font-size); font-weight: 600; white-space: nowrap; letter-spacing: 3px; text-align: left; }
+    .r-date-left { font-size: 10pt; font-weight: 400; letter-spacing: -1px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
+    .r-trx-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
     
     .r-trx-flex {
       display: flex; justify-content: space-between;
@@ -227,12 +169,8 @@ spacing: normal; width: 100%; text-align: left; }
     .r-trx-flex .r-trx-label { text-align: left; flex: 1; white-space: nowrap; }
     .r-trx-flex .r-trx-star { text-align: right; white-space: nowrap; }
     
-    .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-
-
-spacing: normal; width: 100%; text-align: left; }
-    .r-price-row { display: flex; justify-content: space-between; align-items: 
-
-flex-start; gap: 5px; width: 100%; font-weight: 900; }
+    .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
+    .r-price-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; font-weight: 900; }
     .r-price-row .r-label { text-align: left; flex: 1; }
     .r-price-row .r-value { text-align: right; white-space: nowrap; }
 
@@ -301,14 +239,10 @@ flex-start; gap: 5px; width: 100%; font-weight: 900; }
         display: block !important; background: white !important;
       }
       h1, .form-panel, .preview-label, .print-warning { display: none !important; }
-      #receiptPreviewContainer { display: block !important; width: 100% !important; 
-
-}
+      #receiptPreviewContainer { display: block !important; width: 100% !important; }
       .a4-preview-page {
         width: 8.27in !important; height: 11.69in !important;
-        box-shadow: none !important; padding: 0.4in !important; margin: 0 !
-
-important;
+        box-shadow: none !important; padding: 0.4in !important; margin: 0 !important;
         page-break-after: always; break-after: page; overflow: hidden !important;
       }
       .a4-preview-page:last-child { page-break-after: auto; break-after: auto; }
@@ -321,52 +255,22 @@ important;
         letter-spacing: -1.2px; border-bottom: none !important;
         padding-bottom: 0 !important; text-align: left !important;
       }
-      .r-header-main { font-size: var(--header-main-size) !important; line-height: 
-
-1 !important; margin-top: 0 !important; text-align: center !important; }
-      .r-header-branch { font-size: var(--header-branch-size) !important; line-
-
-height: 1 !important; margin-top: 0 !important; margin-bottom: 2px !important; 
-
-text-align: center !important; }
+      .r-header-main { font-size: var(--header-main-size) !important; line-height: 1 !important; margin-top: 0 !important; text-align: center !important; }
+      .r-header-branch { font-size: var(--header-branch-size) !important; line-height: 1 !important; margin-top: 0 !important; margin-bottom: 2px !important; text-align: center !important; }
       .r-dash { margin: 2px 0 !important; }
-      .barcode-container { margin-top: 0 !important; margin-bottom: 0 !important; 
-
-line-height: 0 !important; text-align: left !important; }
-      .barcode-container svg { width: 100% !important; display: block !important; 
-
-margin: 0 !important; }
-      .barcode-text { font-size: var(--barcode-text-size) !important; letter-
-
-spacing: 4.5px !important; display: block; width: 100%; margin-top: 0 !important; 
-
-padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; 
-
-text-align: center !important; }
+      .barcode-container { margin-top: 0 !important; margin-bottom: 0 !important; line-height: 0 !important; text-align: left !important; }
+      .barcode-container svg { width: 100% !important; display: block !important; margin: 0 !important; }
+      .barcode-text { font-size: var(--barcode-text-size) !important; letter-spacing: 4.5px !important; display: block; width: 100%; margin-top: 0 !important; padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; text-align: center !important; }
       .r-www { text-align: center !important; }
-      .r-membership-justify { letter-spacing: 3px !important; gap: 0px !important; 
-
-text-align: left !important; }
+      .r-membership-justify { letter-spacing: 3px !important; gap: 0px !important; text-align: left !important; }
       .r-card-normal { text-align: left !important; }
       .r-trx-normal { text-align: left !important; }
-      .r-trx-flex { display: flex !important; justify-content: space-between !
-
-important; }
-      .r-date-left { font-size: 10pt !important; text-align: left !important; 
-
-white-space: nowrap !important; }
-      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: 
-
-left !important; }
-      .r-einvoice-remark-log { font-size: var(--body-font-size) !important; text-
-
-align: left !important; }
-      .r-returned-title { font-size: 10pt !important; text-align: left !important; 
-
-white-space: nowrap !important; }
-      .r-returned-detail { font-size: 10pt !important; text-align: left !important; 
-
-white-space: nowrap !important; }
+      .r-trx-flex { display: flex !important; justify-content: space-between !important; }
+      .r-date-left { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; }
+      .r-einvoice-remark-log { font-size: var(--body-font-size) !important; text-align: left !important; }
+      .r-returned-title { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-returned-detail { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
       .split-part { min-height: 0 !important; }
     }
   </style>
@@ -380,23 +284,17 @@ white-space: nowrap !important; }
     <div class="form-panel">
       <h2>Paste Log E-Journal (boleh lebih dari satu):</h2>
 
-      <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs 
-
-here... (boleh paste multiple journals)"></textarea>
+      <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here... (boleh paste multiple journals)"></textarea>
 
       <div id="cashierInputsContainer"></div>
 
       <div class="pmy-global">
         <label>PMY Code (sama untuk semua resit)</label>
-        <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" 
-
-placeholder="Contoh: PMY LS6.2 20141230">
+        <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
       </div>
 
       <div class="margin-control">
-        <label>Print Margin <span class="value-display" 
-
-id="marginValue">0mm</span></label>
+        <label>Print Margin <span class="value-display" id="marginValue">0mm</span></label>
         <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
       </div>
 
@@ -418,9 +316,7 @@ id="marginValue">0mm</span></label>
 
     <div class="preview-panel">
       <div class="preview-label">ðŸ” Live A4 Preview</div>
-      <div id="receiptPreviewContainer" style="display: flex; flex-direction: 
-
-column; align-items: center; width: 100%;"></div>
+      <div id="receiptPreviewContainer" style="display: flex; flex-direction: column; align-items: center; width: 100%;"></div>
     </div>
   </div>
 </div>
@@ -459,24 +355,18 @@ column; align-items: center; width: 100%;"></div>
 
   function escapeHtml(text) {
     if (!text) return '';
-    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": 
-
-'&#039;' };
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
   function rebuildCashierInputs() {
     const log = logInput.value;
-    const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*
-
-\*/g);
+    const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
     const count = matches ? matches.length : 0;
 
     const newNames = [];
     for (let i = 0; i < count; i++) {
-      newNames.push(cashierNames[i] !== undefined ? cashierNames[i] : 
-
-DEFAULT_CASHIER);
+      newNames.push(cashierNames[i] !== undefined ? cashierNames[i] : DEFAULT_CASHIER);
     }
     cashierNames = newNames;
 
@@ -495,9 +385,7 @@ DEFAULT_CASHIER);
           <span>Resit ${i + 1} â€” Cashier</span>
           <span class="trx-tag">${escapeHtml(trxTag)}</span>
         </label>
-        <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" 
-
-placeholder="Nama cashier resit ${i + 1}">
+        <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama cashier resit ${i + 1}">
       `;
       cashierInputsContainer.appendChild(div);
     }
@@ -514,9 +402,7 @@ placeholder="Nama cashier resit ${i + 1}">
   function parseSingleReceipt(receiptText, cashier, pmy) {
     let cleanText = receiptText.replace(/[â€¢\x1b]/g, '');
     
-    const salesMatch = cleanText.match(/\*\*\*BEGIN SALES\*\*\*([\s\S]*?)\*\*\*END 
-
-SALES\*\*\*/);
+    const salesMatch = cleanText.match(/\*\*\*BEGIN SALES\*\*\*([\s\S]*?)\*\*\*END SALES\*\*\*/);
     if (!salesMatch) return null;
     
     let receiptData = salesMatch[1];
@@ -576,9 +462,7 @@ SALES\*\*\*/);
         if (isAddress && !txt.includes('SDN BHD') && !txt.includes('19860100')) {
           data.addressLines.push(txt);
         } 
-        else if (txt.includes('SDN BHD') || txt.includes('19860100') || 
-
-txt.includes('WWW.')) {
+        else if (txt.includes('SDN BHD') || txt.includes('19860100') || txt.includes('WWW.')) {
           isAddress = false;
           data.companyLines.push(txt);
         }
@@ -591,25 +475,19 @@ txt.includes('WWW.')) {
         else if (txt.match(/DISC:|DISCOUNT/i)) {
           const match = txt.match(/^(.*?)\s+(-?[\d\.,]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" 
-
-style="padding-left:10px;">
+             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
                         <span class="r-item-name">${escapeHtml(match[1])}</span>
                         <span class="r-item-price">${escapeHtml(match[2])}</span>
                       </div>`);
           } else {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" 
-
-style="padding-left:10px;">
+             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
                         <span class="r-item-name">${escapeHtml(txt)}</span>
                       </div>`);
           }
         }
         else if (txt.match(/PARKSON CARD\s*:\s*([\d\.,]+)/i)) {
           const match = txt.match(/PARKSON CARD\s*:\s*([\d\.,]+)/i);
-          data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-
-
-left:10px;">
+          data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
                         <span class="r-item-name">PARKSON CARD :</span>
                         <span class="r-item-price">${escapeHtml(match[1])}</span>
                       </div>`);
@@ -623,78 +501,48 @@ left:10px;">
                     <span class="r-item-price">${escapeHtml(match[2])}</span>
                   </div>`);
              } else {
-               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}
-
-</div>`);
+               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
              }
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}
-
-</div>`);
+             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/[\d\.,]+\s*X\s*[\d\.,]+(?:RM)?\s*[\d\.,]+/i)) {
-          const parts = txt.match(/([\d\.,]+)\s*X\s*([\d\.,]+)(?:RM)?\s*([\d
-
-\.,]+)/i);
+          const parts = txt.match(/([\d\.,]+)\s*X\s*([\d\.,]+)(?:RM)?\s*([\d\.,]+)/i);
           if (parts) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" 
-
-style="padding-left:10px;">
-                     <span class="r-item-name">${escapeHtml(parts[1])} x 
-
-${escapeHtml(parts[2])}RM</span>
+             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+                     <span class="r-item-name">${escapeHtml(parts[1])} x ${escapeHtml(parts[2])}RM</span>
                      <span class="r-item-price">${escapeHtml(parts[3])}</span>
                    </div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}" style="padding-
-
-left:10px;">${escapeHtml(txt)}</div>`);
+             data.bodyItems.push(`<div class="${nClass}" style="padding-left:10px;">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.startsWith('S/N:')) {
-          data.bodyItems.push(`<div class="${nClass}" style="font-size:0.8rem;">
-
-${escapeHtml(txt)}</div>`);
+          data.bodyItems.push(`<div class="${nClass}" style="font-size:0.8rem;">${escapeHtml(txt)}</div>`);
         }
         else if (txt.includes('NUMBER OF ITEMS')) {
           const match = txt.match(/NUMBER OF ITEMS:\s*(\d+)/i);
           const count = match ? match[1] : '';
-          data.bodyItems.push(`<div class="r-price-row ${nClass}"><span class="r-
-
-label">Number of Items:</span><span class="r-value">${escapeHtml(count)}
-
-</span></div>`);
+          data.bodyItems.push(`<div class="r-price-row ${nClass}"><span class="r-label">Number of Items:</span><span class="r-value">${escapeHtml(count)}</span></div>`);
         }
         else if (txt.match(/NORMAL POINTS|EXTRA POINTS|TOTAL POINTS/i)) {
           const match = txt.match(/^(.*?)\s*:\s*([\d\.,]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" 
-
-style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(match[1].trim())} 
-
-:</span>
-                        <span class="r-item-price">${escapeHtml(match[2].trim())}
-
-</span>
+             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+                        <span class="r-item-name">${escapeHtml(match[1].trim())} :</span>
+                        <span class="r-item-price">${escapeHtml(match[2].trim())}</span>
                       </div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}
-
-</div>`);
+             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/BALANCE|REDEEMABLE/i)) {
           const match = txt.match(/^(.*?)\s*:\s*([\d\.,A-Z]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-nowrap ${nClass}">${escapeHtml
-
-(match[1].trim())} :${escapeHtml(match[2].trim())}</div>`);
+             data.bodyItems.push(`<div class="r-nowrap ${nClass}">${escapeHtml(match[1].trim())} :${escapeHtml(match[2].trim())}</div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}
-
-</div>`);
+             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/MEMBERSHIP NUMBER/i)) {
@@ -702,13 +550,9 @@ style="padding-left:10px;">
            if (parts.length >= 2) {
                const label = parts[0].trim() + ' :';
                const value = parts.slice(1).join(':').trim();
-               data.bodyItems.push(`<div class="r-membership-justify"><span>
-
-${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
+               data.bodyItems.push(`<div class="r-membership-justify"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
            } else {
-               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}
-
-</div>`);
+               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
            }
         }
         else if (txt.match(/APV AS AT/i)) {
@@ -749,49 +593,31 @@ ${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
           const amount = txt.replace('TOTAL RM', '').trim();
           const parsed = parseFloat(amount.replace(/[,]/g, ''));
           if (!isNaN(parsed)) data.totalAmount = parsed;
-          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-
-
-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
+          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         } 
-        else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) 
-
-{
+        else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) {
           const parts = txt.split(' ');
           const amount = parts.pop();
           const label = parts.join(' ');
-          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-
-
-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}
-
-</span></div>`);
+          data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
         }
         else if (txt.match(/CARD NO\./i) || txt.match(/CARD NUMBER/i)) {
-          data.bodyItems.push(`<div class="r-card-normal">${escapeHtml(txt)}
-
-</div>`);
+          data.bodyItems.push(`<div class="r-card-normal">${escapeHtml(txt)}</div>`);
         }
         else if (txt.startsWith('ED*:')) {
           const lastSpace = txt.lastIndexOf(' ');
           if (lastSpace !== -1) {
             const ref = txt.substring(0, lastSpace);
             const amount = txt.substring(lastSpace + 1);
-            data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span 
-
-class="r-label">${escapeHtml(ref)}</span><span class="r-value">${escapeHtml
-
-(amount)}</span></div>`);
+            data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(ref)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
           } else {
-            data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}
-
-</div>`);
+            data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.startsWith('EV:')) {
           let cleanEv = txt.replace(/^EV:\s*/, 'EV: ');
           cleanEv = cleanEv.replace(/(\w+):(\d+)/, '$1 : $2');
-          data.bodyItems.push(`<div class="r-nowrap ${bcClass}">${escapeHtml
-
-(cleanEv)}</div>`);
+          data.bodyItems.push(`<div class="r-nowrap ${bcClass}">${escapeHtml(cleanEv)}</div>`);
         }
         else {
           let foundPayment = false;
@@ -808,25 +634,15 @@ class="r-label">${escapeHtml(ref)}</span><span class="r-value">${escapeHtml
               const label = txt.substring(0, lastSpace).trim();
               const amount = txt.substring(lastSpace + 1).trim();
               if (/^[+-]?[\d\.,]+$/.test(amount)) {
-                data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span 
-
-class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml
-
-(amount)}</span></div>`);
+                data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
               } else {
-                data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}
-
-</div>`);
+                data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
               }
             } else {
-              data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}
-
-</div>`);
+              data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
             }
           } else {
-            data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}
-
-</div>`);
+            data.bodyItems.push(`<div class="${bcClass}">${escapeHtml(txt)}</div>`);
           }
         }
       }
@@ -837,49 +653,33 @@ class="r-label">${escapeHtml(label)}</span><span class="r-value">${escapeHtml
     }
 
     if (data.returnedItemDetail) {
-      data.bodyItems.unshift(`<div class="r-returned-detail">${escapeHtml
-
-(data.returnedItemDetail)}</div>`);
+      data.bodyItems.unshift(`<div class="r-returned-detail">${escapeHtml(data.returnedItemDetail)}</div>`);
     }
     if (data.returnedItemTitle) {
-      data.bodyItems.unshift(`<div class="r-returned-title">${escapeHtml
-
-(data.returnedItemTitle)}</div>`);
+      data.bodyItems.unshift(`<div class="r-returned-title">${escapeHtml(data.returnedItemTitle)}</div>`);
     }
 
     if (data.eInvoiceRemarkText) {
       const cleanText = data.eInvoiceRemarkText.trim();
       const titleCaseText = toTitleCase(cleanText);
-      data.bodyItems.push(`<div class="r-einvoice-remark-log">${escapeHtml
-
-(titleCaseText)}</div>`);
+      data.bodyItems.push(`<div class="r-einvoice-remark-log">${escapeHtml(titleCaseText)}</div>`);
     }
 
     if (!data.storeName) data.storeName = 'PARKSON';
     if (!data.branchName) data.branchName = 'IOI CITY MALL';
-    if (data.addressLines.length === 0) data.addressLines = ['LOT AT-3, IOI CITY 
-
-MALL,', 'LEBUH IRC, SEPANG,62502 PUTRAJAYA'];
-    if (data.companyLines.length === 0) data.companyLines = ['PARKSON CORPORATION 
-
-SDN BHD', '198601007838(157029-X)', 'www.parkson.com.my'];
+    if (data.addressLines.length === 0) data.addressLines = ['LOT AT-3, IOI CITY MALL,', 'LEBUH IRC, SEPANG,62502 PUTRAJAYA'];
+    if (data.companyLines.length === 0) data.companyLines = ['PARKSON CORPORATION SDN BHD', '198601007838(157029-X)', 'www.parkson.com.my'];
 
     let headerHtml = `<div class="r-section-header-trx">`;
-    headerHtml += `<div class="r-center r-header-main">${escapeHtml
-
-(data.storeName)}</div>`;
-    headerHtml += `<div class="r-center r-header-branch">${escapeHtml
-
-(data.branchName)}</div>`;
+    headerHtml += `<div class="r-center r-header-main">${escapeHtml(data.storeName)}</div>`;
+    headerHtml += `<div class="r-center r-header-branch">${escapeHtml(data.branchName)}</div>`;
     data.addressLines.forEach(line => {
       headerHtml += `<div class="r-center r-normal">${escapeHtml(line)}</div>`;
     });
     headerHtml += `<div class="r-center r-normal" style="margin-top:2px;">`;
     data.companyLines.forEach(line => {
       if (line.includes('WWW.')) {
-           headerHtml += `<div class="r-www">${escapeHtml(line.toLowerCase())}
-
-</div>`;
+           headerHtml += `<div class="r-www">${escapeHtml(line.toLowerCase())}</div>`;
       } else {
           headerHtml += `<div>${escapeHtml(line)}</div>`;
       }
@@ -892,15 +692,9 @@ SDN BHD', '198601007838(157029-X)', 'www.parkson.com.my'];
     if(trxDisplay.startsWith(':')) trxDisplay = trxDisplay.substring(1);
     
     if (data.trxStars) {
-      headerHtml += `<div class="r-trx-flex"><span class="r-trx-label">Trx#:
-
-${escapeHtml(trxDisplay)}</span><span class="r-trx-star">${escapeHtml
-
-(data.trxStars)}</span></div>`;
+      headerHtml += `<div class="r-trx-flex"><span class="r-trx-label">Trx#:${escapeHtml(trxDisplay)}</span><span class="r-trx-star">${escapeHtml(data.trxStars)}</span></div>`;
     } else {
-      headerHtml += `<div class="r-trx-normal">Trx#:${escapeHtml(trxDisplay)}
-
-</div>`;
+      headerHtml += `<div class="r-trx-normal">Trx#:${escapeHtml(trxDisplay)}</div>`;
     }
     headerHtml += `</div>`;
     headerHtml += `<div style="margin-bottom:2px;"></div>`;
@@ -922,71 +716,35 @@ ${escapeHtml(trxDisplay)}</span><span class="r-trx-star">${escapeHtml
 
     let footerHtml = `<div class="r-section-barcode-last">`;
     footerHtml += `<div class="barcode-container">`;
-    footerHtml += `<svg class="barcode-svg" data-value="${escapeHtml
-
-(barcodeDisplayText)}"></svg>`;
+    footerHtml += `<svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg>`;
     footerHtml += `</div>`;
-    footerHtml += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}
-
-</div>`;
+    footerHtml += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}</div>`;
     
     if (data.hasEInvoiceRemark) {
-      footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000 
-
-   require a mandatory e-invoice issuance at Customer Service.</div>`;
+      footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000    require a mandatory e-invoice issuance at Customer Service.</div>`;
     }
     
     footerHtml += `</div>`;
   
     let footerNoteHtml = '';
-    footerNoteHtml += `<div class="r-justify r-normal" style="width: 
-
-100%;">Purchases may be exchanged or returned within 7 days (product exclusion 
-
-applies). Any vouchers redeemed must be surrendered else the amount will be 
-
-deducted from the refund. Terms apply.</div>`;
-    footerNoteHtml += `<div class="r-center r-
-
-normal">customerservice@parkson.com.my</div>`;
-    footerNoteHtml += `<div class="r-center r-normal">THANK YOU FOR YOUR 
-
-PATRONAGE</div>`;
+    footerNoteHtml += `<div class="r-justify r-normal" style="width: 100%;">Purchases may be exchanged or returned within 7 days (product exclusion applies). Any vouchers redeemed must be surrendered else the amount will be deducted from the refund. Terms apply.</div>`;
+    footerNoteHtml += `<div class="r-center r-normal">customerservice@parkson.com.my</div>`;
+    footerNoteHtml += `<div class="r-center r-normal">THANK YOU FOR YOUR PATRONAGE</div>`;
 
 
-    let promoHtml = `<div class="r-bold" style="width: 100%; text-align: 
+    let promoHtml = `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
+    promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* YOU ORDER, WE DELIVER!</div>`;
+    promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* Shop NOW at parksononline.com.my</div>`;
+    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">* Register NOW to enjoy RM10 OFF</div>`;
+    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">  your first order</div>`;
+    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">* FREE SHIPPING across West Msia*</div>`;
+    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">Terms Apply</div>`;
+    promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
 
-left;">****************************************</div>`;
-    promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* YOU 
-
-ORDER, WE DELIVER!</div>`;
-    promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* Shop 
-
-NOW at parksononline.com.my</div>`;
-    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">* 
-
-Register NOW to enjoy RM10 OFF</div>`;
-    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">  
-
-your first order</div>`;
-    promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">* 
-
-FREE SHIPPING across West Msia*</div>`;
-    promoHtml += `<div class="r-normal" style="width: 100%; text-align: 
-
-left;">Terms Apply</div>`;
-    promoHtml += `<div class="r-bold" style="width: 100%; text-align: 
-
-left;">****************************************</div>`;
-
-    let cashierHtml = `<div class="r-normal">Cashier Name : ${escapeHtml(cashier)}
-
-</div>`;
+    let cashierHtml = `<div class="r-normal">Cashier Name : ${escapeHtml(cashier)}</div>`;
     cashierHtml += `<div class="r-normal">${escapeHtml(pmy)}</div>`;
 
-    return { headerHtml, bodyItems: data.bodyItems, footerNoteHtml, promoHtml, 
-
-cashierHtml, footerHtml, barcodeDisplayText };
+    return { headerHtml, bodyItems: data.bodyItems, footerNoteHtml, promoHtml, cashierHtml, footerHtml, barcodeDisplayText };
   }
 
   function buildFullHtml(r) {
@@ -1022,30 +780,16 @@ cashierHtml, footerHtml, barcodeDisplayText };
     temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3.2in;';
     document.body.appendChild(temp);
 
-    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">
-
-${r.headerHtml}</div>`;
-    const headerH = temp.querySelector('.receipt-preview-
-
-item').getBoundingClientRect().height;
+    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.headerHtml}</div>`;
+    const headerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
 
     const itemHeights = tailItems.map(it => {
-      temp.innerHTML = `<div class="receipt-preview-item" 
-
-style="${MEASURE_STYLE}"><div class="r-section-item-number">${it.html}
-
-</div></div>`;
-      return temp.querySelector('.receipt-preview-item').getBoundingClientRect
-
-().height;
+      temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}"><div class="r-section-item-number">${it.html}</div></div>`;
+      return temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
     });
 
-    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">
-
-${r.footerHtml}</div>`;
-    const footerH = temp.querySelector('.receipt-preview-
-
-item').getBoundingClientRect().height;
+    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.footerHtml}</div>`;
+    const footerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
 
     temp.remove();
 
@@ -1076,9 +820,7 @@ item').getBoundingClientRect().height;
         isFirstPart = false;
         current = [last];
       }
-      parts.push({ items: current, includeHeader: isFirstPart, includeFooter: true 
-
-});
+      parts.push({ items: current, includeHeader: isFirstPart, includeFooter: true });
     } else if (parts.length > 0) {
       parts[parts.length - 1].includeFooter = true;
     } else {
@@ -1102,17 +844,13 @@ item').getBoundingClientRect().height;
     const matches = log.match(regex);
 
     if (!matches || matches.length === 0) {
-        previewContainer.innerHTML = `<div class="r-center" style="color:red; 
-
-padding: 20px;">âŒ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
+        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px;">âŒ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
         return;
     }
 
     const receipts = [];
     matches.forEach((chunk, i) => {
-      const cashier = cashierNames[i] !== undefined ? cashierNames[i] : 
-
-DEFAULT_CASHIER;
+      const cashier = cashierNames[i] !== undefined ? cashierNames[i] : DEFAULT_CASHIER;
       const r = parseSingleReceipt(chunk, cashier, pmy);
       if (r) receipts.push(r);
     });
@@ -1120,19 +858,11 @@ DEFAULT_CASHIER;
     const A4_COLUMN_H = getA4ColumnHeight();
 
     const hiddenWrap = document.createElement('div');
-    hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; 
-
-visibility:hidden; width:3.2in;';
+    hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3.2in;';
     document.body.appendChild(hiddenWrap);
-    hiddenWrap.innerHTML = receipts.map(r => buildFullHtml(r).replace
-
-('class="receipt-preview-item"', `class="receipt-preview-item" 
-
-style="${MEASURE_STYLE}"`)).join('');
+    hiddenWrap.innerHTML = receipts.map(r => buildFullHtml(r).replace('class="receipt-preview-item"', `class="receipt-preview-item" style="${MEASURE_STYLE}"`)).join('');
     const fullItems = hiddenWrap.querySelectorAll('.receipt-preview-item');
-    const heights = Array.from(fullItems).map(el => el.getBoundingClientRect
-
-().height);
+    const heights = Array.from(fullItems).map(el => el.getBoundingClientRect().height);
     hiddenWrap.remove();
 
     const SHORT_THRESHOLD = A4_COLUMN_H;
@@ -1143,9 +873,7 @@ style="${MEASURE_STYLE}"`)).join('');
     function flushShortQueue() {
       while (shortQueue.length > 0) {
         if (shortQueue.length >= 2) {
-          pages.push({ type: 'pair', indices: [shortQueue.shift(), 
-
-shortQueue.shift()] });
+          pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
         } else {
           pages.push({ type: 'single', indices: [shortQueue.shift()] });
         }
@@ -1162,9 +890,7 @@ shortQueue.shift()] });
       } else {
         shortQueue.push(i);
         if (shortQueue.length === 2) {
-          pages.push({ type: 'pair', indices: [shortQueue.shift(), 
-
-shortQueue.shift()] });
+          pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
         }
       }
     });
@@ -1181,9 +907,7 @@ shortQueue.shift()] });
           finalHtml += `</div>`;
         } else {
           finalHtml += `<div class="a4-preview-page a4-single-col">`;
-          finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">
-
-${cols[0]}</div>`;
+          finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${cols[0]}</div>`;
           finalHtml += `</div>`;
         }
       } else if (page.type === 'pair') {
@@ -1195,9 +919,7 @@ ${cols[0]}</div>`;
       } else {
         const idx = page.indices[0];
         finalHtml += `<div class="a4-preview-page a4-single-col">`;
-        finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">
-
-${buildFullHtml(receipts[idx])}</div>`;
+        finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${buildFullHtml(receipts[idx])}</div>`;
         finalHtml += `</div>`;
       }
     });
@@ -1209,9 +931,7 @@ ${buildFullHtml(receipts[idx])}</div>`;
           const val = svg.getAttribute('data-value');
           if (val) {
             try {
-              JsBarcode(svg, val, { format: "CODE128", width: 1.8, height: 18, 
-
-displayValue: false, margin: 0 });
+              JsBarcode(svg, val, { format: "CODE128", width: 1.8, height: 18, displayValue: false, margin: 0 });
             } catch (e) { console.error("Barcode error:", e); }
           }
         });
