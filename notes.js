@@ -48,12 +48,24 @@
       html:
         '<p>Halaman ini membantu cari info transaksi dalam store melalui <b>2 bahagian</b>:</p>' +
         '<ul>' +
-        '<li><b>📥 Bahagian 1 — Transaction:</b> Download fail <code>FileNTX</code> (BI file) dari sistem, kemudian upload di sini untuk cari detail transaksi</li>' +
+        '<li><b>📥 Bahagian 1 — Transaction:</b> Download fail <code>File TX</code> (BI file) dari sistem, kemudian upload di sini untuk cari detail transaksi</li>' +
         '<li><b>👤 Bahagian 2 — Cashier Listing:</b> Rekod nama cashier dengan lebih cepat — sesuai untuk semakan &amp; laporan</li>' +
         '</ul>' +
-        '<p style="margin-top:8px;"><b>Tip:</b> Pastikan fail <code>FileNTX</code> yang betul dari hari yang sama untuk hasil tepat.</p>'
+        '<p style="margin-top:8px;"><b>Tip:</b> Pastikan fail <code>File TX</code> yang betul dari hari yang sama untuk hasil tepat.</p>'
     },
 
+    'member.html': {
+    type: 'info',
+      title: 'ℹ️ Cara Guna Cari Transaction',
+      html:
+        '<p>Halaman ini membantu cari info transaksi dalam store melalui <b>2 bahagian</b>:</p>' +
+        '<ul>' +
+        '<li><b>📥 Bahagian 1 — Transaction:</b> Download fail <code>File TX</code> (BI file) dari sistem, kemudian upload di sini untuk cari detail transaksi</li>' +
+        '<li><b>👤 Bahagian 2 — Cashier Listing:</b> Rekod nama cashier dengan lebih cepat — sesuai untuk semakan &amp; laporan</li>' +
+        '</ul>' +
+        '<p style="margin-top:8px;"><b>Tip:</b> Pastikan fail <code>File TX</code> yang betul dari hari yang sama untuk hasil tepat.</p>'
+    },
+   
     '7step.html': {
       type: 'tip',
       title: '💡 Modul Parkson 7 Step',
