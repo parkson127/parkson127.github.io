@@ -2,7 +2,6 @@
 (function() {
   var notes = {
 
-    // ============================================
     'barcode.html': {
       type: 'info',
       title: 'ℹ️ Cara Guna Penjana Barcode',
@@ -16,7 +15,6 @@
         '<p style="margin-top:8px;"><b>Tip:</b> Barcode dijana serta-merta — tak perlu tekan butang. Tekan <b>Cetak</b> untuk simpan sebagai PDF atau print terus.</p>'
     },
 
-    // ============================================
     'ranking.html': {
       type: 'info',
       title: 'ℹ️ Cara Guna Extract Ranking Brand',
@@ -31,7 +29,6 @@
         '<p style="margin-top:8px;"><b>⚠️ Penting:</b> Pilih mode &amp; dept <b>SEBELUM</b> upload fail supaya hasil tepat.</p>'
     },
 
-    // ============================================
     'stocktake.html': {
       type: 'info',
       title: 'ℹ️ Cara Guna Converter Stocktake',
@@ -45,7 +42,6 @@
         '<p style="margin-top:8px;"><b>Tip:</b> Semak hasil sebelum guna untuk laporan rasmi. Fail asal tidak diubah.</p>'
     },
 
-    // ============================================
     'transaction.html': {
       type: 'info',
       title: 'ℹ️ Cara Guna Cari Transaction',
@@ -58,7 +54,6 @@
         '<p style="margin-top:8px;"><b>Tip:</b> Pastikan fail <code>FileNTX</code> yang betul dari hari yang sama untuk hasil tepat.</p>'
     },
 
-    // ============================================
     '7step.html': {
       type: 'tip',
       title: '💡 Modul Parkson 7 Step',
@@ -71,7 +66,6 @@
         '</ul>'
     },
 
-    // ============================================
     'kehadiran.html': {
       type: 'info',
       title: 'ℹ️ Cara Guna Jadual Kehadiran & Grooming',
@@ -85,7 +79,6 @@
         '<p style="margin-top:8px;"><b>Tip:</b> Buat pada awal bulan supaya senang semak di akhir bulan.</p>'
     },
 
-    // ============================================
     'receipt.html': {
       type: 'warning',
       title: '⚠️ Cara Guna Tukar eJournal ke Resit',
@@ -100,7 +93,6 @@
         '<p style="margin-top:8px;"><b>⚠️ Jangan skip nama cashier</b> — resit tanpa nama cashier tidak sah untuk rekod.</p>'
     },
 
-    // ============================================
     'reports.html': {
       type: 'info',
       title: 'ℹ️ Laporan (Reports)',
@@ -112,7 +104,6 @@
         '</ul>'
     },
 
-    // ============================================
     'drive.html': {
       type: 'tip',
       title: '💡 Cara Guna Transfer Fail (Device A → Device B)',
@@ -126,22 +117,22 @@
         '<p style="margin-top:8px;"><b>Tip:</b> Sesuai untuk pindah fail besar dari telefon ke komputer. Pastikan sambungan internet stabil.</p>'
     }
 
-    // ============================================
     // Tambah halaman baharu di sini...
-    // ============================================
   };
 
-  // AUTO-INJECT
-  var path = window.location.pathname.split('/').pop() || 'index.html';
+  // ============================================
+  // AUTO-INJECT (Cara 4 — tiada localStorage)
+  // ============================================
+  var path = window.location.pathname.split('/').filter(Boolean).pop() || 'index.html';
   var note = notes[path];
   if (!note) return;
-  if (localStorage.getItem('hide-note-' + path) === '1') return;
 
   function inject() {
     if (!document.body) {
       document.addEventListener('DOMContentLoaded', inject);
       return;
     }
+    // Elak suntik dua kali dalam satu page load
     if (document.querySelector('.info-box[data-auto]')) return;
 
     var box = document.createElement('div');
@@ -152,8 +143,8 @@
       '<h4>' + note.title + '</h4>' +
       note.html;
 
+    // Tutup untuk sesi ini sahaja — tiada localStorage
     box.querySelector('.close-btn').addEventListener('click', function() {
-      localStorage.setItem('hide-note-' + path, '1');
       box.remove();
     });
 
