@@ -13,7 +13,6 @@
       --barcode-text-size: 1.1rem;
       --max-width-header-trx: 6.7cm;
       --max-width-item-number: 6.2cm;
-      --max-width-membership-pmy: 6.5cm;
       --max-width-barcode-last: 7.2cm;
       --receipt-width: 3.2in;
       --print-margin: 0mm;
@@ -24,7 +23,6 @@
       --c-text: #0f172a;
       --c-text-muted: #64748b;
       --c-primary: #2563eb;
-      --c-primary-hover: #1d4ed8;
       --c-success: #10b981;
       --c-success-hover: #059669;
       --c-warning: #f59e0b;
@@ -32,7 +30,6 @@
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
-      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
     }
 
@@ -129,97 +126,86 @@
     .log-textarea::placeholder { color: #64748b; }
 
     .cashier-list {
-      display: flex; flex-direction: column; gap: 10px;
+      display: flex; flex-direction: column; gap: 6px;
       max-height: 520px;
       overflow-y: auto;
       padding-right: 4px;
-      scroll-behavior: smooth;
     }
     .cashier-list::-webkit-scrollbar { width: 6px; }
     .cashier-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
-    .cashier-item {
-      background: #f8fafc;
-      border: 1.5px solid var(--c-border);
-      border-radius: var(--radius-md);
-      padding: 14px 14px 12px;
-      transition: border-color 0.15s, box-shadow 0.15s;
-      position: relative;
-    }
-    .cashier-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
-    .cashier-item.detected { background: #f0fdf4; border-color: #86efac; }
-    .cashier-item.unknown { background: #fef2f2; border-color: #fca5a5; }
-
-    .cashier-item .receipt-num {
-      position: absolute;
-      top: -8px;
-      left: 12px;
-      background: var(--c-primary);
-      color: white;
-      font-size: 0.72rem;
-      font-weight: 800;
-      padding: 3px 10px;
-      border-radius: 12px;
-      letter-spacing: 0.3px;
-      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
-      font-family: -apple-system, sans-serif;
-    }
-    .cashier-item.detected .receipt-num {
-      background: var(--c-success);
-      box-shadow: 0 2px 6px rgba(16,185,129,0.3);
-    }
-    .cashier-item.unknown .receipt-num {
-      background: var(--c-danger);
-      box-shadow: 0 2px 6px rgba(239,68,68,0.3);
-    }
-
-    .cashier-item .item-head {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-bottom: 8px; margin-top: 4px; gap: 8px;
-    }
-    .cashier-item .item-title {
+    .cashier-row {
       display: flex; align-items: center; gap: 8px;
-      font-size: 0.82rem; font-weight: 600; color: var(--c-text);
-      flex-wrap: wrap;
+      padding: 8px 10px;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      transition: border-color 0.15s;
     }
-    .cashier-item .badge {
-      display: inline-flex; align-items: center; gap: 4px;
-      font-size: 0.68rem; font-weight: 600;
-      padding: 3px 8px; border-radius: 20px;
+    .cashier-row:hover { border-color: #cbd5e1; }
+    .cashier-row.detected { background: #f0fdf4; border-color: #bbf7d0; }
+    .cashier-row.unknown { background: #fef2f2; border-color: #fecaca; }
+
+    .cashier-row .resit-num {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      font-weight: 800;
+      color: white;
+      background: var(--c-primary);
+      padding: 3px 7px;
+      border-radius: 5px;
+      letter-spacing: 0.2px;
     }
-    .badge.detected { background: #dcfce7; color: #166534; }
-    .badge.unknown { background: #fee2e2; color: #991b1b; }
-    .badge.manual { background: #dbeafe; color: #1e40af; }
-    .cashier-item .trx-tag {
-      font-size: 0.68rem; color: var(--c-text-muted);
+    .cashier-row.detected .resit-num { background: var(--c-success); }
+    .cashier-row.unknown .resit-num { background: var(--c-danger); }
+
+    .cashier-row .trx-num {
+      flex-shrink: 0;
+      font-size: 0.62rem;
+      color: var(--c-text-muted);
       font-family: 'Consolas', monospace;
-      white-space: nowrap;
+      max-width: 90px;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 150px;
+      white-space: nowrap;
     }
-    .cashier-item input {
-      width: 100%;
-      padding: 9px 12px;
-      border: 1px solid #cbd5e1;
-      border-radius: var(--radius-sm);
+
+    .cashier-row input {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
       font-family: 'Consolas', monospace;
-      font-size: 0.88rem;
+      font-size: 0.78rem;
       background: white;
       color: var(--c-text);
-      transition: border-color 0.15s, box-shadow 0.15s;
     }
-    .cashier-item input:focus {
+    .cashier-row input:focus {
       outline: none;
       border-color: var(--c-primary);
-      box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
     }
+
+    .cashier-row .status-pill {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 10px;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+    .status-pill.auto { background: #dcfce7; color: #166534; }
+    .status-pill.manual { background: #dbeafe; color: #1e40af; }
+    .status-pill.unknown { background: #fee2e2; color: #991b1b; }
 
     .field { display: flex; flex-direction: column; gap: 6px; }
     .field label {
       font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted);
       text-transform: uppercase; letter-spacing: 0.5px;
-      display: flex; align-items: center; gap: 6px;
     }
     .field input[type="text"] {
       padding: 8px 12px;
@@ -229,7 +215,6 @@
       font-size: 0.82rem;
       background: white;
       color: var(--c-text);
-      transition: border-color 0.15s, box-shadow 0.15s;
     }
     .field input[type="text"]:focus {
       outline: none;
@@ -277,7 +262,6 @@
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(16,185,129,0.4);
     }
-    .btn-generate:active { transform: translateY(0); }
 
     .preview-panel { min-height: 400px; display: flex; flex-direction: column; }
     .preview-scroll {
@@ -400,28 +384,71 @@
       width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
     }
 
+    /* ============ A4 PAGE — CSS MULTI-COLUMN (Approach C) ============ */
     .a4-preview-page {
-      width: 8.27in; height: 11.69in; background: #fff;
+      width: 8.27in;
+      height: 11.69in;
+      background: #fff;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      padding: 0.4in; margin: 0 auto;
-      box-sizing: border-box; display: grid;
-      grid-template-columns: 1fr 1fr; gap: 0.5in;
-      overflow: hidden; position: relative;
+      padding: 0.4in;
+      margin: 0 auto;
+      box-sizing: border-box;
+      column-count: 2;
+      column-gap: 0.5in;
+      column-fill: auto;
+      overflow: hidden;
+      position: relative;
     }
     .a4-preview-page::after {
-      content: "A4"; position: absolute; top: 4px; right: 6px;
-      font-size: 9px; color: #94a3b8; letter-spacing: 1px;
+      content: "A4";
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 9px;
+      color: #94a3b8;
+      letter-spacing: 1px;
     }
-    .a4-single-col { grid-template-columns: 1fr; }
-    .split-part {
-      width: 100%; height: 100%;
-      min-height: calc(11.69in - 0.8in);
-      overflow: hidden; display: flex; flex-direction: column; align-items: flex-start;
+    .a4-preview-page.a4-single-col {
+      column-count: 1;
     }
-    .split-part > .receipt-preview-item {
-      margin: 0 !important; padding-bottom: 0 !important;
-      border-bottom: none !important; box-shadow: none !important;
-      padding-top: 0 !important;
+
+    /* Setiap receipt — blok utuh, allow auto flow */
+    .receipt-block {
+      break-inside: auto;
+      page-break-inside: auto;
+      margin-bottom: 20px;
+    }
+    .receipt-block:last-child { margin-bottom: 0; }
+
+    .receipt-preview-item {
+      break-inside: auto;
+      page-break-inside: auto;
+    }
+
+    /* PENTING: Setiap item dalam receipt kekal utuh — tak terpotong tengah */
+    .receipt-preview-item > div,
+    .receipt-preview-item .r-item-row,
+    .receipt-preview-item .r-price-row,
+    .receipt-preview-item .r-normal,
+    .receipt-preview-item .r-bold,
+    .receipt-preview-item .r-center,
+    .receipt-preview-item .r-nowrap,
+    .receipt-preview-item .r-trx-normal,
+    .receipt-preview-item .r-trx-flex,
+    .receipt-preview-item .r-card-normal,
+    .receipt-preview-item .r-date-left,
+    .receipt-preview-item .r-membership-justify,
+    .receipt-preview-item .r-returned-title,
+    .receipt-preview-item .r-returned-detail,
+    .receipt-preview-item .r-einvoice-remark-log,
+    .receipt-preview-item .r-einvoice-remark,
+    .receipt-preview-item .barcode-container,
+    .receipt-preview-item .barcode-text,
+    .receipt-preview-item .r-section-header-trx,
+    .receipt-preview-item .r-section-item-number,
+    .receipt-preview-item .r-section-barcode-last {
+      break-inside: avoid;
+      page-break-inside: avoid;
     }
 
     /* ============ PRINT ============ */
@@ -442,12 +469,22 @@
       }
       #receiptPreviewContainer { display: block !important; width: 100% !important; }
       .a4-preview-page {
-        width: 8.27in !important; height: 11.69in !important;
-        box-shadow: none !important; padding: 0.4in !important; margin: 0 !important;
-        page-break-after: always; break-after: page; overflow: hidden !important;
+        width: 8.27in !important;
+        height: 11.69in !important;
+        box-shadow: none !important;
+        padding: 0.4in !important;
+        margin: 0 !important;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden !important;
+        column-count: 2;
+        column-gap: 0.5in;
+        column-fill: auto;
       }
       .a4-preview-page:last-child { page-break-after: auto; break-after: auto; }
       .a4-preview-page::after { display: none !important; }
+      .a4-preview-page.a4-single-col { column-count: 1; }
+
       .receipt-preview-item {
         width: 3.2in !important; max-width: 3.2in !important;
         font-size: var(--body-font-size) !important; font-weight: 600 !important;
@@ -455,7 +492,36 @@
         line-height: 1.05 !important; box-shadow: none !important;
         letter-spacing: -1.2px; border-bottom: none !important;
         padding-bottom: 0 !important; text-align: left !important;
+        break-inside: auto;
+        page-break-inside: auto;
       }
+      .receipt-block { break-inside: auto; page-break-inside: auto; margin-bottom: 20px; }
+
+      /* Kekal item utuh dalam print */
+      .receipt-preview-item > div,
+      .receipt-preview-item .r-item-row,
+      .receipt-preview-item .r-price-row,
+      .receipt-preview-item .r-normal,
+      .receipt-preview-item .r-bold,
+      .receipt-preview-item .r-center,
+      .receipt-preview-item .r-nowrap,
+      .receipt-preview-item .r-trx-normal,
+      .receipt-preview-item .r-trx-flex,
+      .receipt-preview-item .r-card-normal,
+      .receipt-preview-item .r-date-left,
+      .receipt-preview-item .r-membership-justify,
+      .receipt-preview-item .r-returned-title,
+      .receipt-preview-item .r-returned-detail,
+      .receipt-preview-item .r-einvoice-remark-log,
+      .receipt-preview-item .r-einvoice-remark,
+      .receipt-preview-item .barcode-container,
+      .receipt-preview-item .barcode-text,
+      .receipt-preview-item .r-section-header-trx,
+      .receipt-preview-item .r-section-barcode-last {
+        break-inside: avoid;
+        page-break-inside: avoid;
+      }
+
       .r-header-main { font-size: var(--header-main-size) !important; line-height: 1 !important; margin-top: 0 !important; text-align: center !important; }
       .r-header-branch { font-size: var(--header-branch-size) !important; line-height: 1 !important; margin-top: 0 !important; margin-bottom: 2px !important; text-align: center !important; }
       .r-dash { margin: 2px 0 !important; }
@@ -472,7 +538,6 @@
       .r-einvoice-remark-log { font-size: 10pt !important; text-align: left !important; letter-spacing: -1.4px; }
       .r-returned-title { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
       .r-returned-detail { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
-      .split-part { min-height: 0 !important; }
     }
 
     @media (max-width: 1100px) {
@@ -501,7 +566,6 @@
   <div class="layout">
     <div class="form-panel">
 
-      <!-- 1. Log input -->
       <div class="card">
         <div class="card-header">
           <div class="icon">
@@ -520,7 +584,6 @@
         </div>
       </div>
 
-      <!-- 2. Cashier (naik atas) -->
       <div class="card">
         <div class="card-header">
           <div class="icon success">
@@ -543,7 +606,6 @@
         </div>
       </div>
 
-      <!-- 3. Settings (collapsible, bawah) -->
       <div class="card settings-card">
         <div class="card-header settings-toggle" id="settingsToggle" style="cursor: pointer; user-select: none;">
           <div class="icon warn">
@@ -577,7 +639,6 @@
         </div>
       </div>
 
-      <!-- 4. Generate button -->
       <button class="btn-generate" id="generateBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -930,6 +991,7 @@
   ];
 
   let cashierNames = [];
+  let cashierManualFlags = {};
 
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
@@ -968,6 +1030,7 @@
     if (count === 0) {
       cashierInputsContainer.innerHTML = '<div style="color: var(--c-text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">Paste log untuk detect cashier</div>';
       cashierNames = [];
+      cashierManualFlags = {};
       return;
     }
 
@@ -975,7 +1038,7 @@
     const detectedIds = [];
 
     for (let i = 0; i < count; i++) {
-      if (cashierNames[i] !== undefined && cashierNames[i] !== DEFAULT_CASHIER) {
+      if (cashierManualFlags[i] && cashierNames[i] !== undefined) {
         newNames.push(cashierNames[i]);
         detectedIds.push(null);
       } else {
@@ -997,34 +1060,29 @@
 
       const id = detectedIds[i];
       const mapped = id ? getCashierNameById(id) : null;
+      const isManual = cashierManualFlags[i];
 
-      let itemClass = 'cashier-item';
-      let badgeHtml = '';
-      if (id && mapped) {
-        itemClass += ' detected';
-        badgeHtml = `<span class="badge detected">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
-          ID ${id}
-        </span>`;
+      let rowClass = 'cashier-row';
+      let statusPill = '';
+      if (isManual) {
+        statusPill = `<span class="status-pill manual">Manual</span>`;
+      } else if (id && mapped) {
+        rowClass += ' detected';
+        statusPill = `<span class="status-pill auto" title="ID ${id}">Auto</span>`;
       } else if (id && !mapped) {
-        itemClass += ' unknown';
-        badgeHtml = `<span class="badge unknown">
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
-          ID ${id}
-        </span>`;
+        rowClass += ' unknown';
+        statusPill = `<span class="status-pill unknown" title="ID ${id} tiada dalam senarai">ID?</span>`;
       } else {
-        badgeHtml = `<span class="badge manual">Manual</span>`;
+        statusPill = `<span class="status-pill manual">Manual</span>`;
       }
 
       const div = document.createElement('div');
-      div.className = itemClass;
+      div.className = rowClass;
       div.innerHTML = `
-        <div class="receipt-num">RESIT ${i + 1}</div>
-        <div class="item-head">
-          <div class="item-title">${badgeHtml}</div>
-          ${trxTag ? `<span class="trx-tag">${escapeHtml(trxTag)}</span>` : ''}
-        </div>
-        <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama cashier resit ${i + 1}">
+        <span class="resit-num">R${i + 1}</span>
+        <span class="trx-num" title="${escapeHtml(trxTag)}">${escapeHtml(trxTag || '—')}</span>
+        <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama">
+        ${statusPill}
       `;
       cashierInputsContainer.appendChild(div);
     }
@@ -1033,6 +1091,17 @@
       input.addEventListener('input', (e) => {
         const idx = parseInt(e.target.getAttribute('data-index'), 10);
         cashierNames[idx] = e.target.value;
+        cashierManualFlags[idx] = true;
+        const row = input.closest('.cashier-row');
+        if (row) {
+          const pill = row.querySelector('.status-pill');
+          if (pill) {
+            pill.className = 'status-pill manual';
+            pill.textContent = 'Manual';
+            pill.title = '';
+          }
+          row.classList.remove('detected', 'unknown');
+        }
         updatePreview();
       });
     });
@@ -1073,7 +1142,6 @@
     lines.forEach(line => {
       if (!line) return;
 
-      // Capture FULL date line — kekalkan format asal
       const cashierLineMatch = line.match(/^\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}\s+\d+)/);
       if (cashierLineMatch) {
         data.dateLine = cashierLineMatch[1].trim();
@@ -1390,72 +1458,10 @@
     return Math.floor(usable) - 4;
   }
 
-  function splitReceiptIntoParts(r, columnHeight) {
-    const tailItems = [
-      ...r.bodyItems.map(html => ({ html })),
-      { html: r.footerNoteHtml },
-      { html: r.promoHtml },
-      { html: r.cashierHtml },
-    ].filter(x => x.html);
-
-    const temp = document.createElement('div');
-    temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3.2in;';
-    document.body.appendChild(temp);
-
-    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.headerHtml}</div>`;
-    const headerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
-
-    const itemHeights = tailItems.map(it => {
-      temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}"><div class="r-section-item-number">${it.html}</div></div>`;
-      return temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
-    });
-
-    temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.footerHtml}</div>`;
-    const footerH = temp.querySelector('.receipt-preview-item').getBoundingClientRect().height;
-
-    temp.remove();
-
-    const MAX = columnHeight;
-    const parts = [];
-    let current = [];
-    let currentH = headerH;
-    let isFirstPart = true;
-
-    for (let i = 0; i < tailItems.length; i++) {
-      const h = itemHeights[i];
-      if (currentH + h > MAX && current.length > 0) {
-        parts.push({ items: current, includeHeader: isFirstPart });
-        isFirstPart = false;
-        current = [];
-        currentH = 0;
-      }
-      current.push(tailItems[i].html);
-      currentH += h;
-    }
-
-    if (current.length > 0) {
-      if (currentH + footerH > MAX && current.length > 1) {
-        const last = current.pop();
-        parts.push({ items: current, includeHeader: isFirstPart });
-        isFirstPart = false;
-        current = [last];
-      }
-      parts.push({ items: current, includeHeader: isFirstPart, includeFooter: true });
-    } else if (parts.length > 0) {
-      parts[parts.length - 1].includeFooter = true;
-    } else {
-      parts.push({ items: [], includeHeader: true, includeFooter: true });
-    }
-
-    return parts.map(p => `<div class="receipt-preview-item">
-      ${p.includeHeader ? r.headerHtml : ''}
-      <div class="r-section-item-number">${p.items.join('')}</div>
-      ${p.includeFooter ? r.footerHtml : ''}
-    </div>`);
-  }
-
   // ============================================================
-  // BIN PACKING: minimize gap bawah receipt
+  // APPROACH C: CSS column-count untuk natural flow
+  // Receipt = 1 blok utuh, auto flow ke column/page seterusnya
+  // Item kekal utuh (break-inside: avoid dalam CSS)
   // ============================================================
   function updatePreview() {
     const log = logInput.value;
@@ -1501,65 +1507,53 @@
     const heights = Array.from(fullItems).map(el => el.getBoundingClientRect().height);
     hiddenWrap.remove();
 
-    // BIN PACKING UNITS — receipt penuh atau parts
-    const units = [];
+    // Kira berapa unit setiap receipt perlukan
+    // Short (< A4_COLUMN_H) = 1 unit, panjang = ceil(height / A4_COLUMN_H)
+    const units = receipts.map((r, i) => ({
+      receipt: r,
+      height: heights[i],
+      units: Math.max(1, Math.ceil(heights[i] / A4_COLUMN_H))
+    }));
 
-    receipts.forEach((r, i) => {
-      if (heights[i] > A4_COLUMN_H) {
-        // Split receipt panjang
-        const partsHtml = splitReceiptIntoParts(r, A4_COLUMN_H);
-        const measureWrap = document.createElement('div');
-        measureWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3.2in;';
-        document.body.appendChild(measureWrap);
-        partsHtml.forEach(html => {
-          measureWrap.innerHTML = html;
-          const el = measureWrap.querySelector('.receipt-preview-item');
-          const h = el ? el.getBoundingClientRect().height : 0;
-          units.push({ html, height: h });
-        });
-        measureWrap.remove();
+    // Group units into A4 pages
+    const pages = [];
+    let currentPage = [];
+    let currentPageUnits = 0;
+
+    units.forEach(u => {
+      if (u.units > 1) {
+        // Long receipt — page sendiri (CSS flow ke column 2)
+        if (currentPage.length > 0) {
+          pages.push(currentPage);
+          currentPage = [];
+          currentPageUnits = 0;
+        }
+        pages.push([u]);
       } else {
-        units.push({ html: buildFullHtml(r), height: heights[i] });
-      }
-    });
-
-    // FIRST FIT: susun units ke columns
-    const columns = [];
-
-    units.forEach(unit => {
-      let placed = false;
-      for (const col of columns) {
-        if (col.height + unit.height <= A4_COLUMN_H) {
-          col.units.push(unit);
-          col.height += unit.height;
-          placed = true;
-          break;
+        // Short receipt — pair dengan short lain
+        currentPage.push(u);
+        currentPageUnits += 1;
+        if (currentPageUnits >= 2) {
+          pages.push(currentPage);
+          currentPage = [];
+          currentPageUnits = 0;
         }
       }
-      if (!placed) {
-        columns.push({ units: [unit], height: unit.height });
-      }
     });
 
-    // Pair columns jadi A4 pages (2 columns per page)
-    const pages = [];
-    for (let i = 0; i < columns.length; i += 2) {
-      pages.push(columns.slice(i, i + 2));
+    if (currentPage.length > 0) {
+      pages.push(currentPage);
     }
 
     let finalHtml = '';
-    pages.forEach(pageCols => {
-      if (pageCols.length === 2) {
-        finalHtml += `<div class="a4-preview-page">`;
-        pageCols.forEach(col => {
-          finalHtml += `<div class="split-part">${col.units.map(u => u.html).join('')}</div>`;
-        });
-        finalHtml += `</div>`;
-      } else {
-        finalHtml += `<div class="a4-preview-page a4-single-col">`;
-        finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${pageCols[0].units.map(u => u.html).join('')}</div>`;
-        finalHtml += `</div>`;
-      }
+    pages.forEach(pageUnits => {
+      const isSingle = pageUnits.length === 1;
+      const cls = isSingle ? 'a4-preview-page a4-single-col' : 'a4-preview-page';
+      finalHtml += `<div class="${cls}">`;
+      pageUnits.forEach(u => {
+        finalHtml += `<div class="receipt-block">${buildFullHtml(u.receipt)}</div>`;
+      });
+      finalHtml += `</div>`;
     });
 
     previewContainer.innerHTML = finalHtml;
@@ -1594,7 +1588,6 @@
     document.documentElement.style.setProperty('--print-margin', val + 'mm');
   });
 
-  // Settings toggle (collapsible)
   const settingsToggle = document.getElementById('settingsToggle');
   const settingsBody = document.getElementById('settingsBody');
   const settingsChevron = document.getElementById('settingsChevron');
