@@ -15,7 +15,7 @@
       --barcode-text-size: 1.1rem;
       --max-width-header-trx: 6.7cm;
       --max-width-item-number: 6.2cm;
-      --max-width-membership-pmy: 6.3cm;
+      --max-width-membership-pmy: 6.5cm;
       --max-width-barcode-last: 7.2cm;
       --receipt-width: 3.2in;
       --a4-width: 8.27in;
@@ -169,7 +169,7 @@
     .r-trx-flex .r-trx-label { text-align: left; flex: 1; white-space: nowrap; }
     .r-trx-flex .r-trx-star { text-align: right; white-space: nowrap; }
     
-    .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
+    .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: -0.3pt; width: 100%; text-align: left; }
     .r-price-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; font-weight: 900; }
     .r-price-row .r-label { text-align: left; flex: 1; }
     .r-price-row .r-value { text-align: right; white-space: nowrap; }
@@ -186,13 +186,13 @@
     }
 
     .r-einvoice-remark-log {
-      font-size: var(--body-font-size); font-weight: 900;letter-spacing: 0px;
+      font-size: var(--body-font-size); font-weight: 900;letter-spacing: -1px;
       text-align: left; width: 100%; margin-top: 3px;
       line-height: 1.1; color: #000;
     }
 
     .r-einvoice-remark {
-      font-size: 10pt; font-weight: 400; text-align: left;letter-spacing: 0px;
+      font-size: 10pt; font-weight: 400; text-align: left;letter-spacing: -1px;
       width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
     }
 
@@ -263,12 +263,12 @@
       .barcode-text { font-size: var(--barcode-text-size) !important; letter-spacing: 4.5px !important; display: block; width: 100%; margin-top: 0 !important; padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; text-align: center !important; }
       .r-www { text-align: center !important; }
       .r-membership-justify { letter-spacing: 3px !important; gap: 0px !important; text-align: left !important; }
-      .r-card-normal { text-align: left !important; }
+      .r-card-normal { text-align: left !important;letter-spacing: -0.3px  }
       .r-trx-normal { text-align: left !important; }
       .r-trx-flex { display: flex !important; justify-content: space-between !important; }
       .r-date-left { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
-      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; }
-      .r-einvoice-remark-log { font-size: var(--body-font-size) !important; text-align: left !important; }
+      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important;letter-spacing: -0.5px  }
+      .r-einvoice-remark-log { font-size: 10pt !important; text-align: left !important;letter-spacing: -1.4px  }
       .r-returned-title { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
       .r-returned-detail { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
       .split-part { min-height: 0 !important; }
