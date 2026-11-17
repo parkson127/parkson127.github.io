@@ -45,7 +45,6 @@
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
-    /* ============ APP LAYOUT ============ */
     .app { max-width: 1440px; margin: 0 auto; width: 100%; }
 
     .app-header {
@@ -71,7 +70,6 @@
       align-items: flex-start;
     }
 
-    /* ============ CARD ============ */
     .card {
       background: var(--c-surface);
       border-radius: var(--radius-lg);
@@ -98,7 +96,6 @@
     .card-header .subtitle { font-size: 0.75rem; color: var(--c-text-muted); margin-top: 1px; }
     .card-body { padding: 16px 18px; }
 
-    /* ============ FORM PANEL ============ */
     .form-panel {
       display: flex; flex-direction: column; gap: 16px;
       position: sticky; top: 24px;
@@ -131,10 +128,9 @@
     }
     .log-textarea::placeholder { color: #64748b; }
 
-    /* ============ CASHIER CARDS ============ */
     .cashier-list {
       display: flex; flex-direction: column; gap: 10px;
-      max-height: 420px;
+      max-height: 520px;
       overflow-y: auto;
       padding-right: 4px;
       scroll-behavior: smooth;
@@ -154,7 +150,6 @@
     .cashier-item.detected { background: #f0fdf4; border-color: #86efac; }
     .cashier-item.unknown { background: #fef2f2; border-color: #fca5a5; }
 
-    /* Big receipt number badge — left side */
     .cashier-item .receipt-num {
       position: absolute;
       top: -8px;
@@ -220,10 +215,7 @@
       box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
     }
 
-    /* ============ SETTINGS ============ */
-    .field {
-      display: flex; flex-direction: column; gap: 6px;
-    }
+    .field { display: flex; flex-direction: column; gap: 6px; }
     .field label {
       font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted);
       text-transform: uppercase; letter-spacing: 0.5px;
@@ -287,7 +279,6 @@
     }
     .btn-generate:active { transform: translateY(0); }
 
-    /* ============ PREVIEW ============ */
     .preview-panel { min-height: 400px; display: flex; flex-direction: column; }
     .preview-scroll {
       padding: 20px;
@@ -510,14 +501,13 @@
   <div class="layout">
     <div class="form-panel">
 
+      <!-- 1. Log input -->
       <div class="card">
         <div class="card-header">
           <div class="icon">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
               <polyline points="14 2 14 8 20 8"></polyline>
-              <line x1="16" y1="13" x2="8" y2="13"></line>
-              <line x1="16" y1="17" x2="8" y2="17"></line>
             </svg>
           </div>
           <div>
@@ -530,6 +520,7 @@
         </div>
       </div>
 
+      <!-- 2. Cashier (naik atas) -->
       <div class="card">
         <div class="card-header">
           <div class="icon success">
@@ -552,20 +543,24 @@
         </div>
       </div>
 
-      <div class="card">
-        <div class="card-header">
+      <!-- 3. Settings (collapsible, bawah) -->
+      <div class="card settings-card">
+        <div class="card-header settings-toggle" id="settingsToggle" style="cursor: pointer; user-select: none;">
           <div class="icon warn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="12" cy="12" r="3"></circle>
               <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
             </svg>
           </div>
-          <div>
+          <div style="flex: 1;">
             <h2>Settings</h2>
             <div class="subtitle">PMY code & print margin</div>
           </div>
+          <svg class="chevron" id="settingsChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--c-text-muted);">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
         </div>
-        <div class="card-body">
+        <div class="card-body" id="settingsBody" style="display: none;">
           <div style="display: flex; flex-direction: column; gap: 16px;">
             <div class="field">
               <label>PMY Code</label>
@@ -582,6 +577,7 @@
         </div>
       </div>
 
+      <!-- 4. Generate button -->
       <button class="btn-generate" id="generateBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -945,9 +941,7 @@
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
-  // ============ CASHIER ID EXTRACTION ============
   function extractCashierId(receiptText) {
-    // Pattern: |N<7-digit> <6-digit cashier ID> <terminal> <...> <date> <time>
     const mainMatch = receiptText.match(/\|N\d{7}\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
     if (mainMatch && mainMatch[1]) return mainMatch[1];
     const lines = receiptText.split('\n');
@@ -966,20 +960,6 @@
     return null;
   }
 
-  // ============ DATE LINE EXTRACTION ============
-  // Extract date portion from cashier line: "|N0245538 896870 319 01 30/10/26 14:32 127"
-  // Result: "0245538 896870 319 01 30/10/26 14:32 127" (original full line)
-  // Or the date only: "30/10/26 14:32"
-  function extractDateLine(receiptText) {
-    const match = receiptText.match(/\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2})/);
-    if (match && match[1]) {
-      // Return full line tanpa |N prefix
-      return match[1].trim();
-    }
-    return null;
-  }
-
-  // ============ CASHIER INPUTS UI ============
   function rebuildCashierInputs() {
     const log = logInput.value;
     const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
@@ -1020,17 +1000,14 @@
 
       let itemClass = 'cashier-item';
       let badgeHtml = '';
-      let receiptNumClass = '';
       if (id && mapped) {
         itemClass += ' detected';
-        receiptNumClass = 'detected';
         badgeHtml = `<span class="badge detected">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           ID ${id}
         </span>`;
       } else if (id && !mapped) {
         itemClass += ' unknown';
-        receiptNumClass = 'unknown';
         badgeHtml = `<span class="badge unknown">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
           ID ${id}
@@ -1044,9 +1021,7 @@
       div.innerHTML = `
         <div class="receipt-num">RESIT ${i + 1}</div>
         <div class="item-head">
-          <div class="item-title">
-            ${badgeHtml}
-          </div>
+          <div class="item-title">${badgeHtml}</div>
           ${trxTag ? `<span class="trx-tag">${escapeHtml(trxTag)}</span>` : ''}
         </div>
         <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama cashier resit ${i + 1}">
@@ -1063,7 +1038,6 @@
     });
   }
 
-  // ============ RECEIPT PARSING ============
   function parseSingleReceipt(receiptText, cashier, pmy) {
     let cleanText = receiptText.replace(/[•\x1b]/g, '');
 
@@ -1099,12 +1073,12 @@
     lines.forEach(line => {
       if (!line) return;
 
-      // Capture FULL date line from cashier line — sama macam receipt asal
-const cashierLineMatch = line.match(/^\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}\s+\d+)/);
-if (cashierLineMatch) {
-  data.dateLine = cashierLineMatch[1].trim(); // ← FULL line, bukan date only
-  return;
-}
+      // Capture FULL date line — kekalkan format asal
+      const cashierLineMatch = line.match(/^\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}\s+\d+)/);
+      if (cashierLineMatch) {
+        data.dateLine = cashierLineMatch[1].trim();
+        return;
+      }
 
       if (line.startsWith('|4C')) {
         const txt = line.substring(3).trim();
@@ -1136,7 +1110,6 @@ if (cashierLineMatch) {
           data.companyLines.push(txt);
         }
         else if (txt.match(/\d{2}\/\d{2}\/\d{2} \d{2}:\d{2}/)) {
-          // Fallback kalau ada date line lain
           if (!data.dateLine) data.dateLine = txt;
         }
         else if (txt.includes('----')) {
@@ -1481,6 +1454,9 @@ if (cashierLineMatch) {
     </div>`);
   }
 
+  // ============================================================
+  // BIN PACKING: minimize gap bawah receipt
+  // ============================================================
   function updatePreview() {
     const log = logInput.value;
     const pmy = pmyCodeInput.value;
@@ -1516,6 +1492,7 @@ if (cashierLineMatch) {
 
     const A4_COLUMN_H = getA4ColumnHeight();
 
+    // Measure tinggi setiap receipt
     const hiddenWrap = document.createElement('div');
     hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3.2in;';
     document.body.appendChild(hiddenWrap);
@@ -1524,51 +1501,64 @@ if (cashierLineMatch) {
     const heights = Array.from(fullItems).map(el => el.getBoundingClientRect().height);
     hiddenWrap.remove();
 
-    const SHORT_THRESHOLD = A4_COLUMN_H;
-    const pages = [];
-    let shortQueue = [];
+    // BIN PACKING UNITS — receipt penuh atau parts
+    const units = [];
 
-    function flushShortQueue() {
-      while (shortQueue.length > 0) {
-        if (shortQueue.length >= 2) {
-          pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
-        } else {
-          pages.push({ type: 'single', indices: [shortQueue.shift()] });
-        }
-      }
-    }
-
-    heights.forEach((h, i) => {
-      if (h > SHORT_THRESHOLD) {
-        flushShortQueue();
-        const partsHtml = splitReceiptIntoParts(receipts[i], A4_COLUMN_H);
-        for (let k = 0; k < partsHtml.length; k += 2) {
-          pages.push({ type: 'parts', htmls: partsHtml.slice(k, k + 2) });
-        }
+    receipts.forEach((r, i) => {
+      if (heights[i] > A4_COLUMN_H) {
+        // Split receipt panjang
+        const partsHtml = splitReceiptIntoParts(r, A4_COLUMN_H);
+        const measureWrap = document.createElement('div');
+        measureWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3.2in;';
+        document.body.appendChild(measureWrap);
+        partsHtml.forEach(html => {
+          measureWrap.innerHTML = html;
+          const el = measureWrap.querySelector('.receipt-preview-item');
+          const h = el ? el.getBoundingClientRect().height : 0;
+          units.push({ html, height: h });
+        });
+        measureWrap.remove();
       } else {
-        shortQueue.push(i);
-        if (shortQueue.length === 2) {
-          pages.push({ type: 'pair', indices: [shortQueue.shift(), shortQueue.shift()] });
-        }
+        units.push({ html: buildFullHtml(r), height: heights[i] });
       }
     });
-    flushShortQueue();
+
+    // FIRST FIT: susun units ke columns
+    const columns = [];
+
+    units.forEach(unit => {
+      let placed = false;
+      for (const col of columns) {
+        if (col.height + unit.height <= A4_COLUMN_H) {
+          col.units.push(unit);
+          col.height += unit.height;
+          placed = true;
+          break;
+        }
+      }
+      if (!placed) {
+        columns.push({ units: [unit], height: unit.height });
+      }
+    });
+
+    // Pair columns jadi A4 pages (2 columns per page)
+    const pages = [];
+    for (let i = 0; i < columns.length; i += 2) {
+      pages.push(columns.slice(i, i + 2));
+    }
 
     let finalHtml = '';
-    pages.forEach(page => {
-      if (page.type === 'parts') {
-        const cols = page.htmls;
-        if (cols.length === 2) {
-          finalHtml += `<div class="a4-preview-page"><div class="split-part">${cols[0]}</div><div class="split-part">${cols[1]}</div></div>`;
-        } else {
-          finalHtml += `<div class="a4-preview-page a4-single-col"><div class="split-part" style="grid-column: 1 / -1;">${cols[0]}</div></div>`;
-        }
-      } else if (page.type === 'pair') {
-        const [a, b] = page.indices;
-        finalHtml += `<div class="a4-preview-page"><div class="split-part">${buildFullHtml(receipts[a])}</div><div class="split-part">${buildFullHtml(receipts[b])}</div></div>`;
+    pages.forEach(pageCols => {
+      if (pageCols.length === 2) {
+        finalHtml += `<div class="a4-preview-page">`;
+        pageCols.forEach(col => {
+          finalHtml += `<div class="split-part">${col.units.map(u => u.html).join('')}</div>`;
+        });
+        finalHtml += `</div>`;
       } else {
-        const idx = page.indices[0];
-        finalHtml += `<div class="a4-preview-page a4-single-col"><div class="split-part" style="grid-column: 1 / -1;">${buildFullHtml(receipts[idx])}</div></div>`;
+        finalHtml += `<div class="a4-preview-page a4-single-col">`;
+        finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${pageCols[0].units.map(u => u.html).join('')}</div>`;
+        finalHtml += `</div>`;
       }
     });
 
@@ -1602,6 +1592,17 @@ if (cashierLineMatch) {
     const val = this.value;
     marginValue.textContent = val + 'mm';
     document.documentElement.style.setProperty('--print-margin', val + 'mm');
+  });
+
+  // Settings toggle (collapsible)
+  const settingsToggle = document.getElementById('settingsToggle');
+  const settingsBody = document.getElementById('settingsBody');
+  const settingsChevron = document.getElementById('settingsChevron');
+
+  settingsToggle.addEventListener('click', () => {
+    const isOpen = settingsBody.style.display !== 'none';
+    settingsBody.style.display = isOpen ? 'none' : 'block';
+    settingsChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
   });
 
   if (document.readyState === 'complete') {
