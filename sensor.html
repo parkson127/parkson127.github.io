@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Parkson EAS Finder</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    
+    :root {
+      --primary: #1a56db;
+      --primary-dark: #1e429f;
+      --primary-light: #e1effe;
+      --success: #057a55;
+      --success-light: #def7ec;
+      --warning: #c27803;
+      --warning-light: #fdf6b2;
+      --danger: #c81e1e;
+      --danger-light: #fde8e8;
+      --gray-50: #f9fafb;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-300: #d1d5db;
+      --gray-500: #6b7280;
+      --gray-700: #374151;
+      --gray-900: #111827;
+      --radius: 12px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow: 0 1px 3px rgba(0,0,0,0.1), 0 1px 2px rgba(0,0,0,0.06);
+      --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    /* ===== HEADER ===== */
+    .header {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+      color: #fff;
+      padding: 24px 20px;
+      box-shadow: var(--shadow-lg);
+    }
+    .header-inner {
+      max-width: 900px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .header-icon {
+      width: 44px;
+      height: 44px;
+      background: rgba(255,255,255,0.2);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+    .header h1 { font-size: 20px; font-weight: 700; }
+    .header p { font-size: 13px; opacity: 0.85; margin-top: 2px; }
+
+    /* ===== CONTAINER ===== */
+    .container {
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    /* ===== TABS ===== */
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      background: #fff;
+      padding: 6px;
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+    }
+    .tab {
+      flex: 1;
+      padding: 10px 16px;
+      text-align: center;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 500;
+      color: var(--gray-500);
+      transition: all 0.2s;
+      user-select: none;
+    }
+    .tab:hover { background: var(--gray-100); color: var(--gray-700); }
+    .tab.active {
+      background: var(--primary);
+      color: #fff;
+      box-shadow: var(--shadow-sm);
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 20px;
+      margin-bottom: 16px;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-200);
+    }
+    .card-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+    .card-header h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--gray-900);
+    }
+
+    /* ===== FORM ELEMENTS ===== */
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--gray-700);
+      margin-bottom: 6px;
+    }
+    select, input, button {
+      font-family: inherit;
+      font-size: 14px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1px solid var(--gray-300);
+      outline: none;
+      transition: all 0.2s;
+      width: 100%;
+    }
+    select:focus, input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(26,86,219,0.1);
+    }
+    button {
+      background: var(--primary);
+      color: #fff;
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    button:hover { background: var(--primary-dark); }
+    button:active { transform: scale(0.98); }
+    button:disabled { background: var(--gray-300); cursor: not-allowed; }
+
+    .btn-group {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn-group button { width: auto; flex: 1; min-width: 140px; }
+
+    /* ===== WARNING BANNER ===== */
+    .warn {
+      background: var(--warning-light);
+      color: var(--warning);
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-top: 12px;
+      border-left: 4px solid var(--warning);
+      display: flex;
+      gap: 8px;
+      align-items: flex-start;
+    }
+
+    /* ===== RESULT CARD ===== */
+    .result-card {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 16px 20px;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid var(--gray-200);
+      transition: all 0.2s;
+    }
+    .result-card:hover {
+      box-shadow: var(--shadow);
+      border-color: var(--primary-light);
+    }
+    .result-card .distance {
+      float: right;
+      background: var(--primary-light);
+      color: var(--primary-dark);
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .result-card h3 {
+      font-size: 15px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: var(--gray-900);
+    }
+    .badge {
+      display: inline-block;
+      background: var(--gray-100);
+      color: var(--gray-700);
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 500;
+      margin-right: 6px;
+      margin-bottom: 4px;
+    }
+    .badge-primary {
+      background: var(--primary-light);
+      color: var(--primary-dark);
+    }
+    .result-card .phone {
+      font-size: 13px;
+      color: var(--gray-700);
+      margin: 8px 0;
+    }
+    .result-card a {
+      display: inline-block;
+      margin-top: 8px;
+      color: var(--primary);
+      text-decoration: none;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .result-card a:hover { text-decoration: underline; }
+
+    /* ===== TABLE ===== */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: var(--radius);
+      border: 1px solid var(--gray-200);
+      background: #fff;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+      min-width: 700px;
+    }
+    thead {
+      background: var(--gray-50);
+      border-bottom: 1px solid var(--gray-200);
+    }
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 600;
+      color: var(--gray-700);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--gray-100);
+      color: var(--gray-700);
+    }
+    tbody tr:hover { background: var(--gray-50); }
+    tbody tr:last-child td { border-bottom: none; }
+
+    .btn-icon {
+      width: 32px;
+      height: 32px;
+      padding: 0;
+      border-radius: 6px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      margin: 0 2px;
+    }
+    .btn-icon.edit { background: var(--primary-light); color: var(--primary-dark); }
+    .btn-icon.edit:hover { background: var(--primary); color: #fff; }
+    .btn-icon.delete { background: var(--danger-light); color: var(--danger); }
+    .btn-icon.delete:hover { background: var(--danger); color: #fff; }
+
+    /* ===== MODAL ===== */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 16px;
+      backdrop-filter: blur(2px);
+    }
+    .modal-bg.hidden { display: none; }
+    .modal-box {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 24px;
+      max-width: 440px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-lg);
+      animation: modalIn 0.2s ease;
+    }
+    @keyframes modalIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.98); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .modal-box h3 {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      color: var(--gray-900);
+    }
+    .modal-box input, .modal-box select { margin-bottom: 10px; }
+    .modal-actions {
+      display: flex;
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .modal-actions button { flex: 1; }
+    .btn-secondary {
+      background: var(--gray-100);
+      color: var(--gray-700);
+    }
+    .btn-secondary:hover { background: var(--gray-200); }
+
+    /* ===== NOTIS ===== */
+    .notis {
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 13px;
+      margin-bottom: 12px;
+      display: none;
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity 0.3s ease, transform 0.3s ease;
+      font-weight: 500;
+    }
+    .notis.show { display: block; opacity: 1; transform: translateY(0); }
+    .notis.error {
+      background: var(--warning-light);
+      color: var(--warning);
+      border-left: 4px solid var(--warning);
+    }
+    .notis.success {
+      background: var(--success-light);
+      color: var(--success);
+      border-left: 4px solid var(--success);
+    }
+
+    /* ===== LOADING ===== */
+    .loading {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray-500);
+      font-size: 14px;
+    }
+    .spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid var(--gray-200);
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+      margin: 0 auto 12px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .hidden { display: none !important; }
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: var(--gray-500);
+      font-size: 14px;
+    }
+    .empty-state .icon { font-size: 40px; margin-bottom: 8px; }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 600px) {
+      .header h1 { font-size: 17px; }
+      .tab { font-size: 13px; padding: 8px 10px; }
+      .card { padding: 16px; }
+      .btn-group button { min-width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="header-icon">🔍</div>
+      <div>
+        <h1>Parkson EAS Finder</h1>
+        <p>Sistem Carian Sensor Tag & Rekod Cawangan</p>
+      </div>
+    </div>
+  </header>
+
+  <div class="container">
+
+    <!-- TABS -->
+    <div class="tabs">
+      <div class="tab active" onclick="showTab('carian', event)">🔎 Carian</div>
+      <div class="tab" onclick="showTab('rekod', event)">📋 Rekod</div>
+    </div>
+
+    <!-- TAB CARIAN -->
+    <div id="tab-carian">
+      <div class="card">
+        <div class="card-header">
+          <h2>🔎 Cari Cawangan Sama EAS</h2>
+        </div>
+        <label for="storeMain">Customer beli dari store mana:</label>
+        <select id="storeMain"></select>
+        <div style="margin-top:12px;">
+          <button onclick="cariCawangan()">🔎 Cari Cawangan</button>
+        </div>
+        <div class="warn">
+          <span>⚠️</span>
+          <span>Sila telefon cawangan dulu untuk pastikan alat buka tag tersedia.</span>
+        </div>
+      </div>
+      <div id="hasil">
+        <div class="loading">
+          <div class="spinner"></div>
+          Memuatkan data...
+        </div>
+      </div>
+    </div>
+
+    <!-- TAB REKOD -->
+    <div id="tab-rekod" class="hidden">
+      <div class="card">
+        <div class="card-header">
+          <h2>📋 Pengurusan Rekod Store</h2>
+        </div>
+        <div class="btn-group">
+          <button onclick="bukaFormTambah()">+ Tambah Store</button>
+          <button class="btn-secondary" onclick="muatData()">🔄 Refresh</button>
+        </div>
+      </div>
+      <div id="jadualRekod"></div>
+    </div>
+
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal-bg hidden">
+    <div class="modal-box">
+      <h3 id="modalTitle">Tambah Store</h3>
+      <div id="notisModal" class="notis"></div>
+      
+      <label>Store Code (nombor sahaja)</label>
+      <input id="f_code" type="number" min="0" placeholder="Contoh: 1001" oninput="this.style.border=''">
+      
+      <label>Nama Store</label>
+      <input id="f_nama" placeholder="Contoh: Parkson IOI City Mall">
+      
+      <label>State</label>
+      <select id="f_state"></select>
+      
+      <label>Phone</label>
+      <input id="f_phone" placeholder="Contoh: 03-8953 8398">
+      
+      <label>Type EAS</label>
+      <select id="f_eas">
+        <option>AM</option>
+        <option>RF</option>
+        <option>AM+RF</option>
+      </select>
+      
+      <label>Latitude</label>
+      <input id="f_lat" placeholder="Contoh: 2.9700">
+      
+      <label>Longitude</label>
+      <input id="f_lng" placeholder="Contoh: 101.7130">
+      
+      <label>Store Status</label>
+      <select id="f_status">
+        <option>Active</option>
+        <option>Coming Soon</option>
+        <option>Closed</option>
+      </select>
+      
+      <div class="modal-actions">
+        <button onclick="simpanStore()">💾 Simpan</button>
+        <button class="btn-secondary" onclick="tutupModal()">❌ Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ====== URL API ANDA ======
+    const API_URL = 'https://script.google.com/macros/s/AKfycbymryaHYZ8AfEXJURVraWjVsMVM37BJnjRdXeF0EMy9I6X3L-zXv25x89mjrAtmWt4R2g/exec';
+
+    const SENARAI_NEGERI = ["Johor","Kedah","Kelantan","Melaka","Negeri Sembilan","Pahang","Perak","Perlis","Pulau Pinang","Sabah","Sarawak","Selangor","Terengganu","Kuala Lumpur","Labuan","Putrajaya"];
+
+    let parksonData = [];
+    let modeEdit = false;
+
+    // ====== INIT ======
+    window.onload = function() {
+      isiDropdownState();
+      muatData();
+    };
+
+    function isiDropdownState() {
+      const sel = document.getElementById("f_state");
+      sel.innerHTML = "";
+      SENARAI_NEGERI.forEach(n => {
+        const opt = document.createElement("option");
+        opt.value = n;
+        opt.textContent = n;
+        sel.appendChild(opt);
+      });
+    }
+
+    // ====== MUAT DATA ======
+    function muatData() {
+      document.getElementById("hasil").innerHTML = 
+        '<div class="loading"><div class="spinner"></div>Memuatkan data...</div>';
+      
+      fetch(API_URL + '?t=' + Date.now())
+        .then(res => res.json())
+        .then(data => {
+          parksonData = data;
+          isiDropdownStore();
+          paparRekod();
+          document.getElementById("hasil").innerHTML = 
+            '<div class="empty-state"><div class="icon">👆</div>Pilih store main dan klik "Cari Cawangan".</div>';
+        })
+        .catch(err => {
+          console.error(err);
+          document.getElementById("hasil").innerHTML = 
+            '<div class="card"><div class="notis error show">❌ Gagal muat data. Sila refresh page.</div></div>';
+        });
+    }
+
+    // ====== ISI DROPDOWN STORE ======
+    function isiDropdownStore() {
+      const select = document.getElementById("storeMain");
+      select.innerHTML = "";
+      parksonData.forEach(s => {
+        const opt = document.createElement("option");
+        opt.value = s["Store Code"];
+        opt.textContent = `${s["Store Code"]} | ${s["Store Name"]}`;
+        select.appendChild(opt);
+      });
+    }
+
+    // ====== HAVERSINE ======
+    function haversine(lat1, lon1, lat2, lon2) {
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+      const a = Math.sin(dLat/2) ** 2 +
+                Math.cos(lat1 * Math.PI/180) * Math.cos(lat2 * Math.PI/180) *
+                Math.sin(dLon/2) ** 2;
+      return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    // ====== CARIAN ======
+    function cariCawangan() {
+      const mainCode = document.getElementById("storeMain").value;
+      const main = parksonData.find(s => String(s["Store Code"]) === mainCode);
+      const hasilDiv = document.getElementById("hasil");
+      if (!main) { hasilDiv.innerHTML = ""; return; }
+
+      const sama = parksonData.filter(s =>
+        String(s["Store Code"]) !== mainCode && 
+        s["Type EAS"] === main["Type EAS"]
+      );
+
+      if (sama.length === 0) {
+        hasilDiv.innerHTML = `<div class="card"><div class="notis error show">❌ Tiada cawangan lain dengan EAS sama (${main["Type EAS"]}).</div></div>`;
+        return;
+      }
+
+      const denganJarak = sama.map(s => ({
+        ...s,
+        jarak: haversine(Number(main["Latitude"]), Number(main["Longitude"]), Number(s["Latitude"]), Number(s["Longitude"]))
+      })).sort((a, b) => a.jarak - b.jarak);
+
+      hasilDiv.innerHTML = `
+        <div class="card" style="background:var(--primary-light);border-color:var(--primary);">
+          <strong style="color:var(--primary-dark);">Store main:</strong> ${main["Store Code"]} | ${main["Store Name"]}<br>
+          <strong style="color:var(--primary-dark);">EAS:</strong> ${main["Type EAS"]}
+        </div>
+        <h3 style="font-size:15px;margin:16px 0 12px;color:var(--gray-700);">📍 Cawangan sama EAS — paling dekat dulu:</h3>
+      ` + denganJarak.map(s => `
+        <div class="result-card">
+          <span class="distance">📏 ${s.jarak.toFixed(1)} km</span>
+          <h3>${s["Store Code"]} | ${s["Store Name"]}</h3>
+          <span class="badge badge-primary">${s["State"]}</span>
+          <span class="badge">EAS: ${s["Type EAS"]}</span>
+          <div class="phone">📞 ${s["Phone"]}</div>
+          <a href="https://www.google.com/maps/dir/?api=1&destination=${s["Latitude"]},${s["Longitude"]}" target="_blank">🗺️ Buka Peta</a>
+        </div>
+      `).join("");
+    }
+
+    // ====== PAPAR JADUAL REKOD ======
+    function paparRekod() {
+      const div = document.getElementById("jadualRekod");
+      if (parksonData.length === 0) {
+        div.innerHTML = '<div class="card"><div class="empty-state"><div class="icon">📋</div>Tiada rekod. Klik "+ Tambah Store" untuk mula.</div></div>';
+        return;
+      }
+      div.innerHTML = `
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Code</th>
+                <th>Nama</th>
+                <th>State</th>
+                <th>Phone</th>
+                <th>EAS</th>
+                <th>Status</th>
+                <th>Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${parksonData.map(s => `
+                <tr>
+                  <td><strong>${s["Store Code"]}</strong></td>
+                  <td>${s["Store Name"]}</td>
+                  <td>${s["State"]}</td>
+                  <td>${s["Phone"]}</td>
+                  <td><span class="badge badge-primary">${s["Type EAS"]}</span></td>
+                  <td>${s["Store Status"] || "Active"}</td>
+                  <td style="text-align:center;white-space:nowrap;">
+                    <button class="btn-icon edit" onclick="bukaFormEdit('${s["Store Code"]}')" title="Edit">✏️</button>
+                    <button class="btn-icon delete" onclick="padamStore('${s["Store Code"]}')" title="Padam">🗑️</button>
+                  </td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>
+        </div>
+      `;
+    }
+
+    // ====== NOTIS ======
+    function paparNotis(mesej, jenis) {
+      const el = document.getElementById("notisModal");
+      el.textContent = mesej;
+      el.className = "notis show " + jenis;
+    }
+
+    function sembunyiNotis() {
+      const el = document.getElementById("notisModal");
+      el.classList.remove("show");
+      setTimeout(() => {
+        el.className = "notis";
+        el.textContent = "";
+      }, 300);
+    }
+
+    // ====== TAMBAH / EDIT ======
+    function bukaFormTambah() {
+      modeEdit = false;
+      document.getElementById("modalTitle").textContent = "Tambah Store";
+      ["f_code","f_nama","f_phone","f_lat","f_lng"].forEach(id => document.getElementById(id).value = "");
+      document.getElementById("f_state").selectedIndex = 0;
+      document.getElementById("f_eas").selectedIndex = 0;
+      document.getElementById("f_status").selectedIndex = 0;
+      document.getElementById("f_code").disabled = false;
+      document.getElementById("f_code").style.border = "";
+      sembunyiNotis();
+      document.getElementById("modal").classList.remove("hidden");
+      setTimeout(() => document.getElementById("f_code").focus(), 100);
+    }
+
+    function bukaFormEdit(code) {
+      modeEdit = true;
+      const s = parksonData.find(x => String(x["Store Code"]) === String(code));
+      if (!s) return;
+      document.getElementById("modalTitle").textContent = "Edit Store";
+      document.getElementById("f_code").value = s["Store Code"];
+      document.getElementById("f_code").disabled = true;
+      document.getElementById("f_nama").value = s["Store Name"];
+      document.getElementById("f_state").value = s["State"];
+      document.getElementById("f_phone").value = s["Phone"];
+      document.getElementById("f_eas").value = s["Type EAS"];
+      document.getElementById("f_lat").value = s["Latitude"];
+      document.getElementById("f_lng").value = s["Longitude"];
+      document.getElementById("f_status").value = s["Store Status"] || "Active";
+      document.getElementById("f_code").style.border = "";
+      sembunyiNotis();
+      document.getElementById("modal").classList.remove("hidden");
+      setTimeout(() => document.getElementById("f_nama").focus(), 100);
+    }
+
+    function tutupModal() {
+      document.getElementById("modal").classList.add("hidden");
+      const el = document.getElementById("notisModal");
+      el.className = "notis";
+      el.textContent = "";
+    }
+
+    // ====== SIMPAN ======
+    function simpanStore() {
+      sembunyiNotis();
+
+      const data = {
+        store_code: document.getElementById("f_code").value.trim(),
+        nama_store: document.getElementById("f_nama").value.trim(),
+        state: document.getElementById("f_state").value,
+        phone: document.getElementById("f_phone").value.trim(),
+        type_eas: document.getElementById("f_eas").value,
+        lat: document.getElementById("f_lat").value.trim(),
+        lng: document.getElementById("f_lng").value.trim(),
+        store_status: document.getElementById("f_status").value
+      };
+
+      if (!data.store_code || !data.nama_store) {
+        paparNotis("⚠️ Store Code dan Nama Store wajib diisi!", "error");
+        if (!data.store_code) {
+          const el = document.getElementById("f_code");
+          el.style.border = "2px solid var(--danger)";
+          el.focus();
+          el.select();
+        } else {
+          document.getElementById("f_nama").focus();
+        }
+        return;
+      }
+
+      if (!/^\d+$/.test(data.store_code)) {
+        paparNotis("⚠️ Store Code mesti nombor sahaja (contoh: 1001)!", "error");
+        const el = document.getElementById("f_code");
+        el.style.border = "2px solid var(--danger)";
+        el.focus();
+        el.select();
+        return;
+      }
+
+      const action = modeEdit ? "edit" : "add";
+
+      fetch(API_URL, {
+        method: "POST",
+        body: new URLSearchParams({ action, data: JSON.stringify(data) })
+      })
+      .then(res => res.json())
+      .then(res => {
+        if (res.success) {
+          paparNotis("✅ " + res.message, "success");
+          setTimeout(() => {
+            tutupModal();
+            muatData();
+          }, 1200);
+        } else {
+          paparNotis("⚠️ " + res.message + " Sila guna nombor lain.", "error");
+          const codeInput = document.getElementById("f_code");
+          codeInput.style.border = "2px solid var(--danger)";
+          codeInput.focus();
+          codeInput.select();
+        }
+      })
+      .catch(err => {
+        paparNotis("❌ Ralat: " + err, "error");
+      });
+    }
+
+    // ====== PADAM ======
+    function padamStore(code) {
+      if (!confirm("Padam store " + code + "? Tindakan tidak boleh diundo.")) return;
+      fetch(API_URL, {
+        method: "POST",
+        body: new URLSearchParams({ action: "delete", store_code: code })
+      })
+      .then(res => res.json())
+      .then(res => {
+        alert(res.message);
+        if (res.success) muatData();
+      });
+    }
+
+    // ====== TAB SWITCH ======
+    function showTab(name, e) {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      e.target.classList.add('active');
+      document.getElementById('tab-carian').classList.add('hidden');
+      document.getElementById('tab-rekod').classList.add('hidden');
+      document.getElementById('tab-' + name).classList.remove('hidden');
+    }
+  </script>
+</body>
+</html>
