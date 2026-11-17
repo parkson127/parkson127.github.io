@@ -3,174 +3,518 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt â€” A4 Auto Split (Fixed)</title>
+  <title>Multi-Receipt → A4 Auto Split</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <link rel="stylesheet" href="/info-box.css">
-<script src="/notes.js" defer></script>
+  <script src="/notes.js" defer></script>
   <style>
     :root {
-      --body-font-size: 9.7pt;
+      --body-font-size: 10pt;
       --header-main-size: 2.0rem;
       --header-branch-size: 2.0rem;
-      --barcode-text-size: 1.0rem;
+      --barcode-text-size: 1.1rem;
       --max-width-header-trx: 6.7cm;
-      --max-width-item-number: 6.1cm;
+      --max-width-item-number: 6.2cm;
       --max-width-membership-pmy: 6.5cm;
-      --max-width-barcode-last: 6.6cm;
-      --receipt-width: 3in;
+      --max-width-barcode-last: 7.2cm;
+      --receipt-width: 3.2in;
       --a4-width: 8.27in;
       --a4-height: 11.69in;
       --a4-padding: 0.4in;
       --col-gap: 0.5in;
       --print-margin: 0mm;
-    }
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace; }
-    body { background: #f3f4f6; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 20px; }
-    .container { max-width: 1400px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 20px 35px rgba(0,0,0,0.1); padding: 30px; }
-    h1 { font-size: 1.5rem; font-weight: 600; color: #1e293b; text-align: center; margin-bottom: 25px; border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; font-family: sans-serif; }
-    .receipt-wrapper { display: flex; flex-wrap: wrap; gap: 30px; }
-    
-    .form-panel { flex: 1; min-width: 380px; background: #f8fafc; border-radius: 18px; padding: 20px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; }
-    .form-panel h2 { font-size: 1.1rem; margin-bottom: 10px; color: #0f172a; font-family: sans-serif; }
-    
-    .per-receipt-cashier {
-      background: #dbeafe; padding: 10px; border-radius: 8px;
-      margin-bottom: 10px; border-left: 4px solid #3b82f6;
-    }
-    .per-receipt-cashier .r-label {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.75rem; font-weight: 700; color: #1e40af;
-      margin-bottom: 4px; font-family: sans-serif;
-    }
-    .per-receipt-cashier .r-label .trx-tag {
-      font-size: 0.65rem; color: #64748b; font-weight: 400;
-      font-family: 'Consolas', monospace;
-    }
-    .per-receipt-cashier input {
-      width: 100%; padding: 6px 10px; border: 1px solid #93c5fd;
-      border-radius: 6px; font-family: 'Consolas', monospace;
-      font-size: 0.85rem; background: white;
-    }
-    
-    .pmy-global {
-      background: #fef3c7; padding: 10px; border-radius: 8px;
-      margin-bottom: 15px; border-left: 4px solid #f59e0b;
-    }
-    .pmy-global label {
-      display: block; font-size: 0.75rem; font-weight: 700;
-      color: #92400e; margin-bottom: 4px; font-family: sans-serif;
-    }
-    .pmy-global input {
-      width: 100%; padding: 6px 10px; border: 1px solid #fcd34d;
-      border-radius: 6px; font-family: 'Consolas', monospace;
-      font-size: 0.85rem; background: white;
+
+      /* Design tokens */
+      --c-bg: #f1f5f9;
+      --c-surface: #ffffff;
+      --c-border: #e2e8f0;
+      --c-text: #0f172a;
+      --c-text-muted: #64748b;
+      --c-primary: #2563eb;
+      --c-primary-hover: #1d4ed8;
+      --c-success: #10b981;
+      --c-success-hover: #059669;
+      --c-warning: #f59e0b;
+      --c-danger: #ef4444;
+      --c-info: #3b82f6;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+      --shadow-lg: 0 20px 40px rgba(0,0,0,0.10);
     }
 
-    .margin-control {
-      background: #e2e8f0; padding: 10px; border-radius: 8px;
-      margin-bottom: 15px;
+    * {
+      margin: 0; padding: 0; box-sizing: border-box;
+      font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace;
     }
-    .margin-control label {
-      display: block; font-size: 0.75rem; font-weight: 700;
-      color: #334155; margin-bottom: 4px; font-family: sans-serif;
+    body {
+      background: var(--c-bg);
+      min-height: 100vh;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-    .margin-control .value-display {
-      display: inline-block; background: #cbd5e1;
-      padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;
-      margin-left: 8px; font-weight: 600;
+
+    /* ============ APP LAYOUT ============ */
+    .app {
+      max-width: 1440px;
+      width: 100%;
     }
-    .margin-control input[type="range"] { width: 100%; }
-    
-    .log-textarea {
-      width: 100%; flex: 1; min-height: 300px; max-height: 400px; padding: 15px;
-      border: 1px solid #cbd5e1; border-radius: 12px;
-      font-family: 'Consolas', monospace; font-size: 0.85rem;
-      background: #0f172a; color: #38bdf8; resize: vertical;
-      line-height: 1.4; margin-bottom: 15px;
+
+    .app-header {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-bottom: 20px;
+      padding: 0 4px;
     }
-    .log-textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
-    
-    .print-warning {
-      background: #fffbeb; border: 1px solid #fcd34d; color: #b45309;
-      padding: 10px; border-radius: 8px; font-size: 0.8rem;
-      margin-bottom: 15px; display: flex; align-items: flex-start;
-      gap: 8px; font-family: sans-serif; line-height: 1.4;
-    }
-    .btn-generate {
-      width: 100%; background: #10b981; color: white; border: none;
-      padding: 15px; border-radius: 12px; font-weight: 700;
-      font-size: 1rem; cursor: pointer; transition: 0.2s;
+    .app-header .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--c-primary), #1e40af);
+      border-radius: var(--radius-md);
       display: flex; align-items: center; justify-content: center;
-      gap: 10px; font-family: sans-serif;
-      position: sticky; bottom: 0; z-index: 10;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
     }
-    .btn-generate:hover { background: #059669; transform: translateY(-2px); }
-    
+    .app-header h1 {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--c-text);
+      letter-spacing: -0.3px;
+    }
+    .app-header p {
+      font-size: 0.8rem;
+      color: var(--c-text-muted);
+      margin-top: 2px;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 420px 1fr;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    /* ============ CARD ============ */
+    .card {
+      background: var(--c-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--c-border);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: linear-gradient(180deg, #fafbfc, #f8fafc);
+    }
+    .card-header .icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      background: #eff6ff;
+      color: var(--c-primary);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-header .icon.success {
+      background: #ecfdf5;
+      color: var(--c-success);
+    }
+    .card-header .icon.warn {
+      background: #fffbeb;
+      color: var(--c-warning);
+    }
+    .card-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--c-text);
+      letter-spacing: -0.2px;
+    }
+    .card-header .subtitle {
+      font-size: 0.75rem;
+      color: var(--c-text-muted);
+      margin-top: 1px;
+      font-family: -apple-system, sans-serif;
+    }
+    .card-body {
+      padding: 16px 20px;
+    }
+
+    /* ============ FORM PANEL ============ */
+    .form-panel {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      position: sticky;
+      top: 24px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+    }
+
+    .log-textarea {
+      width: 100%;
+      min-height: 180px;
+      max-height: 280px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--c-border);
+      border-radius: var(--radius-md);
+      font-family: 'Consolas', monospace;
+      font-size: 0.8rem;
+      background: #0f172a;
+      color: #38bdf8;
+      resize: vertical;
+      line-height: 1.5;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .log-textarea:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    .log-textarea::placeholder { color: #64748b; }
+
+    /* Per-receipt cashier cards */
+    .cashier-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .cashier-item {
+      background: #f8fafc;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      transition: border-color 0.15s;
+    }
+    .cashier-item:hover {
+      border-color: #cbd5e1;
+    }
+    .cashier-item.detected {
+      background: #f0fdf4;
+      border-color: #86efac;
+    }
+    .cashier-item.unknown {
+      background: #fef2f2;
+      border-color: #fca5a5;
+    }
+    .cashier-item .item-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 8px;
+      gap: 8px;
+    }
+    .cashier-item .item-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--c-text);
+    }
+    .cashier-item .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-family: -apple-system, sans-serif;
+    }
+    .badge.detected {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge.unknown {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .badge.manual {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+    .cashier-item .trx-tag {
+      font-size: 0.7rem;
+      color: var(--c-text-muted);
+      font-family: 'Consolas', monospace;
+    }
+    .cashier-item input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: var(--radius-sm);
+      font-family: 'Consolas', monospace;
+      font-size: 0.85rem;
+      background: white;
+      color: var(--c-text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .cashier-item input:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    }
+    .cashier-item .id-hint {
+      font-size: 0.7rem;
+      color: var(--c-text-muted);
+      margin-top: 6px;
+      font-family: 'Consolas', monospace;
+    }
+
+    /* PMY + margin in 2-col grid */
+    .field-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    .field label {
+      font-size: 0.72rem;
+      font-weight: 600;
+      color: var(--c-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .field input[type="text"] {
+      padding: 8px 12px;
+      border: 1.5px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      background: white;
+      color: var(--c-text);
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .field input[type="text"]:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    }
+    .field .value-display {
+      display: inline-block;
+      background: #dbeafe;
+      color: #1e40af;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      font-family: -apple-system, sans-serif;
+    }
+
+    /* Range slider */
+    .range-wrap {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+    input[type="range"] {
+      width: 100%;
+      height: 6px;
+      border-radius: 3px;
+      background: #e2e8f0;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--c-primary);
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px;
+      border-radius: 50%;
+      background: var(--c-primary);
+      cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+
+    /* Generate button */
+    .btn-generate {
+      width: 100%;
+      background: linear-gradient(135deg, var(--c-success), var(--c-success-hover));
+      color: white;
+      border: none;
+      padding: 14px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      font-family: -apple-system, sans-serif;
+      transition: transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+    }
+    .btn-generate:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16,185,129,0.4);
+    }
+    .btn-generate:active {
+      transform: translateY(0);
+    }
+
+    /* ============ PREVIEW PANEL ============ */
     .preview-panel {
-      flex: 1.5; min-width: 350px; background: white;
-      border-radius: 12px; padding: 15px; border: 2px dashed #cbd5e1;
-      display: flex; flex-direction: column; align-items: center;
-      overflow-x: auto; max-height: 85vh;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
     }
-    .preview-label {
-      font-size: 0.8rem; text-transform: uppercase; color: #64748b;
-      margin-bottom: 10px; font-weight: 600; text-align: center;
-      font-family: sans-serif;
+    .preview-scroll {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+      overflow-x: auto;
+      background: #f8fafc;
     }
-    
+
+    .empty-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: var(--c-text-muted);
+      text-align: center;
+      gap: 12px;
+    }
+    .empty-state .empty-icon {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      color: #94a3b8;
+    }
+    .empty-state h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--c-text);
+    }
+    .empty-state p {
+      font-size: 0.8rem;
+      max-width: 300px;
+      line-height: 1.5;
+    }
+
+    /* ============ RECEIPT STYLES (preserve original) ============ */
     .receipt-preview-item {
-      background: #fafafa; padding: 10px 5px;
-      font-family: 'Consolas', monospace; font-weight: 400;
-      font-size: var(--body-font-size); line-height: 1.05;
-      color: #000; width: 3in; min-width: 3in; max-width: 3in;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05); letter-spacing: -1.2px;
-      margin-bottom: 20px; border-bottom: 2px dashed #94a3b8;
-      padding-bottom: 10px; text-align: left;
+      background: #fafafa;
+      padding: 10px 5px;
+      font-family: 'Consolas', monospace;
+      font-weight: 400;
+      font-size: var(--body-font-size);
+      line-height: 1.05;
+      color: #000;
+      width: 3.2in;
+      min-width: 3.2in;
+      max-width: 3.2in;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+      letter-spacing: -1.2px;
+      margin-bottom: 20px;
+      border-bottom: 2px dashed #94a3b8;
+      padding-bottom: 10px;
+      text-align: left;
     }
-    .receipt-preview-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-    
+    .receipt-preview-item:last-child {
+      margin-bottom: 0;
+      border-bottom: none;
+      padding-bottom: 0;
+    }
+
     .r-center { text-align: center !important; }
     .r-left { text-align: left !important; }
     .r-justify { text-align: justify !important; }
     .r-bold { font-weight: 900; }
     .r-normal { font-weight: 400; text-align: left; }
     .r-dash { border-top: 1px dashed #000; margin: 3px 0; }
-    
-    .r-item-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; }
+
+    .r-item-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 5px; width: 100%;
+    }
     .r-item-name { flex: 1; text-align: left; }
     .r-item-price { white-space: nowrap; text-align: right; }
     .r-nowrap { white-space: nowrap !important; display: block; width: 100%; text-align: left; }
-    
+
     .r-section-header-trx { max-width: var(--max-width-header-trx); width: 100%; margin: 0; }
     .r-section-item-number { max-width: var(--max-width-item-number); width: 100%; margin: 0; }
     .r-section-membership-pmy { max-width: var(--max-width-membership-pmy); width: 100%; margin: 0; }
     .r-section-barcode-last { max-width: var(--max-width-barcode-last); width: 100%; margin: 0; }
-    
-    .r-header-main { font-size: var(--header-main-size); font-weight: 500; letter-spacing: 0.8px; line-height: 1; margin-top: 0; margin-bottom: 0; text-align: center; }
-    .r-header-branch { font-size: var(--header-branch-size); font-weight: 500; letter-spacing: 0.8px; margin-bottom: 2px; margin-top: 0; text-align: center; }
-    
-    .barcode-container { text-align: left; margin-top: 0px; margin-bottom: 0; line-height: 0; }
+
+    .r-header-main {
+      font-size: var(--header-main-size); font-weight: 500;
+      letter-spacing: -1.5px; line-height: 1;
+      margin-top: 0; margin-bottom: 0; text-align: center;
+    }
+    .r-header-branch {
+      font-size: var(--header-branch-size); font-weight: 500;
+      letter-spacing: -1.5px; margin-bottom: 2px; margin-top: 0; text-align: center;
+    }
+
+    .barcode-container { text-align: left; margin: 0; line-height: 0; }
     .barcode-container svg { max-width: 100%; height: auto; display: block; margin: 0; }
-    .barcode-text { text-align: center; font-size: var(--barcode-text-size); letter-spacing: 4.5px; font-weight: 400 !important; margin-top: 0; padding-top: 0; white-space: nowrap; display: block; width: 100%; line-height: 1; }
-    
+    .barcode-text {
+      text-align: center; font-size: var(--barcode-text-size);
+      letter-spacing: 4.5px; font-weight: 400 !important;
+      margin-top: 0; padding-top: 0; white-space: nowrap;
+      display: block; width: 100%; line-height: 1;
+    }
+
     .r-www { text-align: center; width: 100%; letter-spacing: normal; }
-    .r-membership-justify { display: flex; align-items: flex-start; gap: 0px; width: 100%; font-size: var(--body-font-size); font-weight: 600; white-space: nowrap; letter-spacing: 3px; text-align: left; }
-    .r-date-left { font-size: 9.7pt; font-weight: 400; letter-spacing: -0.9px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
-    .r-trx-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
-    
+    .r-membership-justify {
+      display: flex; align-items: flex-start; gap: 0;
+      width: 100%; font-size: var(--body-font-size); font-weight: 600;
+      white-space: nowrap; letter-spacing: 3px; text-align: left;
+    }
+    .r-date-left {
+      font-size: 10pt; font-weight: 400; letter-spacing: -1px;
+      text-align: left; width: 100%; white-space: nowrap; overflow: hidden;
+    }
+    .r-trx-normal {
+      font-size: var(--body-font-size); font-weight: 900;
+      letter-spacing: normal; width: 100%; text-align: left;
+    }
     .r-trx-flex {
       display: flex; justify-content: space-between;
       align-items: flex-start; gap: 5px; width: 100%;
-      font-size: var(--body-font-size); font-weight: 900;
-      letter-spacing: normal;
+      font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal;
     }
     .r-trx-flex .r-trx-label { text-align: left; flex: 1; white-space: nowrap; }
     .r-trx-flex .r-trx-star { text-align: right; white-space: nowrap; }
-    
-    .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
-    .r-price-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; font-weight: 900; }
+
+    .r-card-normal {
+      font-size: var(--body-font-size); font-weight: 900;
+      letter-spacing: -0.3pt; width: 100%; text-align: left;
+    }
+    .r-price-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 5px; width: 100%; font-weight: 900;
+    }
     .r-price-row .r-label { text-align: left; flex: 1; }
     .r-price-row .r-value { text-align: right; white-space: nowrap; }
 
@@ -184,22 +528,19 @@
       white-space: nowrap; text-align: left; width: 100%;
       overflow: hidden; font-weight: 400; line-height: 1.1;
     }
-
     .r-einvoice-remark-log {
-      font-size: var(--body-font-size); font-weight: 900;letter-spacing: 0px;
-      text-align: left; width: 100%; margin-top: 3px;
-      line-height: 1.1; color: #000;
+      font-size: var(--body-font-size); font-weight: 900; letter-spacing: -1px;
+      text-align: left; width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
     }
-
     .r-einvoice-remark {
-      font-size: 10.1pt; font-weight: 400; text-align: left;letter-spacing: 0px;
+      font-size: 10pt; font-weight: 400; text-align: left; letter-spacing: -1px;
       width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
     }
 
     .a4-preview-page {
       width: 8.27in; height: 11.69in; background: #fff;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      padding: 0.4in; margin: 0 auto 20px auto;
+      padding: 0.4in; margin: 0 auto;
       box-sizing: border-box; display: grid;
       grid-template-columns: 1fr 1fr; gap: 0.5in;
       overflow: hidden; position: relative;
@@ -211,13 +552,9 @@
     }
     .a4-single-col { grid-template-columns: 1fr; }
     .split-part {
-      width: 100%;
-      height: 100%;
+      width: 100%; height: 100%;
       min-height: calc(11.69in - 0.8in);
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-start;
+      overflow: hidden; display: flex; flex-direction: column; align-items: flex-start;
     }
     .split-part > .receipt-preview-item {
       margin: 0 !important; padding-bottom: 0 !important;
@@ -225,20 +562,23 @@
       padding-top: 0 !important;
     }
 
+    /* ============ PRINT ============ */
     @media print {
       @page { size: A4 portrait; margin: 0; }
-      html, body { 
+      html, body {
         background: white !important; padding: 0 !important; margin: 0 !important;
         width: 8.27in !important; display: block !important;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
-      .container, .receipt-wrapper, .preview-panel { 
+      .app-header, .form-panel, .card-header, .preview-scroll > .empty-state { display: none !important; }
+      .layout { display: block !important; }
+      .card, .card-body, .preview-panel, .preview-scroll {
         box-shadow: none !important; padding: 0 !important; margin: 0 !important;
         max-width: 100% !important; width: 100% !important;
         border: none !important; overflow: visible !important;
         display: block !important; background: white !important;
+        gap: 0 !important;
       }
-      h1, .form-panel, .preview-label, .print-warning { display: none !important; }
       #receiptPreviewContainer { display: block !important; width: 100% !important; }
       .a4-preview-page {
         width: 8.27in !important; height: 11.69in !important;
@@ -247,9 +587,9 @@
       }
       .a4-preview-page:last-child { page-break-after: auto; break-after: auto; }
       .a4-preview-page::after { display: none !important; }
-      .receipt-preview-item { 
-        width: 3in !important; max-width: 3in !important;
-        font-size: var(--body-font-size) !important; font-weight: 600 !important; 
+      .receipt-preview-item {
+        width: 3.2in !important; max-width: 3.2in !important;
+        font-size: var(--body-font-size) !important; font-weight: 600 !important;
         padding: 0 !important; margin: 0 !important;
         line-height: 1.05 !important; box-shadow: none !important;
         letter-spacing: -1.2px; border-bottom: none !important;
@@ -258,70 +598,474 @@
       .r-header-main { font-size: var(--header-main-size) !important; line-height: 1 !important; margin-top: 0 !important; text-align: center !important; }
       .r-header-branch { font-size: var(--header-branch-size) !important; line-height: 1 !important; margin-top: 0 !important; margin-bottom: 2px !important; text-align: center !important; }
       .r-dash { margin: 2px 0 !important; }
-      .barcode-container { margin-top: 0 !important; margin-bottom: 0 !important; line-height: 0 !important; text-align: left !important; }
+      .barcode-container { margin: 0 !important; line-height: 0 !important; text-align: left !important; }
       .barcode-container svg { width: 100% !important; display: block !important; margin: 0 !important; }
       .barcode-text { font-size: var(--barcode-text-size) !important; letter-spacing: 4.5px !important; display: block; width: 100%; margin-top: 0 !important; padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; text-align: center !important; }
       .r-www { text-align: center !important; }
-      .r-membership-justify { letter-spacing: 3px !important; gap: 0px !important; text-align: left !important; }
-      .r-card-normal { text-align: left !important; }
+      .r-membership-justify { letter-spacing: 3px !important; gap: 0 !important; text-align: left !important; }
+      .r-card-normal { text-align: left !important; letter-spacing: -0.3px; }
       .r-trx-normal { text-align: left !important; }
       .r-trx-flex { display: flex !important; justify-content: space-between !important; }
-      .r-date-left { font-size: 9.7pt !important; text-align: left !important; white-space: nowrap !important; }
-      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; }
-      .r-einvoice-remark-log { font-size: var(--body-font-size) !important; text-align: left !important; }
-      .r-returned-title { font-size: 9.5pt !important; text-align: left !important; white-space: nowrap !important; }
-      .r-returned-detail { font-size: 9.6pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-date-left { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; letter-spacing: -0.5px; }
+      .r-einvoice-remark-log { font-size: 10pt !important; text-align: left !important; letter-spacing: -1.4px; }
+      .r-returned-title { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
+      .r-returned-detail { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
       .split-part { min-height: 0 !important; }
+    }
+
+    /* Responsive */
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .form-panel { position: static; max-height: none; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Multi-Receipt â†’ A4 (Auto Split Fixed)</h1>
-  
-  <div class="receipt-wrapper">
+<div class="app">
+  <!-- Header -->
+  <header class="app-header">
+    <div class="logo">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9V2h12v7"></path>
+        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+        <rect x="6" y="14" width="12" height="8"></rect>
+      </svg>
+    </div>
+    <div>
+      <h1>Multi-Receipt → A4 Auto Split</h1>
+      <p>Paste log → auto-detect cashier → print A4</p>
+    </div>
+  </header>
+
+  <div class="layout">
+    <!-- FORM PANEL -->
     <div class="form-panel">
-      <h2>Paste Log E-Journal (boleh lebih dari satu):</h2>
 
-      <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here... (boleh paste multiple journals)"></textarea>
-
-      <div id="cashierInputsContainer"></div>
-
-      <div class="pmy-global">
-        <label>PMY Code (sama untuk semua resit)</label>
-        <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
+      <!-- Log input card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h2>Log E-Journal</h2>
+            <div class="subtitle">Paste satu atau lebih receipt</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <textarea id="logInput" class="log-textarea" placeholder="Paste POS logs here... (boleh paste multiple journals)"></textarea>
+        </div>
       </div>
 
-      <div class="margin-control">
-        <label>Print Margin <span class="value-display" id="marginValue">0mm</span></label>
-        <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
+      <!-- Cashier card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="icon success">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div>
+            <h2>Cashier</h2>
+            <div class="subtitle">Auto-detected dari log · boleh edit manual</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="cashierInputsContainer" class="cashier-list">
+            <div style="color: var(--c-text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">Paste log untuk detect cashier</div>
+          </div>
+        </div>
       </div>
 
-      <!--
-<div class="print-warning">
-  <span>âš ï¸</span>
-  <div>
-    <strong>Notis Print A4:</strong><br>
-    â€¢ Paper: <strong>A4</strong><br>
-    â€¢ Scale: <strong>100%</strong> (jangan "Fit to page")<br>
-    â€¢ Margin: <strong>None / 0</strong><br>
-    â€¢ Background graphics: <strong>ON</strong>
-  </div>
-</div>
--->
+      <!-- Settings card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="icon warn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div>
+            <h2>Settings</h2>
+            <div class="subtitle">PMY code & print margin</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="field">
+              <label>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                  <line x1="16" y1="2" x2="16" y2="6"></line>
+                  <line x1="8" y1="2" x2="8" y2="6"></line>
+                  <line x1="3" y1="10" x2="21" y2="10"></line>
+                </svg>
+                PMY Code
+              </label>
+              <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
+            </div>
+            <div class="range-wrap">
+              <label style="font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;">
+                <span style="display: flex; align-items: center; gap: 6px;">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="12" y1="19" x2="12" y2="5"></line>
+                    <polyline points="5 12 12 5 19 12"></polyline>
+                  </svg>
+                  Print Margin
+                </span>
+                <span class="value-display" id="marginValue">0mm</span>
+              </label>
+              <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
 
-      <button class="btn-generate" id="generateBtn">ðŸ–¨ï¸ CONVERT & PRINT</button>
+      <!-- Generate button -->
+      <button class="btn-generate" id="generateBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        CONVERT & PRINT
+      </button>
     </div>
 
-    <div class="preview-panel">
-      <div class="preview-label">ðŸ” Live A4 Preview</div>
-      <div id="receiptPreviewContainer" style="display: flex; flex-direction: column; align-items: center; width: 100%;"></div>
+    <!-- PREVIEW PANEL -->
+    <div class="card preview-panel">
+      <div class="card-header">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+        <div>
+          <h2>Live A4 Preview</h2>
+          <div class="subtitle">Auto-split ikut tinggi column A4</div>
+        </div>
+      </div>
+      <div class="preview-scroll" id="receiptPreviewContainer">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+              <polyline points="10 9 9 9 8 9"></polyline>
+            </svg>
+          </div>
+          <h3>Belum ada receipt</h3>
+          <p>Paste log E-Journal di sebelah kiri untuk mula preview</p>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script>
+  // ============ CASHIER MAPPING (exact case dari .txt) ============
+  const CASHIER_MAP = {
+    '000352': 'HAZIM', '000369': 'KRISWARAN', '000383': 'HAZRUL', '000390': 'NOR AFIFAH',
+    '000475': 'SYAHIR', '000840': 'BASYIR', '000949': 'BARATHAN', '001007': 'DAYANA',
+    '001052': 'SANTHI', '001335': 'SRINATH', '001366': 'HARIPRASANTH', '001380': 'NUR ATIKAH',
+    '001618': 'FATIN ATIQAH', '001762': 'SYAFIQ', '001779': 'AS', '001892': 'ARVIND',
+    '002139': 'ZAHWAN DANIEL', '002189': 'THIVAKARAN', '002233': 'ILANGKABILAN',
+    '002776': 'AMEER FIRDAUS', '003025': 'M.Syahmi', '003599': 'AISYAH NABILA',
+    '003605': 'SHEIKH', '003629': 'HARITH', '003704': 'TANANAYAR', '003735': 'MUHD QASHRI',
+    '003773': 'MIZAN', '003780': 'SYIRA', '003797': 'AZIMAN', '003841': 'MARHAINI',
+    '003865': 'FARID', '003896': 'IRFAN', '004725': 'SYAHIR', '004800': 'AZRI ARSHAD',
+    '004985': 'NOR AINUL', '005005': 'DANISH HAIQARL', '005029': 'ZAIM', '005234': 'IZENI',
+    '005388': 'HAWA', '005739': 'EDDIE', '005944': 'EIMAN', '006408': 'HAZIRAH',
+    '006439': 'BELLA', '006675': 'Amirul', '006712': 'HAFIZ', '007337': 'KALAIVANI',
+    '007368': 'PRAVEEN', '007702': 'AINA', '007719': 'Angelo', '008464': 'NASRAH',
+    '008471': 'BASYIR', '009775': 'ALIA', '009805': 'SITI HAWA', '010054': 'ANAZ',
+    '010757': 'Mohd Arham', '010764': 'KHAIRIN', '010771': 'Azrin', '010832': 'MIRZA HAFDIE',
+    '010849': 'HAZIQ IZZUDDIN', '010993': 'ASMAWATI', '011099': 'NOR ATIKAH',
+    '011594': 'AMMAR', '011631': 'ED', '011907': 'SAHMIN', '011914': 'IZZUDDIN',
+    '012515': 'Mathavi', '012706': 'FITRAH', '012867': 'ZAKI', '013369': 'ADENAN',
+    '013376': 'SYAFIQ', '013383': 'SYAHMI', '013390': 'FARID ADZLAN', '013406': 'AFIFI',
+    '013482': 'ATIQAH', '013499': 'MUAZZAM', '013505': 'NATASYA', '013833': 'FAZLIANA',
+    '014038': 'AZMIL', '014113': 'ZULHILMI', '014151': 'NURSHIDA', '014168': 'ZURAIDA',
+    '014205': 'AFIQ KHAN', '014526': 'IZWA', '014540': 'LEO', '015424': 'SYAUQI MUQRI',
+    '015431': 'NUR IZZATI', '015691': 'AIMAN', '015936': 'RUSMADA', '015943': 'AMEY',
+    '015950': 'HARIZ', '016339': 'AMERRA', '016353': 'RIZAL', '016360': 'NADIA',
+    '016704': 'GEORGE', '016759': 'KHALISH', '016803': 'SYIRA', '017305': 'HUSSAINI',
+    '017435': 'HAIZIF', '017602': 'ARIFF', '018906': 'DILLAH', '018999': 'ZAINUN',
+    '019026': 'HAMZAH', '019057': 'ALIF', '019194': 'HANISAH', '019262': 'AMIRUL',
+    '019415': 'NUUR ATIKAH', '019446': 'ADLI', '019897': 'HUDA NURANI', '020299': 'CHEAH',
+    '021326': 'ZAHWAN DANIEL', '021579': 'THIVA', '021821': 'NUR ERIQA',
+    '022415': 'FAUZAN FADZIL', '022545': 'ADIBSAUFI', '022552': 'WAN AZIM', '022736': 'ATUN',
+    '022743': 'FAZ', '023511': 'SITI HASNIDHA', '023528': 'RIZUWAN', '023535': 'NAJIB',
+    '023559': 'MAWONG', '023566': 'ALI', '023733': 'SHARIFAH WAFA', '023740': 'DANIAL WONG',
+    '024150': 'IZZAT', '025683': 'QALIFATUL', '026031': 'N.YOGESWARAN', '026147': 'ADAM',
+    '026314': 'IZWAN', '026475': 'FARAH JEHAN', '026499': "NUR'AIN NABILAH",
+    '026512': 'AISHAH NARIND', '026598': 'SYAZWANA', '026635': 'DANIAL', '026765': 'ADIHA',
+    '026789': 'ALIF HASIF', '026826': 'HAZIQ AIMAN', '027618': 'PUTERA', '027625': 'ALIF',
+    '027854': 'HEZRIQ', '027885': 'ZULHAIRIE', '027892': 'ARIF DZAHIRI', '027946': 'IKA',
+    '027953': 'ISKANDAR', '028172': 'UMAR HAMZAH', '028189': 'SYAFIQAH', '028202': 'SHAKIRA',
+    '029667': 'SYAHIR', '030502': 'ZAHIDAH', '030519': 'shelly', '030526': 'DIANA',
+    '030533': 'SHIDA', '030663': 'AHMAD', '030960': 'ADAM ARIEF', '031509': 'SHAZLY',
+    '031523': 'SYAHIRAN', '031639': 'ROAZMAN', '031707': 'FARID IKHMAN', '031851': 'SYAMIL',
+    '031868': 'AJREENA', '031943': 'FIRDAUS', '032117': 'MD AMIRUL', '032186': 'AFWAN',
+    '032230': 'PUTERI', '032278': 'DELIA', '032285': 'QASHRI', '032629': 'HISHAM',
+    '033046': 'AZIM', '033053': 'FARIS', '033626': 'ZAHIRUL', '033633': 'HISHAM',
+    '033862': 'SYUHADA', '033909': 'THIVAKARAN', '034067': 'SHA', '036092': 'AININ',
+    '037211': 'NIK', '037228': 'FATHIN', '037570': 'ASUN', '038720': 'IBRAHIM',
+    '039093': 'SYAFIQ NAIM', '039109': 'TAUFEEQ', '041447': 'MASZAIDATUL', '041508': 'WAFA',
+    '041638': 'HAZIQ GAMAL', '041645': 'IZZAT IRFAN', '041652': 'AIKAL', '041669': 'DANIAL',
+    '042239': 'AMMAR', '042253': 'FAKHRUL', '042260': 'SAM', '042284': 'ATHIRAH',
+    '042314': 'IZZAT', '042321': 'AZRI', '042550': 'HAZIM', '042857': 'MOHAMAD FARID',
+    '042864': 'KAVI', '043168': 'JAYARAMAN', '043175': 'FADHLI', '043182': 'HAIRI',
+    '043373': 'WAN SYAHMI', '043564': 'ZULKHAIRY', '043670': 'FAKHRUSY', '043731': 'SYAFIQA',
+    '043762': 'NADIA', '045018': 'AININA', '045469': 'THIPA', '045667': 'LUTFIL',
+    '045766': 'AZLIN', '045889': 'Teh zulaikha', '045964': 'Akmalluddin',
+    '046107': 'SITI SARAH', '046299': 'SYAZWANI', '046657': 'AIMAN',
+    '046664': 'NURUL NADHIRAH', '046671': 'FADHLULLAH', '046695': 'NUR ALIYA',
+    '046701': 'RIZUWAN HAIKAL', '046718': 'SYAFINAZ', '046831': 'NUR BATRIESYA',
+    '046848': 'AUNI FATNIN', '046855': 'FARAH HANIM', '046862': 'NURFAZRIN',
+    '046978': 'SALMAN FARIS', '047104': 'SYAMALAN', '047111': 'MAGESWARY',
+    '047128': 'MUHAMMAD ALIF', '047135': 'ADDLI HAZMI', '047159': 'AVINESH',
+    '047166': 'AMIR NASRI', '047302': 'ARSYAD', '047395': 'SIEW LIN SEW',
+    '047548': 'Pavethira', '047555': 'Nurul Najihah', '047890': 'KOH SANTHI',
+    '048804': 'NUR AIN', '048828': 'CHAN KOK HOU', '048859': 'SIEW LIN',
+    '049825': 'DEVI SRII', '049832': 'NUR ADRIANA', '049856': 'AINUL', '049863': 'NUR NABILA',
+    '050012': 'NIK  EIDLAN', '050029': 'RUSYAIDI', '050036': 'MUHAMAD MUAZ',
+    '050043': 'SAFWAN', '050050': 'DANISH HAIQARL', '050067': 'RAFIQ',
+    '050074': 'NIK ERDEENA', '050364': 'NUR NISRIN', '050371': 'NURIN QISTINA',
+    '050401': 'NURIN YASMIN', '051064': 'NUR AIN', '051453': 'FADHLULLAH',
+    '051569': 'NURFAZRIN', '052337': 'NORAZLINA', '052344': 'IZENI', '054065': 'FUZIAH',
+    '054072': 'NURLISSA', '054126': 'NORFADILAH', '054157': 'MUHD SHUIB',
+    '054454': 'SITI AISHAH', '054973': 'AKMA', '055543': 'NIK EIDLAN',
+    '055703': 'SYAHIRAH', '055741': 'RIZUWAN HAIKAL', '055758': 'SYAFUAN', '055925': 'ALIF',
+    '056526': 'KHAIRUL ANUAR', '057158': 'MATHEW GANA', '058155': 'JULIANA',
+    '058162': 'ALLISA', '058650': 'ADRIANNA', '058759': 'FRANCIS TAN',
+    '060394': 'NURULRAFINA', '061179': 'HILMI', '061339': 'NUR AIN FARHANA',
+    '061698': 'HAIRATUL AMIRAH', '062015': 'SAFWAN', '062022': 'KHAIRUNNISA',
+    '062299': 'HAKEEM', '062442': 'NUR AMIRAH AINA', '062459': 'NUR AMIRAH AIDA',
+    '062640': 'EIDLAN', '063173': 'MUHAMMAD ALIEF', '063272': 'YUVAN RAJ',
+    '063289': 'ALISSA SOFIA', '063340': 'NURIN IRDINA', '063722': 'Fazlina',
+    '064040': 'NORZITA', '064422': 'KHAIRUL AMIR', '064460': 'HAFIZUDDIN',
+    '065306': 'ANIS NATASHA', '065511': 'MUHD ALIFF', '065627': 'Marini',
+    '065931': 'SAFILLA', '065955': 'NOR FAZATUL', '066761': 'AMIRUL HAKIM',
+    '066891': 'NUUR ATIKAH', '067119': 'HAZIQ', '067386': 'SHAFIQ',
+    '067416': 'MUHAMAD HAFIZ', '067829': 'SAIDATUL HANUM', '067874': 'ATIQAH',
+    '068253': 'JENNYSIA', '068857': 'NIK EIDLAN', '068888': 'FADHLULLAH',
+    '069106': 'FIKRI DANEAL', '069236': 'BERENGANG', '071307': 'ARIEF',
+    '071314': 'SHAKIR', '071338': 'HAIKAL HAZIQ', '071345': 'SYAFIQ',
+    '072878': 'DEVA DARSHINI', '074650': 'NOR FARIDA', '075152': 'Nurulnadiah',
+    '075541': 'ASZA', '075909': 'SAFWAN', '075930': 'RUSYAIDI', '075947': 'NIK EIDLAN',
+    '075954': 'NOREFY', '077019': 'NUR AMIRAH AIDA', '077026': 'NUR AMIRAH AINA',
+    '077385': 'AUNI FATNIN', '077392': 'ALLY NORFAEZZA', '077408': 'AMIR SAFWAN',
+    '077439': 'ALIF HAIKAL', '077446': 'AQIL', '078246': 'AISYAH SAKINAH',
+    '078412': 'ALYA FIRJANI', '078511': 'NUR SHAFA AMIRA', '078900': 'AHMAD FARHAN',
+    '078917': 'AHMAD IZZAT', '079051': 'MUHAMMAD IKRAM', '079815': 'NURUL SHAFIZA',
+    '080774': 'SARA', '081498': 'MD AMIRUL', '083030': 'AMMAR HUSNI',
+    '083931': 'INTAN ELLYANA', '083935': 'INTAN ELLYANA', '083980': 'MUHAMMAD MUAZ',
+    '108386': 'MIRZA HAFDIE', '108409': 'HAZIQ IZZUDDIN', '114424': 'ALLISYA',
+    '125055': 'EMELYN', '125307': 'NURUL IFFAH', '127455': 'ADALIA',
+    '128445': 'RIQMAL HAFIZI', '130486': 'MAXINE', '130493': 'CHRIS',
+    '130509': 'WAN NOOR MALIZ', '130516': 'MARY LIM (BA)', '130530': 'AIN SHAFIQAH',
+    '131759': 'BADARIAH', '131773': 'NOR ZURAIDAH', '131780': 'NUR HIDAYAH',
+    '131797': 'MAZENY', '133555': 'NUR DAMIA IWANI', '136600': 'NUR ALYA',
+    '139908': 'ZAID', '140713': 'IKRAM ISHAK', '140715': 'IKRAM ISHAK',
+    '140871': 'AQIL KHAIZURAN', '140874': 'AQIL KHAIZURAN', '141260': 'AIMAN ASRAFIQ',
+    '143131': 'SYUKRY AL AMIN', '143134': 'SYUKRY AL AMIN', '143745': 'ARIF ISKANDAR',
+    '145718': 'INTAN SYAKIRA', '145893': 'NUR BATRISYIA', '146210': 'VIVIAN',
+    '152099': 'JAMALUDIN', '156295': 'AMINAH', '156479': 'RANIA', '156523': 'THENEESH',
+    '157308': 'NUR AMALINA', '158381': 'NAZRIN AFIQ', '158565': 'IRFAN',
+    '159937': 'Seng Yee', '160193': 'MUHAMMAD ARIEF', '170383': 'AMMAR HUSNI',
+    '171762': 'MOHAMMAD', '174084': 'ASY-SYAARI', '174695': 'SUKI YING',
+    '183048': 'NIK EIDLAN', '183888': 'HASHEMIE', '185042': 'NOR HISHAM',
+    '185325': 'NUR FITRAH', '185875': 'ALIF NAZRIN', '195720': 'AJMAL ZABIDI',
+    '201926': 'HARIZ HAZIQ', '202022': 'DAFIE', '202497': 'AFWAN',
+    '204644': 'DANISH HAKIM', '204729': 'AMIR RAFIQ', '204767': 'AKMAL DINI',
+    '205542': 'AZRIL SHAHDAN', '205672': 'RUSHDAN', '205948': 'ARIF HAKIM',
+    '205979': 'SYAZWAN AFIQ', '205993': 'ABU SYAZWAN', '206013': 'MOHAMAD AZIB',
+    '206020': 'AMIRUL HAIKAL', '206747': 'SYED SYAKIR', '210119': 'ABDUL HALIM',
+    '223713': 'ATIFAH RAHAYU', '224338': 'SITI MARIAM', '225465': 'FARHANA',
+    '227766': 'MUZAMMIL', '229005': 'AMAR AIMAN', '229609': 'NUR SOFIYA',
+    '231343': 'SYAHMI AQIL', '231565': 'NORRAZLAN SHAH', '232371': 'NUR ADALIA',
+    '232623': 'ADAM NIFAIL', '232647': 'ALIF NAZHAN', '234283': 'NASRUL AMIN',
+    '234726': 'NIK EIDLAN', '234832': 'AMEER MUAZ', '236119': 'IKHWAN',
+    '237550': 'HARIZ HAZIQ', '237826': 'HANG YUSRI', '238014': 'SRI ATIFAH',
+    '238038': 'FARIS', '238052': 'FAHMI PUTRA', '238489': 'DANISH',
+    '238496': 'NURDARWISYAH', '238700': 'NUR EMELYN', '238717': 'AQIL KHAIZURAN',
+    '238724': 'NURUL IFFAH', '238731': 'MUHAMMAD ARIEF', '238908': 'AMIRULLAH AMIN',
+    '239141': 'HARITH DANIAL', '239165': 'NAZRIN AFIQ', '239172': 'SYUKRY AL AMIN',
+    '239202': 'ARIF ISKANDAR', '241441': 'AHYAR', '242226': 'NIK ADLI',
+    '242233': 'MUHAMMAD AIMAN', '242530': 'NURUL LIYANA', '243971': 'HAMZAH BASIT',
+    '244473': 'ALYA MAISARAH', '244527': 'TARSHINI', '244947': 'SARAH DAMIA',
+    '245043': 'NOREFY HAFSHAH', '245111': 'NUR HAFIZAH', '245333': 'NAFI',
+    '245357': 'AMMAR AIMAN', '245845': 'IQMAL HAKIM', '246644': 'CLIVE BILLY',
+    '247139': 'AHMAD PHAHAMIN', '248211': 'NUR NADIAH', '248471': 'SHARIES WRAN',
+    '248891': 'AHMAD FAIQ', '249263': 'CHE AMAL ZAQUAN', '249751': 'AMIRUL AFIQ',
+    '249768': 'NURUL HIDAYAH', '249775': 'EKA AHMAD', '249782': 'ASHMAN IMRAN',
+    '249980': 'AUFA IDDEEN', '249997': 'MUHAMMAD FARIS', '250009': 'AHMAD DANISH',
+    '250115': 'NIK EIDLAN', '250238': 'UMAR AUDADI', '250429': 'ALISHA ARINAH',
+    '250696': 'SYAMIL HAZIQ', '250733': 'ADRIANA', '250740': 'AMSYAR MIRZA',
+    '250757': 'SARAH DANIA', '251822': 'SRI ATIRAH', '252799': 'ALIFF NADZMI',
+    '252812': 'FARID DANISH', '253338': 'SYAHMI AQIL', '253680': 'IFFAH HILMAN',
+    '253697': 'ADALIA KHAIRI', '253970': 'AQIL SYAHMI', '254304': 'KHAIRONIE',
+    '254656': 'FARHAN HAKIMI', '254687': 'DANIAL HAZIQ', '254724': 'DARREN FINNAND',
+    '256001': 'NURA HAZIQAH', '256223': 'MUHAMMAD HAKIMI', '256841': "NUR 'ALIYAH",
+    '258005': 'AIZIQ ZIKRI', '259033': 'NIK EIDLAN', '259330': 'ZUHAILY AZRI',
+    '259736': 'HARITH THAQIF', '259743': 'IQHFAN AQIEYMIE', '259781': 'SYAHMI AQIL',
+    '259804': 'NURDARWISYAH', '259811': 'ADALIA TASNIM', '259873': 'NURUL IFFAH',
+    '260121': 'NAZRIN AFIQ', '260138': 'SYUKRY AL-AMIN', '260312': 'MUHAMMAD ARIEF',
+    '260329': 'EMELYN SYAFIQAH', '260336': 'NASRUL AMIN', '261425': 'MARTINA',
+    '262163': 'NASREEN NABILA', '263047': 'AL-AZIM', '287012': 'KOK SIONG',
+    '292467': 'NOR HIDAYAH', '293235': 'SITI AISHAH', '293242': 'AZHARUDDIN',
+    '297004': 'PATMATHASAN', '297875': 'NIK MOHD AZRIN', '302449': 'Fariz Effandi',
+    '311687': 'NORAZLAN', '314671': 'MUSTAQIM', '320078': 'ATIKAH', '322140': 'HASMIDA',
+    '322157': 'Liana', '325905': 'ANIS', '331487': 'FERERRY LORENZY',
+    '334716': 'NOR ATIKAH', '335454': 'NURUL ASHIKIN', '351652': 'CHIN YOKE MOY',
+    '354974': 'MOHD SYAREDZA', '355179': 'SUHAILI AHMAD', '355186': 'YAZID',
+    '361446': 'NORIESSA', '372169': 'BADRUL HISHAM', '377850': 'ADILA',
+    '379915': 'MOHD FAIZOL', '384933': 'IEQA', '386999': 'HANNA', '387002': 'NUR AMIRA',
+    '387019': 'NIK NUR AYUNI', '387026': 'ayu', '388986': 'NUR MUZDALIFAH',
+    '389181': 'FARHANAH', '389204': 'Mohd Izuan', '389761': 'MASMIZA',
+    '402576': 'MOHAMAD HELMIE', '405881': 'NOR AZLINA', '409803': 'UMI KALSUM',
+    '409865': 'TARMIZI', '417877': 'DALIANA', '418201': 'ZUNNUR', '421768': 'DALIANA',
+    '423090': 'NURFARANIA', '426893': 'NUR ATIQAH', '437271': 'NOR HAFIZIE',
+    '440288': 'Arnizawati', '441858': 'AINA', '441865': 'ZAINAL', '471923': 'AZIRA',
+    '473385': 'NURAIN', '473545': 'AIMAN FARHAN', '473590': 'AMIRUL AFIFI',
+    '473606': 'AIMAN NAZREEN', '474672': 'ARIF', '474757': 'FARAHIN', '481038': 'SHAHIR',
+    '481052': 'WAN AFIQ', '481533': 'MOHD FARHAN', '483155': 'ASYRAF',
+    '483162': 'SHAZMEER', '483193': 'AFIQ FARHAN', '483209': 'NADIRAH',
+    '483216': 'HELMI', '483223': 'ALIF RAFIQ', '483230': 'AIDIL AIDID',
+    '483247': 'AHNAF', '483254': 'LUQMAN', '483261': 'SMANTHOZEUS', '483278': 'AMIRUL',
+    '489461': 'JANNY ROSARY', '489478': 'LYASMIRA', '491594': 'YAMUNA',
+    '491617': 'SITI AISAH', '493017': 'SITI RASMAH', '493765': 'SITI AISAH',
+    '493772': 'NORAZILAH', '493789': 'MOHAMAD HAFIZZ', '493987': 'Nur Azri',
+    '494564': 'SAIDATUL', '494571': 'KHAIRUL ANWAR', '499064': 'EYRA',
+    '500777': 'RAZHAN', '502238': 'CHLOE CHEN', '502641': 'AFIQ FARHAN',
+    '502658': 'KHAIRUL', '506540': 'Nurafifah Daud', '506649': 'NORSHAHIDA',
+    '506656': 'NURSHARIDA', '506663': 'LIYANA', '508803': 'WAN NOOR MALIZ',
+    '511629': 'JAY', '511988': 'MAIZATUL', '511995': 'WANA', '512268': 'ZAHIR',
+    '512411': 'IZZUL IKHWAN', '512459': 'AMIN', '514187': 'ROZAIMY',
+    '519342': 'AIZAT', '519748': 'KASIH AMANDA', '520072': 'NURUL SYIFA',
+    '524599': 'SAIFUDDIN', '525619': 'MEI YEE', '527194': 'RUTRASH',
+    '529842': 'SYAMIMI LIYANA', '530552': 'SHIRLYN', '532747': 'HASNORASHIKIN',
+    '535847': 'cc', '535854': 'ZUNNUR', '537735': 'AHMAD FAUZI', '538947': 'MAYA',
+    '542951': 'AEVY', '543415': 'MUGENESWARI', '543422': 'FARA SHUHADA',
+    '547857': 'FARAH ATIKAH', '550604': 'NURRAINNA', '553209': 'VISHNU',
+    '553216': 'SITI NOR AZURA', '553223': 'MUHILAN', '555579': 'SHAHRIZ',
+    '555593': 'AMIN', '555869': 'NATASHA', '558785': 'RASUL', '559065': "NOR'AIN",
+    '560320': 'Alif', '566032': 'NATASHA', '570558': 'Ng Pei Jun', '575188': 'MIRA',
+    '576758': 'SYAFFIQ', '577847': 'NORNISAIDA', '578639': 'Mohamad Syafiq',
+    '578806': 'ASNAH', '580908': 'FATIN IZZATY', '580915': 'Rosmalinda',
+    '581134': 'TASHA', '581141': 'Juema', '583312': 'SHARINA SIREGAR',
+    '583329': 'AMIERA FILZA', '583336': 'Norhayati', '583671': 'NG PEI JUN',
+    '583732': 'JAMALUDIN', '584104': 'NG PEI JUN', '584616': 'CHU YING',
+    '585057': 'NURUL NAINA', '585187': 'MUHAMMAD SUKRI', '585309': 'MUHAMMAD KAMIL',
+    '586467': 'Sha. Rohayu', '586665': 'ROSMALINDA', '586702': 'Faiszuddin',
+    '586719': 'RIZ', '586856': 'FARHAN', '586870': 'Muhamad Razif',
+    '586894': 'Nasirah', '587266': 'KHAIRUL', '587280': 'Muhammad Fadli',
+    '587297': 'NURUL ATIKAH', '587624': 'SYAFIQ', '588270': 'SYAMIMI',
+    '589017': 'ROSMALINDA', '589307': 'ASHVINI', '589314': 'ARIFF', '589475': 'YUNUS',
+    '589482': 'Amir Saifullah', '591737': 'SHAHRUL HAZNI', '592642': 'WANI',
+    '597241': 'SITI NOR AISHAH', '597258': 'AINI SOFIA', '597272': 'YEN PENG',
+    '597371': 'SYAZWAN', '598934': 'NUR NADIAH', '605984': 'Aslam',
+    '609180': 'NURUL SYAHIRAH', '609203': 'MUHD MIFZAL', '609210': 'FARAH',
+    '610704': 'HAFFISZI', '614870': 'MUHD HIDAYAT', '619233': 'NAJWA',
+    '619240': 'MOHD HELMI', '620352': 'MUHD SAFFI', '620437': 'HAZIQ',
+    '630252': 'NURIN ATHIRAH', '633505': 'HAZIQ', '633512': 'Dasuki',
+    '633529': 'SHAHRUL FIRDAUS', '635790': 'ABDUL KADIR', '635905': 'ADAM',
+    '640718': 'Hazlina', '641968': 'FATIN', '642057': 'HUMAIZAH',
+    '642668': 'NICHOLAS FAHMI', '642965': 'MUHD HADI', '650106': 'FIRDAUS',
+    '650113': 'HANIS SYAZANA', '650229': 'NURSYAWALIZA', '650519': 'AIZANI',
+    '654210': 'SANTHI', '654548': 'ARDY', '657129': 'IDRUS MAT',
+    '662529': 'NORSHAZLINA', '662536': 'AMIRUL', '665667': 'MOHAMMAD AFIQ',
+    '665674': 'A.AIZAD', '667005': 'MUHD AMIR', '667807': 'ABDUL',
+    '668781': 'SHAMALAH', '670173': 'ZULKARNAIN', '670180': 'NAJWA',
+    '672276': 'NURUL SYIFA', '672375': 'ZAHIRUL HAQ', '676021': 'FITRI',
+    '676878': 'LOKMAN', '681131': 'SITI SOLEHAH', '681148': 'NADZIRAH',
+    '688574': 'NIK EIDLAN', '689113': 'NORZATY', '689120': 'DANIAL ASYRAF',
+    '689830': 'SHAFAWI', '691185': 'YUSOF', '692335': 'SHARJITAH',
+    '702478': 'RAZAK', '704342': 'AMEYRA', '704373': 'AMIRUL',
+    '723770': 'MEOR RIDHWAN', '723961': 'MURNIE', '724685': 'FIZAH',
+    '725415': 'MOHD ZAFRI', '725507': 'SUNTHARI', '726511': 'MOHD JAFNI',
+    '729222': 'JAMILAH', '736916': 'ARIF', '736923': 'ASYRAFF',
+    '736961': 'AQILAH', '736978': 'RASYDAN', '737029': 'SITI RAHAYU',
+    '738569': 'AIN', '742313': 'SITI SUHAILI', '742320': 'AKMA', '743426': 'NABILA',
+    '746069': 'FIQRI', '746212': 'HAFIZ', '746229': 'AZIM', '746236': 'KHAIRUL HAZWAN',
+    '748704': 'SYAHID ADLII', '748735': 'AMIR FARHAN', '748780': 'SYAZELAN',
+    '748797': 'MUHD FAHMI', '748803': 'HAKEEM', '748827': 'ZULKARNAIN',
+    '748834': 'SYARIF', '748841': 'SHUKERY', '748858': 'NAUFAL AKIF',
+    '748865': 'SHAQIL', '749046': 'HAQ', '749077': 'MUHD IKBAL', '749091': 'IHSAN',
+    '749107': 'KHAIRUL', '750011': 'SHAH REZA', '750738': 'NURUL SYAHIRAH',
+    '751339': 'EFADH', '751735': 'SYUHADAH', '751834': 'ZULKIFLI',
+    '752817': 'MUHD AFIQ', '752824': 'MUHD ILYAS', '752831': 'AZMIL AIDIL',
+    '752855': "NA'IM", '755757': 'MIMI', '760355': 'NURUL EFFIQA',
+    '761062': 'FARHAN', '762533': 'AHMAD DASUKI', '762557': 'NAZRIN',
+    '763141': 'SYAFUAN AIDIL', '763165': 'FAIZ', '765893': 'SITI HAWA',
+    '767620': 'NIK SYAHMI', '770064': 'ZARIEF', '770071': 'IZZAT',
+    '770156': 'KU AMIRUL', '770170': 'IRFAN', '773539': 'ZAWANI',
+    '775786': 'NUR HAIRIENNA', '781312': 'SAIDATUL AKMA', '781626': 'SHAH',
+    '782005': 'FARID IKHMAN', '782449': 'AISYAH SAKINAH', '784306': 'HADI',
+    '785969': 'FAIZ ZULKIFLI', '786058': 'NICHOLAS FAHMI', '787369': 'ASSA ASYEMA',
+    '790659': 'ROSMAWATI', '790666': 'SYAFIQ', '790673': 'IKMAL FAIZ',
+    '790697': 'ZURAI', '792806': 'NORHARTINI', '796200': 'AELYA NASLIN',
+    '796279': 'NUR ALIA', '796286': 'LUQMAN HAKIM', '797313': 'MUHAIMIN',
+    '797320': 'AQIL NAIM', '801362': 'Fairus Saharani', '801744': 'Siti Salwan',
+    '802420': 'NURHAFIZAM', '802444': 'AMIR FARHAN', '802451': 'QASHRI',
+    '802505': 'SYAZANI', '802512': 'AMIR UMAR', '802529': 'AZIMAN',
+    '803359': 'IMAN', '803519': 'IZZUDDIN', '804400': 'AMIRUL FARIS',
+    '804431': 'ANNUAR SYAHIR', '804608': 'KHAIRUL NAIM', '804615': 'NAZIRUL HANIF',
+    '805193': 'SK WONG', '806039': 'Mazlan', '806138': 'SH LEONG',
+    '806572': 'ZULHELMI', '807449': 'FARID', '807722': 'KHAFIZAH',
+    '809542': 'VIKNESH', '811002': 'SYAHIRAH', '814409': 'ADAM',
+    '814713': 'MIIRRAH', '814911': 'DANISH', '816007': 'NAZIR',
+    '817028': 'AMMAR FIKHRI', '819084': 'ZUHDI', '819138': 'SYAHRUL',
+    '820776': 'DIN', '821841': 'ATIQAH', '821865': 'SHAFIQ IZHAM', '827201': 'AIMI',
+    '827249': 'Balkis', '827256': 'Hakimi', '827553': 'Hakimi', '839891': 'SYUHADA',
+    '840019': 'NURSYAHIRAH', '840026': 'NOOR NAJLA', '840743': 'SITI SUHAILAH',
+    '840804': 'NOOR AZINAH', '840842': 'NUR SHAFIQAH', '840927': 'SUZIANTI',
+    '842242': 'NUR DALILAH', '842266': 'NOREZWANI', '842365': 'KHAIRUL',
+    '842488': 'FARID', '848442': 'MUBARAQ', '849319': 'HARITH', '850032': 'ARIFF',
+    '850070': 'SYAKIR', '850087': 'IKHMAL', '850780': 'NURUL AQILAH',
+    '851367': 'MOHAMAD IQBAL', '851800': 'IZWAN', '852173': 'NUR AFIQAH',
+    '852302': 'AZMIL AIDIL', '852708': 'NURUL AZIRAH', '853583': 'NURHANA AFIFAH',
+    '853774': 'SHARJITAH', '853811': 'IMBRAN', '853910': 'ATIKAH',
+    '853941': 'PUNITHA', '857710': 'ASHIKIN', '862332': 'AKIF RUSYAIDI',
+    '865746': 'ISWANDY', '865753': 'FAMHMIE FITRIE', '865999': 'HAFIZI SABRI',
+    '866224': 'SHUKERY', '868556': 'FARHAN', '869072': 'ANWAR',
+    '869157': 'FARIZ FAHRIZAL', '869164': 'AMIRUL ASYRAAF', '869218': 'NURSYAKIRIN',
+    '869225': 'ISKANDAR', '869232': 'MUHAMMAD HAIKAL', '869447': 'HAZIQ',
+    '869904': 'MUHAMMAD AFHAM', '870016': 'NABIL FIKRI', '870092': 'AZRIQ',
+    '870153': 'SHAZLY IMAN', '870177': 'ILMAN ZAHID', '870672': 'AHMAD MUZAKKIR',
+    '870924': 'AMIN FAIZ', '870931': 'ZEN', '871136': 'AHMAD HAREZZ',
+    '871143': 'ADI HAIKAL', '871167': 'LUQMAN AL-HAKIM', '873871': 'FARHAIN',
+    '873932': 'NURUL FATIHAH', '879712': 'MUHD RAZIN', '879729': 'THARIQ',
+    '879972': 'MUHHAMMAD AZHAR', '885430': 'USAMA', '885447': 'ZULAIKHA',
+    '891677': 'DELIA', '891684': 'NATASYA', '891974': 'MUHD HAFIEZ',
+    '892568': 'ARWIN', '895286': 'SHEN TONG', '895439': 'YONG SIAN',
+    '896221': 'QILA', '896399': 'PUSPA', '896429': 'NURUL SHAHIDAH',
+    '896870': 'Ginette Lim', '908870': 'MUZAREEQ', '909068': 'FARRAH',
+    '909297': 'AIMAN SYAFIQ', '912099': 'SHAIK M.DANIEL', '912297': 'SIVAPRAKASH',
+    '912303': 'YUVAN RAJ', '912631': 'DANIEL HAQIEM', '915991': 'NURLINA',
+    '951241': 'ZAIDANI', '962285': 'RAVENTHAREN', '972369': 'NUR HIDAYAH',
+    '972376': 'DANIAL', '978958': 'SHAZWAN', '978972': 'MUHD AIMAN',
+    '979801': 'IZZUDDIN', '991629': 'AHNAF', '996761': 'HAZIQ ARIF',
+    '997737': 'GIRISH KUMAR', '997959': 'Tiffany Lim', '998093': 'IMRAN'
+  };
+
+  // ============ CONSTANTS ============
   const logInput = document.getElementById('logInput');
   const generateBtn = document.getElementById('generateBtn');
   const previewContainer = document.getElementById('receiptPreviewContainer');
@@ -329,6 +1073,9 @@
   const pmyCodeInput = document.getElementById('pmyCodeInput');
   const marginRange = document.getElementById('marginRange');
   const marginValue = document.getElementById('marginValue');
+
+  const DEFAULT_CASHIER = 'KAHIRUL YAZID';
+  const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
 
   const PAYMENT_TYPES = [
     'VISA', 'MASTER', 'MASTERCARD', 'AMEX', 'AMERICAN EXPRESS',
@@ -339,18 +1086,14 @@
     'MAE', 'CIMB', 'MAYBANK', 'PUBLIC BANK', 'RHB', 'HONG LEONG',
     'INSTALLMENT', 'EPP', 'BNPL', 'ATOME', 'SPAYLATER', 'HUTANG',
     'SHOPEEPAY', 'LAZADA', 'ZALORA', 'FOODPANDA', 'GRABFOOD',
-    'DEBIT CARD', 'CREDIT CARD' , 'PCV' , 'PDV' , 'MRV' , 'CHANGE IN CASH'
+    'DEBIT CARD', 'CREDIT CARD', 'PCV', 'PDV', 'MRV', 'CHANGE IN CASH'
   ];
 
   let cashierNames = [];
-  const DEFAULT_CASHIER = 'KAHIRUL YAZID';
 
-  const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
-
+  // ============ UTILS ============
   function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt) {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
+    return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   }
 
   function escapeHtml(text) {
@@ -359,14 +1102,55 @@
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
+  // ============ CASHIER EXTRACTION ============
+  function extractCashierId(receiptText) {
+    // Pattern utama: |N<7-digit> <6-digit cashier ID> <terminal> <...> <date> <time>
+    // Contoh: |N0245538 896870 319 01 30/10/26 14:32 127
+    const mainMatch = receiptText.match(/\|N\d{7}\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
+    if (mainMatch && mainMatch[1]) return mainMatch[1];
+
+    // Fallback: scan setiap line
+    const lines = receiptText.split('\n');
+    for (const line of lines) {
+      const m = line.match(/^\s*\|N(\d{7})\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
+      if (m && m[2]) return m[2];
+    }
+    return null;
+  }
+
+  function getCashierNameById(id) {
+    if (!id) return null;
+    const cleanId = String(id).replace(/\D/g, '').padStart(6, '0');
+    const name = CASHIER_MAP[cleanId];
+    if (name && name.trim().length > 0) return name.trim();
+    return null;
+  }
+
+  // ============ CASHIER INPUTS UI ============
   function rebuildCashierInputs() {
     const log = logInput.value;
     const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
     const count = matches ? matches.length : 0;
 
+    if (count === 0) {
+      cashierInputsContainer.innerHTML = '<div style="color: var(--c-text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">Paste log untuk detect cashier</div>';
+      cashierNames = [];
+      return;
+    }
+
     const newNames = [];
+    const detectedIds = [];
+
     for (let i = 0; i < count; i++) {
-      newNames.push(cashierNames[i] !== undefined ? cashierNames[i] : DEFAULT_CASHIER);
+      if (cashierNames[i] !== undefined && cashierNames[i] !== DEFAULT_CASHIER) {
+        newNames.push(cashierNames[i]);
+        detectedIds.push(null);
+      } else {
+        const id = matches && matches[i] ? extractCashierId(matches[i]) : null;
+        detectedIds.push(id);
+        const mapped = getCashierNameById(id);
+        newNames.push(mapped || DEFAULT_CASHIER);
+      }
     }
     cashierNames = newNames;
 
@@ -375,16 +1159,44 @@
       let trxTag = '';
       if (matches && matches[i]) {
         const trxMatch = matches[i].match(/\|BCTRX#:\s*([^\s\n]+)/);
-        if (trxMatch) trxTag = 'Trx#: ' + trxMatch[1];
+        if (trxMatch) trxTag = trxMatch[1];
+      }
+
+      const id = detectedIds[i];
+      const mapped = id ? getCashierNameById(id) : null;
+
+      let itemClass = 'cashier-item';
+      let badgeHtml = '';
+      if (id && mapped) {
+        itemClass += ' detected';
+        badgeHtml = `<span class="badge detected">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          ID ${id}
+        </span>`;
+      } else if (id && !mapped) {
+        itemClass += ' unknown';
+        badgeHtml = `<span class="badge unknown">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+          ID ${id}
+        </span>`;
+      } else {
+        badgeHtml = `<span class="badge manual">Manual</span>`;
       }
 
       const div = document.createElement('div');
-      div.className = 'per-receipt-cashier';
+      div.className = itemClass;
       div.innerHTML = `
-        <label class="r-label">
-          <span>Resit ${i + 1} â€” Cashier</span>
-          <span class="trx-tag">${escapeHtml(trxTag)}</span>
-        </label>
+        <div class="item-head">
+          <div class="item-title">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+            Resit ${i + 1}
+            ${badgeHtml}
+          </div>
+          ${trxTag ? `<span class="trx-tag">${escapeHtml(trxTag)}</span>` : ''}
+        </div>
         <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama cashier resit ${i + 1}">
       `;
       cashierInputsContainer.appendChild(div);
@@ -399,12 +1211,13 @@
     });
   }
 
+  // ============ RECEIPT PARSING ============
   function parseSingleReceipt(receiptText, cashier, pmy) {
-    let cleanText = receiptText.replace(/[â€¢\x1b]/g, '');
-    
+    let cleanText = receiptText.replace(/[•\x1b]/g, '');
+
     const salesMatch = cleanText.match(/\*\*\*BEGIN SALES\*\*\*([\s\S]*?)\*\*\*END SALES\*\*\*/);
     if (!salesMatch) return null;
-    
+
     let receiptData = salesMatch[1];
 
     receiptData = receiptData.replace(/Terminal No\.:[^\n]*\n/g, '');
@@ -413,7 +1226,7 @@
 
     receiptData = receiptData.replace(/([^\n])(\|N|\|BC|\|4C|\|BCTRX)/g, '$1\n$2');
     receiptData = receiptData.replace(/\|N([A-Z])/g, '|N $1');
-    
+
     const lines = receiptData.split('\n').map(l => l.trim()).filter(l => l);
 
     let data = {
@@ -434,14 +1247,19 @@
     lines.forEach(line => {
       if (!line) return;
 
+      // Skip line yang ada cashier ID pattern (supaya tak masuk body)
+      if (/^\|N\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/.test(line)) {
+        return;
+      }
+
       if (line.startsWith('|4C')) {
         const txt = line.substring(3).trim();
         if (!data.storeName) data.storeName = txt;
         else if (!data.branchName) data.branchName = txt;
       }
       else if (line.startsWith('|BCTRX#')) {
-        let rawTrx = line.substring(7).trim(); 
-        rawTrx = rawTrx.replace(/^:/, ''); 
+        let rawTrx = line.substring(7).trim();
+        rawTrx = rawTrx.replace(/^:/, '');
         const starMatch = rawTrx.match(/\s*\*+\s*$/);
         if (starMatch) {
           data.trxStars = starMatch[0].trim();
@@ -452,16 +1270,13 @@
       else if (line.startsWith('|N')) {
         const txt = line.substring(2).trim();
         if (!txt) return;
-
         const nClass = 'r-normal';
 
-        if (txt.includes('Purchases may be exchanged')) {
-          data.hasFooterNote = true;
-        }
+        if (txt.includes('Purchases may be exchanged')) data.hasFooterNote = true;
 
         if (isAddress && !txt.includes('SDN BHD') && !txt.includes('19860100')) {
           data.addressLines.push(txt);
-        } 
+        }
         else if (txt.includes('SDN BHD') || txt.includes('19860100') || txt.includes('WWW.')) {
           isAddress = false;
           data.companyLines.push(txt);
@@ -475,47 +1290,47 @@
         else if (txt.match(/DISC:|DISCOUNT/i)) {
           const match = txt.match(/^(.*?)\s+(-?[\d\.,]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(match[1])}</span>
-                        <span class="r-item-price">${escapeHtml(match[2])}</span>
-                      </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(match[1])}</span>
+              <span class="r-item-price">${escapeHtml(match[2])}</span>
+            </div>`);
           } else {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(txt)}</span>
-                      </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(txt)}</span>
+            </div>`);
           }
         }
         else if (txt.match(/PARKSON CARD\s*:\s*([\d\.,]+)/i)) {
           const match = txt.match(/PARKSON CARD\s*:\s*([\d\.,]+)/i);
           data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">PARKSON CARD :</span>
-                        <span class="r-item-price">${escapeHtml(match[1])}</span>
-                      </div>`);
+            <span class="r-item-name">PARKSON CARD :</span>
+            <span class="r-item-price">${escapeHtml(match[1])}</span>
+          </div>`);
         }
         else if (/^\d{6,12}\s+[A-Z]/i.test(txt)) {
           if (txt.match(/[\d\.,]+$/) && !txt.includes('X')) {
-             const match = txt.match(/^(.*?)\s+([\d\.,]+)$/);
-             if (match) {
-               data.bodyItems.push(`<div class="r-item-row ${nClass}">
-                    <span class="r-item-name">${escapeHtml(match[1].trim())}</span>
-                    <span class="r-item-price">${escapeHtml(match[2])}</span>
-                  </div>`);
-             } else {
-               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
-             }
+            const match = txt.match(/^(.*?)\s+([\d\.,]+)$/);
+            if (match) {
+              data.bodyItems.push(`<div class="r-item-row ${nClass}">
+                <span class="r-item-name">${escapeHtml(match[1].trim())}</span>
+                <span class="r-item-price">${escapeHtml(match[2])}</span>
+              </div>`);
+            } else {
+              data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+            }
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/[\d\.,]+\s*X\s*[\d\.,]+(?:RM)?\s*[\d\.,]+/i)) {
           const parts = txt.match(/([\d\.,]+)\s*X\s*([\d\.,]+)(?:RM)?\s*([\d\.,]+)/i);
           if (parts) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                     <span class="r-item-name">${escapeHtml(parts[1])} x ${escapeHtml(parts[2])}RM</span>
-                     <span class="r-item-price">${escapeHtml(parts[3])}</span>
-                   </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(parts[1])} x ${escapeHtml(parts[2])}RM</span>
+              <span class="r-item-price">${escapeHtml(parts[3])}</span>
+            </div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}" style="padding-left:10px;">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}" style="padding-left:10px;">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.startsWith('S/N:')) {
@@ -529,37 +1344,37 @@
         else if (txt.match(/NORMAL POINTS|EXTRA POINTS|TOTAL POINTS/i)) {
           const match = txt.match(/^(.*?)\s*:\s*([\d\.,]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(match[1].trim())} :</span>
-                        <span class="r-item-price">${escapeHtml(match[2].trim())}</span>
-                      </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(match[1].trim())} :</span>
+              <span class="r-item-price">${escapeHtml(match[2].trim())}</span>
+            </div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/BALANCE|REDEEMABLE/i)) {
           const match = txt.match(/^(.*?)\s*:\s*([\d\.,A-Z]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-nowrap ${nClass}">${escapeHtml(match[1].trim())} :${escapeHtml(match[2].trim())}</div>`);
+            data.bodyItems.push(`<div class="r-nowrap ${nClass}">${escapeHtml(match[1].trim())} :${escapeHtml(match[2].trim())}</div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/MEMBERSHIP NUMBER/i)) {
-           const parts = txt.split(':');
-           if (parts.length >= 2) {
-               const label = parts[0].trim() + ' :';
-               const value = parts.slice(1).join(':').trim();
-               data.bodyItems.push(`<div class="r-membership-justify"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
-           } else {
-               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
-           }
+          const parts = txt.split(':');
+          if (parts.length >= 2) {
+            const label = parts[0].trim() + ' :';
+            const value = parts.slice(1).join(':').trim();
+            data.bodyItems.push(`<div class="r-membership-justify"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
+          } else {
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+          }
         }
         else if (txt.match(/APV AS AT/i)) {
-           data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+          data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
         }
         else {
-           data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+          data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
         }
       }
       else if (line.startsWith('|BC')) {
@@ -594,7 +1409,7 @@
           const parsed = parseFloat(amount.replace(/[,]/g, ''));
           if (!isNaN(parsed)) data.totalAmount = parsed;
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
-        } 
+        }
         else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) {
           const parts = txt.split(' ');
           const amount = parts.pop();
@@ -622,12 +1437,8 @@
         else {
           let foundPayment = false;
           for (const pt of PAYMENT_TYPES) {
-            if (txt.toUpperCase().startsWith(pt)) {
-              foundPayment = true;
-              break;
-            }
+            if (txt.toUpperCase().startsWith(pt)) { foundPayment = true; break; }
           }
-
           if (foundPayment) {
             const lastSpace = txt.lastIndexOf(' ');
             if (lastSpace !== -1) {
@@ -648,9 +1459,7 @@
       }
     });
 
-    if (data.totalAmount > 10000) {
-      data.hasEInvoiceRemark = true;
-    }
+    if (data.totalAmount > 10000) data.hasEInvoiceRemark = true;
 
     if (data.returnedItemDetail) {
       data.bodyItems.unshift(`<div class="r-returned-detail">${escapeHtml(data.returnedItemDetail)}</div>`);
@@ -658,7 +1467,6 @@
     if (data.returnedItemTitle) {
       data.bodyItems.unshift(`<div class="r-returned-title">${escapeHtml(data.returnedItemTitle)}</div>`);
     }
-
     if (data.eInvoiceRemarkText) {
       const cleanText = data.eInvoiceRemarkText.trim();
       const titleCaseText = toTitleCase(cleanText);
@@ -679,18 +1487,17 @@
     headerHtml += `<div class="r-center r-normal" style="margin-top:2px;">`;
     data.companyLines.forEach(line => {
       if (line.includes('WWW.')) {
-           headerHtml += `<div class="r-www">${escapeHtml(line.toLowerCase())}</div>`;
+        headerHtml += `<div class="r-www">${escapeHtml(line.toLowerCase())}</div>`;
       } else {
-          headerHtml += `<div>${escapeHtml(line)}</div>`;
+        headerHtml += `<div>${escapeHtml(line)}</div>`;
       }
     });
     headerHtml += `</div>`;
-    if (data.dateLine) {
-      headerHtml += `<div class="r-date-left">${escapeHtml(data.dateLine)}</div>`;
-    }
+    if (data.dateLine) headerHtml += `<div class="r-date-left">${escapeHtml(data.dateLine)}</div>`;
+
     let trxDisplay = data.trxNo;
-    if(trxDisplay.startsWith(':')) trxDisplay = trxDisplay.substring(1);
-    
+    if (trxDisplay.startsWith(':')) trxDisplay = trxDisplay.substring(1);
+
     if (data.trxStars) {
       headerHtml += `<div class="r-trx-flex"><span class="r-trx-label">Trx#:${escapeHtml(trxDisplay)}</span><span class="r-trx-star">${escapeHtml(data.trxStars)}</span></div>`;
     } else {
@@ -704,33 +1511,26 @@
     let parts = barcodeDisplayText.split('-');
 
     if (parts.length === 3) {
-        let p1 = parts[0]; 
-        let p2 = parts[1]; 
-        let p3 = parts[2]; 
-        let cleanP3 = p3.replace(/^0+/, ''); 
-        let formattedP3 = '000' + cleanP3.padStart(6, '0');
-        barcodeDisplayText = 'T' + '000' + p1 + '-' + p2 + formattedP3;
+      let p1 = parts[0], p2 = parts[1], p3 = parts[2];
+      let cleanP3 = p3.replace(/^0+/, '');
+      let formattedP3 = '000' + cleanP3.padStart(6, '0');
+      barcodeDisplayText = 'T' + '000' + p1 + '-' + p2 + formattedP3;
     } else {
-        barcodeDisplayText = 'T' + barcodeDisplayText.replace(/-/g, '');
+      barcodeDisplayText = 'T' + barcodeDisplayText.replace(/-/g, '');
     }
 
     let footerHtml = `<div class="r-section-barcode-last">`;
-    footerHtml += `<div class="barcode-container">`;
-    footerHtml += `<svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg>`;
-    footerHtml += `</div>`;
+    footerHtml += `<div class="barcode-container"><svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg></div>`;
     footerHtml += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}</div>`;
-    
     if (data.hasEInvoiceRemark) {
       footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000    require a mandatory e-invoice issuance at Customer Service.</div>`;
     }
-    
     footerHtml += `</div>`;
-  
+
     let footerNoteHtml = '';
     footerNoteHtml += `<div class="r-justify r-normal" style="width: 100%;">Purchases may be exchanged or returned within 7 days (product exclusion applies). Any vouchers redeemed must be surrendered else the amount will be deducted from the refund. Terms apply.</div>`;
     footerNoteHtml += `<div class="r-center r-normal">customerservice@parkson.com.my</div>`;
     footerNoteHtml += `<div class="r-center r-normal">THANK YOU FOR YOUR PATRONAGE</div>`;
-
 
     let promoHtml = `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
     promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* YOU ORDER, WE DELIVER!</div>`;
@@ -741,6 +1541,7 @@
     promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">Terms Apply</div>`;
     promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
 
+    // ← CASHIER NAME: exact macam dalam mapping (dah trim masa lookup)
     let cashierHtml = `<div class="r-normal">Cashier Name : ${escapeHtml(cashier)}</div>`;
     cashierHtml += `<div class="r-normal">${escapeHtml(pmy)}</div>`;
 
@@ -760,6 +1561,7 @@
     </div>`;
   }
 
+  // ============ A4 SPLIT ============
   function getA4ColumnHeight() {
     const A4_IN = 11.69;
     const PADDING_IN = 0.4;
@@ -777,7 +1579,7 @@
     ].filter(x => x.html);
 
     const temp = document.createElement('div');
-    temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3in;';
+    temp.style.cssText = 'position:absolute; left:-99999px; top:0; width:3.2in;';
     document.body.appendChild(temp);
 
     temp.innerHTML = `<div class="receipt-preview-item" style="${MEASURE_STYLE}">${r.headerHtml}</div>`;
@@ -801,14 +1603,12 @@
 
     for (let i = 0; i < tailItems.length; i++) {
       const h = itemHeights[i];
-
       if (currentH + h > MAX && current.length > 0) {
         parts.push({ items: current, includeHeader: isFirstPart });
         isFirstPart = false;
         current = [];
         currentH = 0;
       }
-
       current.push(tailItems[i].html);
       currentH += h;
     }
@@ -834,19 +1634,32 @@
     </div>`);
   }
 
+  // ============ MAIN UPDATE ============
   function updatePreview() {
     const log = logInput.value;
     const pmy = pmyCodeInput.value;
-    
-    previewContainer.innerHTML = '';
-    
+
     const regex = /\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g;
     const matches = log.match(regex);
 
     if (!matches || matches.length === 0) {
-        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px;">âŒ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
-        return;
+      previewContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <h3>Belum ada receipt</h3>
+          <p>Paste log E-Journal di sebelah kiri untuk mula preview</p>
+        </div>`;
+      return;
     }
+
+    previewContainer.innerHTML = '';
 
     const receipts = [];
     matches.forEach((chunk, i) => {
@@ -858,7 +1671,7 @@
     const A4_COLUMN_H = getA4ColumnHeight();
 
     const hiddenWrap = document.createElement('div');
-    hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3in;';
+    hiddenWrap.style.cssText = 'position:absolute; left:-99999px; top:0; visibility:hidden; width:3.2in;';
     document.body.appendChild(hiddenWrap);
     hiddenWrap.innerHTML = receipts.map(r => buildFullHtml(r).replace('class="receipt-preview-item"', `class="receipt-preview-item" style="${MEASURE_STYLE}"`)).join('');
     const fullItems = hiddenWrap.querySelectorAll('.receipt-preview-item');
@@ -866,7 +1679,6 @@
     hiddenWrap.remove();
 
     const SHORT_THRESHOLD = A4_COLUMN_H;
-
     const pages = [];
     let shortQueue = [];
 
@@ -927,27 +1739,28 @@
     previewContainer.innerHTML = finalHtml;
 
     setTimeout(() => {
-        document.querySelectorAll('.barcode-svg').forEach(svg => {
-          const val = svg.getAttribute('data-value');
-          if (val) {
-            try {
-              JsBarcode(svg, val, { format: "CODE128", width: 1.8, height: 18, displayValue: false, margin: 0 });
-            } catch (e) { console.error("Barcode error:", e); }
-          }
-        });
+      document.querySelectorAll('.barcode-svg').forEach(svg => {
+        const val = svg.getAttribute('data-value');
+        if (val) {
+          try {
+            JsBarcode(svg, val, { format: "CODE128", width: 1.8, height: 18, displayValue: false, margin: 0 });
+          } catch (e) { console.error("Barcode error:", e); }
+        }
+      });
     }, 50);
   }
 
+  // ============ EVENTS ============
   logInput.addEventListener('input', () => {
     rebuildCashierInputs();
     updatePreview();
   });
   pmyCodeInput.addEventListener('input', updatePreview);
-  
+
   generateBtn.addEventListener('click', (e) => {
     e.preventDefault();
     updatePreview();
-    setTimeout(() => window.print(), 400); 
+    setTimeout(() => window.print(), 400);
   });
 
   marginRange.addEventListener('input', function() {
