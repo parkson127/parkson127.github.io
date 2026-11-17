@@ -5,8 +5,6 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Multi-Receipt → A4 Auto Split</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="/info-box.css">
-  <script src="/notes.js" defer></script>
   <style>
     :root {
       --body-font-size: 10pt;
@@ -18,13 +16,8 @@
       --max-width-membership-pmy: 6.5cm;
       --max-width-barcode-last: 7.2cm;
       --receipt-width: 3.2in;
-      --a4-width: 8.27in;
-      --a4-height: 11.69in;
-      --a4-padding: 0.4in;
-      --col-gap: 0.5in;
       --print-margin: 0mm;
 
-      /* Design tokens */
       --c-bg: #f1f5f9;
       --c-surface: #ffffff;
       --c-border: #e2e8f0;
@@ -36,41 +29,28 @@
       --c-success-hover: #059669;
       --c-warning: #f59e0b;
       --c-danger: #ef4444;
-      --c-info: #3b82f6;
       --radius-sm: 8px;
       --radius-md: 12px;
       --radius-lg: 16px;
       --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
       --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-      --shadow-lg: 0 20px 40px rgba(0,0,0,0.10);
     }
 
-    * {
-      margin: 0; padding: 0; box-sizing: border-box;
-      font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       background: var(--c-bg);
       min-height: 100vh;
-      display: flex;
-      align-items: flex-start;
-      justify-content: center;
       padding: 24px;
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     /* ============ APP LAYOUT ============ */
-    .app {
-      max-width: 1440px;
-      width: 100%;
-    }
+    .app { max-width: 1440px; margin: 0 auto; width: 100%; }
 
     .app-header {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-bottom: 20px;
-      padding: 0 4px;
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; padding: 0 4px;
     }
     .app-header .logo {
       width: 44px; height: 44px;
@@ -79,22 +59,14 @@
       display: flex; align-items: center; justify-content: center;
       color: white;
       box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      flex-shrink: 0;
     }
-    .app-header h1 {
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--c-text);
-      letter-spacing: -0.3px;
-    }
-    .app-header p {
-      font-size: 0.8rem;
-      color: var(--c-text-muted);
-      margin-top: 2px;
-    }
+    .app-header h1 { font-size: 1.25rem; font-weight: 700; color: var(--c-text); letter-spacing: -0.3px; }
+    .app-header p { font-size: 0.8rem; color: var(--c-text-muted); margin-top: 2px; }
 
     .layout {
       display: grid;
-      grid-template-columns: 420px 1fr;
+      grid-template-columns: 440px 1fr;
       gap: 20px;
       align-items: flex-start;
     }
@@ -108,60 +80,39 @@
       overflow: hidden;
     }
     .card-header {
-      padding: 16px 20px;
+      padding: 14px 18px;
       border-bottom: 1px solid var(--c-border);
-      display: flex;
-      align-items: center;
-      gap: 10px;
+      display: flex; align-items: center; gap: 10px;
       background: linear-gradient(180deg, #fafbfc, #f8fafc);
     }
     .card-header .icon {
       width: 32px; height: 32px;
       border-radius: var(--radius-sm);
-      background: #eff6ff;
-      color: var(--c-primary);
+      background: #eff6ff; color: var(--c-primary);
       display: flex; align-items: center; justify-content: center;
       flex-shrink: 0;
     }
-    .card-header .icon.success {
-      background: #ecfdf5;
-      color: var(--c-success);
-    }
-    .card-header .icon.warn {
-      background: #fffbeb;
-      color: var(--c-warning);
-    }
-    .card-header h2 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--c-text);
-      letter-spacing: -0.2px;
-    }
-    .card-header .subtitle {
-      font-size: 0.75rem;
-      color: var(--c-text-muted);
-      margin-top: 1px;
-      font-family: -apple-system, sans-serif;
-    }
-    .card-body {
-      padding: 16px 20px;
-    }
+    .card-header .icon.success { background: #ecfdf5; color: var(--c-success); }
+    .card-header .icon.warn { background: #fffbeb; color: var(--c-warning); }
+    .card-header h2 { font-size: 0.95rem; font-weight: 600; color: var(--c-text); letter-spacing: -0.2px; }
+    .card-header .subtitle { font-size: 0.75rem; color: var(--c-text-muted); margin-top: 1px; }
+    .card-body { padding: 16px 18px; }
 
     /* ============ FORM PANEL ============ */
     .form-panel {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      position: sticky;
-      top: 24px;
+      display: flex; flex-direction: column; gap: 16px;
+      position: sticky; top: 24px;
       max-height: calc(100vh - 48px);
       overflow-y: auto;
+      padding-right: 4px;
     }
+    .form-panel::-webkit-scrollbar { width: 6px; }
+    .form-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
     .log-textarea {
       width: 100%;
-      min-height: 180px;
-      max-height: 280px;
+      min-height: 160px;
+      max-height: 260px;
       padding: 12px 14px;
       border: 1.5px solid var(--c-border);
       border-radius: var(--radius-md);
@@ -180,79 +131,85 @@
     }
     .log-textarea::placeholder { color: #64748b; }
 
-    /* Per-receipt cashier cards */
+    /* ============ CASHIER CARDS ============ */
     .cashier-list {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
+      display: flex; flex-direction: column; gap: 10px;
+      max-height: 420px;
+      overflow-y: auto;
+      padding-right: 4px;
+      scroll-behavior: smooth;
     }
+    .cashier-list::-webkit-scrollbar { width: 6px; }
+    .cashier-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
     .cashier-item {
       background: #f8fafc;
-      border: 1px solid var(--c-border);
+      border: 1.5px solid var(--c-border);
       border-radius: var(--radius-md);
-      padding: 12px 14px;
-      transition: border-color 0.15s;
+      padding: 14px 14px 12px;
+      transition: border-color 0.15s, box-shadow 0.15s;
+      position: relative;
     }
-    .cashier-item:hover {
-      border-color: #cbd5e1;
-    }
-    .cashier-item.detected {
-      background: #f0fdf4;
-      border-color: #86efac;
-    }
-    .cashier-item.unknown {
-      background: #fef2f2;
-      border-color: #fca5a5;
-    }
-    .cashier-item .item-head {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 8px;
-      gap: 8px;
-    }
-    .cashier-item .item-title {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--c-text);
-    }
-    .cashier-item .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      font-size: 0.68rem;
-      font-weight: 600;
-      padding: 3px 8px;
-      border-radius: 20px;
+    .cashier-item:hover { box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .cashier-item.detected { background: #f0fdf4; border-color: #86efac; }
+    .cashier-item.unknown { background: #fef2f2; border-color: #fca5a5; }
+
+    /* Big receipt number badge — left side */
+    .cashier-item .receipt-num {
+      position: absolute;
+      top: -8px;
+      left: 12px;
+      background: var(--c-primary);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 3px 10px;
+      border-radius: 12px;
+      letter-spacing: 0.3px;
+      box-shadow: 0 2px 6px rgba(37,99,235,0.3);
       font-family: -apple-system, sans-serif;
     }
-    .badge.detected {
-      background: #dcfce7;
-      color: #166534;
+    .cashier-item.detected .receipt-num {
+      background: var(--c-success);
+      box-shadow: 0 2px 6px rgba(16,185,129,0.3);
     }
-    .badge.unknown {
-      background: #fee2e2;
-      color: #991b1b;
+    .cashier-item.unknown .receipt-num {
+      background: var(--c-danger);
+      box-shadow: 0 2px 6px rgba(239,68,68,0.3);
     }
-    .badge.manual {
-      background: #dbeafe;
-      color: #1e40af;
+
+    .cashier-item .item-head {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-bottom: 8px; margin-top: 4px; gap: 8px;
     }
+    .cashier-item .item-title {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.82rem; font-weight: 600; color: var(--c-text);
+      flex-wrap: wrap;
+    }
+    .cashier-item .badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.68rem; font-weight: 600;
+      padding: 3px 8px; border-radius: 20px;
+    }
+    .badge.detected { background: #dcfce7; color: #166534; }
+    .badge.unknown { background: #fee2e2; color: #991b1b; }
+    .badge.manual { background: #dbeafe; color: #1e40af; }
     .cashier-item .trx-tag {
-      font-size: 0.7rem;
-      color: var(--c-text-muted);
+      font-size: 0.68rem; color: var(--c-text-muted);
       font-family: 'Consolas', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 150px;
     }
     .cashier-item input {
       width: 100%;
-      padding: 8px 12px;
+      padding: 9px 12px;
       border: 1px solid #cbd5e1;
       border-radius: var(--radius-sm);
       font-family: 'Consolas', monospace;
-      font-size: 0.85rem;
+      font-size: 0.88rem;
       background: white;
       color: var(--c-text);
       transition: border-color 0.15s, box-shadow 0.15s;
@@ -262,33 +219,15 @@
       border-color: var(--c-primary);
       box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
     }
-    .cashier-item .id-hint {
-      font-size: 0.7rem;
-      color: var(--c-text-muted);
-      margin-top: 6px;
-      font-family: 'Consolas', monospace;
-    }
 
-    /* PMY + margin in 2-col grid */
-    .field-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
+    /* ============ SETTINGS ============ */
     .field {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
+      display: flex; flex-direction: column; gap: 6px;
     }
     .field label {
-      font-size: 0.72rem;
-      font-weight: 600;
-      color: var(--c-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      gap: 6px;
+      font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+      display: flex; align-items: center; gap: 6px;
     }
     .field input[type="text"] {
       padding: 8px 12px;
@@ -307,65 +246,38 @@
     }
     .field .value-display {
       display: inline-block;
-      background: #dbeafe;
-      color: #1e40af;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      font-family: -apple-system, sans-serif;
+      background: #dbeafe; color: #1e40af;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 0.72rem; font-weight: 700;
     }
 
-    /* Range slider */
-    .range-wrap {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
     input[type="range"] {
-      width: 100%;
-      height: 6px;
-      border-radius: 3px;
-      background: #e2e8f0;
-      outline: none;
-      -webkit-appearance: none;
-      appearance: none;
+      width: 100%; height: 6px;
+      border-radius: 3px; background: #e2e8f0;
+      outline: none; -webkit-appearance: none; appearance: none;
     }
     input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      appearance: none;
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: var(--c-primary);
-      cursor: pointer;
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--c-primary); cursor: pointer;
       border: 3px solid white;
       box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
     input[type="range"]::-moz-range-thumb {
-      width: 18px; height: 18px;
-      border-radius: 50%;
-      background: var(--c-primary);
-      cursor: pointer;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--c-primary); cursor: pointer;
       border: 3px solid white;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
     }
 
-    /* Generate button */
     .btn-generate {
       width: 100%;
       background: linear-gradient(135deg, var(--c-success), var(--c-success-hover));
-      color: white;
-      border: none;
-      padding: 14px;
+      color: white; border: none; padding: 14px;
       border-radius: var(--radius-md);
-      font-weight: 700;
-      font-size: 0.95rem;
+      font-weight: 700; font-size: 0.95rem;
       cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      display: flex; align-items: center; justify-content: center;
       gap: 10px;
-      font-family: -apple-system, sans-serif;
       transition: transform 0.1s, box-shadow 0.15s;
       box-shadow: 0 4px 12px rgba(16,185,129,0.3);
     }
@@ -373,78 +285,42 @@
       transform: translateY(-1px);
       box-shadow: 0 6px 16px rgba(16,185,129,0.4);
     }
-    .btn-generate:active {
-      transform: translateY(0);
-    }
+    .btn-generate:active { transform: translateY(0); }
 
-    /* ============ PREVIEW PANEL ============ */
-    .preview-panel {
-      min-height: 400px;
-      display: flex;
-      flex-direction: column;
-    }
+    /* ============ PREVIEW ============ */
+    .preview-panel { min-height: 400px; display: flex; flex-direction: column; }
     .preview-scroll {
       padding: 20px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
-      overflow-x: auto;
+      display: flex; flex-direction: column; align-items: center;
+      gap: 20px; overflow-x: auto;
       background: #f8fafc;
     }
 
     .empty-state {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      padding: 60px 20px;
-      color: var(--c-text-muted);
-      text-align: center;
-      gap: 12px;
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 20px;
+      color: var(--c-text-muted); text-align: center; gap: 12px;
     }
     .empty-state .empty-icon {
-      width: 64px; height: 64px;
-      border-radius: 50%;
+      width: 64px; height: 64px; border-radius: 50%;
       background: #e2e8f0;
       display: flex; align-items: center; justify-content: center;
       color: #94a3b8;
     }
-    .empty-state h3 {
-      font-size: 0.95rem;
-      font-weight: 600;
-      color: var(--c-text);
-    }
-    .empty-state p {
-      font-size: 0.8rem;
-      max-width: 300px;
-      line-height: 1.5;
-    }
+    .empty-state h3 { font-size: 0.95rem; font-weight: 600; color: var(--c-text); }
+    .empty-state p { font-size: 0.8rem; max-width: 300px; line-height: 1.5; }
 
-    /* ============ RECEIPT STYLES (preserve original) ============ */
+    /* ============ RECEIPT STYLES ============ */
     .receipt-preview-item {
-      background: #fafafa;
-      padding: 10px 5px;
-      font-family: 'Consolas', monospace;
-      font-weight: 400;
-      font-size: var(--body-font-size);
-      line-height: 1.05;
-      color: #000;
-      width: 3.2in;
-      min-width: 3.2in;
-      max-width: 3.2in;
-      box-shadow: 0 0 10px rgba(0,0,0,0.05);
-      letter-spacing: -1.2px;
-      margin-bottom: 20px;
-      border-bottom: 2px dashed #94a3b8;
-      padding-bottom: 10px;
-      text-align: left;
+      background: #fafafa; padding: 10px 5px;
+      font-family: 'Consolas', monospace; font-weight: 400;
+      font-size: var(--body-font-size); line-height: 1.05;
+      color: #000; width: 3.2in; min-width: 3.2in; max-width: 3.2in;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05); letter-spacing: -1.2px;
+      margin-bottom: 20px; border-bottom: 2px dashed #94a3b8;
+      padding-bottom: 10px; text-align: left;
     }
-    .receipt-preview-item:last-child {
-      margin-bottom: 0;
-      border-bottom: none;
-      padding-bottom: 0;
-    }
+    .receipt-preview-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
 
     .r-center { text-align: center !important; }
     .r-left { text-align: left !important; }
@@ -453,17 +329,13 @@
     .r-normal { font-weight: 400; text-align: left; }
     .r-dash { border-top: 1px dashed #000; margin: 3px 0; }
 
-    .r-item-row {
-      display: flex; justify-content: space-between; align-items: flex-start;
-      gap: 5px; width: 100%;
-    }
+    .r-item-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; }
     .r-item-name { flex: 1; text-align: left; }
     .r-item-price { white-space: nowrap; text-align: right; }
     .r-nowrap { white-space: nowrap !important; display: block; width: 100%; text-align: left; }
 
     .r-section-header-trx { max-width: var(--max-width-header-trx); width: 100%; margin: 0; }
     .r-section-item-number { max-width: var(--max-width-item-number); width: 100%; margin: 0; }
-    .r-section-membership-pmy { max-width: var(--max-width-membership-pmy); width: 100%; margin: 0; }
     .r-section-barcode-last { max-width: var(--max-width-barcode-last); width: 100%; margin: 0; }
 
     .r-header-main {
@@ -547,8 +419,7 @@
     }
     .a4-preview-page::after {
       content: "A4"; position: absolute; top: 4px; right: 6px;
-      font-size: 9px; color: #94a3b8; font-family: sans-serif;
-      letter-spacing: 1px;
+      font-size: 9px; color: #94a3b8; letter-spacing: 1px;
     }
     .a4-single-col { grid-template-columns: 1fr; }
     .split-part {
@@ -570,14 +441,13 @@
         width: 8.27in !important; display: block !important;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
-      .app-header, .form-panel, .card-header, .preview-scroll > .empty-state { display: none !important; }
+      .app-header, .form-panel, .card-header { display: none !important; }
       .layout { display: block !important; }
       .card, .card-body, .preview-panel, .preview-scroll {
         box-shadow: none !important; padding: 0 !important; margin: 0 !important;
         max-width: 100% !important; width: 100% !important;
         border: none !important; overflow: visible !important;
         display: block !important; background: white !important;
-        gap: 0 !important;
       }
       #receiptPreviewContainer { display: block !important; width: 100% !important; }
       .a4-preview-page {
@@ -614,7 +484,6 @@
       .split-part { min-height: 0 !important; }
     }
 
-    /* Responsive */
     @media (max-width: 1100px) {
       .layout { grid-template-columns: 1fr; }
       .form-panel { position: static; max-height: none; }
@@ -624,7 +493,6 @@
 <body>
 
 <div class="app">
-  <!-- Header -->
   <header class="app-header">
     <div class="logo">
       <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -640,10 +508,8 @@
   </header>
 
   <div class="layout">
-    <!-- FORM PANEL -->
     <div class="form-panel">
 
-      <!-- Log input card -->
       <div class="card">
         <div class="card-header">
           <div class="icon">
@@ -652,7 +518,6 @@
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
               <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
           </div>
           <div>
@@ -665,7 +530,6 @@
         </div>
       </div>
 
-      <!-- Cashier card -->
       <div class="card">
         <div class="card-header">
           <div class="icon success">
@@ -688,7 +552,6 @@
         </div>
       </div>
 
-      <!-- Settings card -->
       <div class="card">
         <div class="card-header">
           <div class="icon warn">
@@ -705,26 +568,12 @@
         <div class="card-body">
           <div style="display: flex; flex-direction: column; gap: 16px;">
             <div class="field">
-              <label>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                  <line x1="16" y1="2" x2="16" y2="6"></line>
-                  <line x1="8" y1="2" x2="8" y2="6"></line>
-                  <line x1="3" y1="10" x2="21" y2="10"></line>
-                </svg>
-                PMY Code
-              </label>
+              <label>PMY Code</label>
               <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
             </div>
-            <div class="range-wrap">
-              <label style="font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center;">
-                <span style="display: flex; align-items: center; gap: 6px;">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <line x1="12" y1="19" x2="12" y2="5"></line>
-                    <polyline points="5 12 12 5 19 12"></polyline>
-                  </svg>
-                  Print Margin
-                </span>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span>Print Margin</span>
                 <span class="value-display" id="marginValue">0mm</span>
               </label>
               <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
@@ -733,7 +582,6 @@
         </div>
       </div>
 
-      <!-- Generate button -->
       <button class="btn-generate" id="generateBtn">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="6 9 6 2 18 2 18 9"></polyline>
@@ -744,7 +592,6 @@
       </button>
     </div>
 
-    <!-- PREVIEW PANEL -->
     <div class="card preview-panel">
       <div class="card-header">
         <div class="icon">
@@ -766,7 +613,6 @@
               <polyline points="14 2 14 8 20 8"></polyline>
               <line x1="16" y1="13" x2="8" y2="13"></line>
               <line x1="16" y1="17" x2="8" y2="17"></line>
-              <polyline points="10 9 9 9 8 9"></polyline>
             </svg>
           </div>
           <h3>Belum ada receipt</h3>
@@ -778,7 +624,6 @@
 </div>
 
 <script>
-  // ============ CASHIER MAPPING (exact case dari .txt) ============
   const CASHIER_MAP = {
     '000352': 'HAZIM', '000369': 'KRISWARAN', '000383': 'HAZRUL', '000390': 'NOR AFIFAH',
     '000475': 'SYAHIR', '000840': 'BASYIR', '000949': 'BARATHAN', '001007': 'DAYANA',
@@ -1065,7 +910,6 @@
     '997737': 'GIRISH KUMAR', '997959': 'Tiffany Lim', '998093': 'IMRAN'
   };
 
-  // ============ CONSTANTS ============
   const logInput = document.getElementById('logInput');
   const generateBtn = document.getElementById('generateBtn');
   const previewContainer = document.getElementById('receiptPreviewContainer');
@@ -1074,7 +918,7 @@
   const marginRange = document.getElementById('marginRange');
   const marginValue = document.getElementById('marginValue');
 
-  const DEFAULT_CASHIER = 'CASHIER NAME';
+  const DEFAULT_CASHIER = 'KAHIRUL YAZID';
   const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
 
   const PAYMENT_TYPES = [
@@ -1091,7 +935,6 @@
 
   let cashierNames = [];
 
-  // ============ UTILS ============
   function toTitleCase(str) {
     return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   }
@@ -1102,14 +945,11 @@
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
-  // ============ CASHIER EXTRACTION ============
+  // ============ CASHIER ID EXTRACTION ============
   function extractCashierId(receiptText) {
-    // Pattern utama: |N<7-digit> <6-digit cashier ID> <terminal> <...> <date> <time>
-    // Contoh: |N0245538 896870 319 01 30/10/26 14:32 127
+    // Pattern: |N<7-digit> <6-digit cashier ID> <terminal> <...> <date> <time>
     const mainMatch = receiptText.match(/\|N\d{7}\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
     if (mainMatch && mainMatch[1]) return mainMatch[1];
-
-    // Fallback: scan setiap line
     const lines = receiptText.split('\n');
     for (const line of lines) {
       const m = line.match(/^\s*\|N(\d{7})\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
@@ -1123,6 +963,19 @@
     const cleanId = String(id).replace(/\D/g, '').padStart(6, '0');
     const name = CASHIER_MAP[cleanId];
     if (name && name.trim().length > 0) return name.trim();
+    return null;
+  }
+
+  // ============ DATE LINE EXTRACTION ============
+  // Extract date portion from cashier line: "|N0245538 896870 319 01 30/10/26 14:32 127"
+  // Result: "0245538 896870 319 01 30/10/26 14:32 127" (original full line)
+  // Or the date only: "30/10/26 14:32"
+  function extractDateLine(receiptText) {
+    const match = receiptText.match(/\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2})/);
+    if (match && match[1]) {
+      // Return full line tanpa |N prefix
+      return match[1].trim();
+    }
     return null;
   }
 
@@ -1167,14 +1020,17 @@
 
       let itemClass = 'cashier-item';
       let badgeHtml = '';
+      let receiptNumClass = '';
       if (id && mapped) {
         itemClass += ' detected';
+        receiptNumClass = 'detected';
         badgeHtml = `<span class="badge detected">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
           ID ${id}
         </span>`;
       } else if (id && !mapped) {
         itemClass += ' unknown';
+        receiptNumClass = 'unknown';
         badgeHtml = `<span class="badge unknown">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
           ID ${id}
@@ -1186,13 +1042,9 @@
       const div = document.createElement('div');
       div.className = itemClass;
       div.innerHTML = `
+        <div class="receipt-num">RESIT ${i + 1}</div>
         <div class="item-head">
           <div class="item-title">
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-              <circle cx="12" cy="7" r="4"></circle>
-            </svg>
-            Resit ${i + 1}
             ${badgeHtml}
           </div>
           ${trxTag ? `<span class="trx-tag">${escapeHtml(trxTag)}</span>` : ''}
@@ -1247,10 +1099,12 @@
     lines.forEach(line => {
       if (!line) return;
 
-      // Skip line yang ada cashier ID pattern (supaya tak masuk body)
-      if (/^\|N\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/.test(line)) {
-        return;
-      }
+      // Capture FULL date line from cashier line — sama macam receipt asal
+const cashierLineMatch = line.match(/^\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}\s+\d+)/);
+if (cashierLineMatch) {
+  data.dateLine = cashierLineMatch[1].trim(); // ← FULL line, bukan date only
+  return;
+}
 
       if (line.startsWith('|4C')) {
         const txt = line.substring(3).trim();
@@ -1282,7 +1136,8 @@
           data.companyLines.push(txt);
         }
         else if (txt.match(/\d{2}\/\d{2}\/\d{2} \d{2}:\d{2}/)) {
-          data.dateLine = txt;
+          // Fallback kalau ada date line lain
+          if (!data.dateLine) data.dateLine = txt;
         }
         else if (txt.includes('----')) {
           data.bodyItems.push(`<div class="r-dash"></div>`);
@@ -1381,14 +1236,8 @@
         const txt = line.substring(3).trim();
         const bcClass = 'r-bold';
 
-        if (txt.startsWith('RETURNED ITEM(S)')) {
-          data.returnedItemTitle = txt;
-          return;
-        }
-        if (txt.startsWith('(ORG TRX#')) {
-          data.returnedItemDetail = txt;
-          return;
-        }
+        if (txt.startsWith('RETURNED ITEM(S)')) { data.returnedItemTitle = txt; return; }
+        if (txt.startsWith('(ORG TRX#')) { data.returnedItemDetail = txt; return; }
 
         if (txt.startsWith('(PLEASE PROCEED TO THE CUSTOMER SERVICE') ||
             txt.startsWith('(PLEASE PROCEED') ||
@@ -1541,7 +1390,6 @@
     promoHtml += `<div class="r-normal" style="width: 100%; text-align: left;">Terms Apply</div>`;
     promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
 
-    // ← CASHIER NAME: exact macam dalam mapping (dah trim masa lookup)
     let cashierHtml = `<div class="r-normal">Cashier Name : ${escapeHtml(cashier)}</div>`;
     cashierHtml += `<div class="r-normal">${escapeHtml(pmy)}</div>`;
 
@@ -1561,7 +1409,6 @@
     </div>`;
   }
 
-  // ============ A4 SPLIT ============
   function getA4ColumnHeight() {
     const A4_IN = 11.69;
     const PADDING_IN = 0.4;
@@ -1634,7 +1481,6 @@
     </div>`);
   }
 
-  // ============ MAIN UPDATE ============
   function updatePreview() {
     const log = logInput.value;
     const pmy = pmyCodeInput.value;
@@ -1713,26 +1559,16 @@
       if (page.type === 'parts') {
         const cols = page.htmls;
         if (cols.length === 2) {
-          finalHtml += `<div class="a4-preview-page">`;
-          finalHtml += `<div class="split-part">${cols[0]}</div>`;
-          finalHtml += `<div class="split-part">${cols[1]}</div>`;
-          finalHtml += `</div>`;
+          finalHtml += `<div class="a4-preview-page"><div class="split-part">${cols[0]}</div><div class="split-part">${cols[1]}</div></div>`;
         } else {
-          finalHtml += `<div class="a4-preview-page a4-single-col">`;
-          finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${cols[0]}</div>`;
-          finalHtml += `</div>`;
+          finalHtml += `<div class="a4-preview-page a4-single-col"><div class="split-part" style="grid-column: 1 / -1;">${cols[0]}</div></div>`;
         }
       } else if (page.type === 'pair') {
         const [a, b] = page.indices;
-        finalHtml += `<div class="a4-preview-page">`;
-        finalHtml += `<div class="split-part">${buildFullHtml(receipts[a])}</div>`;
-        finalHtml += `<div class="split-part">${buildFullHtml(receipts[b])}</div>`;
-        finalHtml += `</div>`;
+        finalHtml += `<div class="a4-preview-page"><div class="split-part">${buildFullHtml(receipts[a])}</div><div class="split-part">${buildFullHtml(receipts[b])}</div></div>`;
       } else {
         const idx = page.indices[0];
-        finalHtml += `<div class="a4-preview-page a4-single-col">`;
-        finalHtml += `<div class="split-part" style="grid-column: 1 / -1;">${buildFullHtml(receipts[idx])}</div>`;
-        finalHtml += `</div>`;
+        finalHtml += `<div class="a4-preview-page a4-single-col"><div class="split-part" style="grid-column: 1 / -1;">${buildFullHtml(receipts[idx])}</div></div>`;
       }
     });
 
@@ -1750,7 +1586,6 @@
     }, 50);
   }
 
-  // ============ EVENTS ============
   logInput.addEventListener('input', () => {
     rebuildCashierInputs();
     updatePreview();
