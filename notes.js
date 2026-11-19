@@ -99,7 +99,7 @@
         '<ul>' +
         '<li><b>1. Copy</b> kandungan eJournal dari sistem</li>' +
         '<li><b>2. Paste</b> dalam kotak yang disediakan (boleh paste <b>beberapa resit</b> sekali gus)</li>' +
-        '<li><b>3. WAJIB tulis <code>NAMA CASHIER</code> secara MANUAL</b> sebelum print</li>' +
+        '<li><b>3. Nama Cashier akan muncul auto jika nama dan id telah direkodkan ( tekan butang + )</b> boleh semak dulu sebelum print</li>' +
         '<li><b>4. Semak</b> semua detail — kemudian tekan <b>Print</b></li>' +
         '</ul>' +
         '<p style="margin-top:8px;"><b>⚠️ Jangan skip nama cashier</b> — resit tanpa nama cashier tidak sah untuk rekod.</p>'
