@@ -3,123 +3,597 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt â€” A4 Auto Split (Fixed)</title>
+  <title>Multi-Receipt ? A4 Auto Split</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
-  <link rel="stylesheet" href="/info-box.css">
-<script src="/notes.js" defer></script>
   <style>
     :root {
       --body-font-size: 10pt;
       --header-main-size: 2.0rem;
       --header-branch-size: 2.0rem;
-      --barcode-text-size: 1.1rem;
+      --barcode-text-size: 1.0rem;
       --max-width-header-trx: 6.7cm;
       --max-width-item-number: 6.2cm;
-      --max-width-membership-pmy: 6.5cm;
       --max-width-barcode-last: 7.2cm;
       --receipt-width: 3.2in;
-      --a4-width: 8.27in;
-      --a4-height: 11.69in;
-      --a4-padding: 0.4in;
-      --col-gap: 0.5in;
       --print-margin: 0mm;
-    }
-    
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Consolas', 'Lucida Console', 'Courier New', monospace; }
-    body { background: #f3f4f6; min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 20px; }
-    .container { max-width: 1400px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 20px 35px rgba(0,0,0,0.1); padding: 30px; }
-    h1 { font-size: 1.5rem; font-weight: 600; color: #1e293b; text-align: center; margin-bottom: 25px; border-bottom: 2px dashed #cbd5e1; padding-bottom: 15px; font-family: sans-serif; }
-    .receipt-wrapper { display: flex; flex-wrap: wrap; gap: 30px; }
-    
-    .form-panel { flex: 1; min-width: 380px; background: #f8fafc; border-radius: 18px; padding: 20px; border: 1px solid #e2e8f0; display: flex; flex-direction: column; position: relative; }
-    .form-panel h2 { font-size: 1.1rem; margin-bottom: 10px; color: #0f172a; font-family: sans-serif; }
-    
-    .per-receipt-cashier {
-      background: #dbeafe; padding: 10px; border-radius: 8px;
-      margin-bottom: 10px; border-left: 4px solid #3b82f6;
-    }
-    .per-receipt-cashier .r-label {
-      display: flex; justify-content: space-between; align-items: center;
-      font-size: 0.75rem; font-weight: 700; color: #1e40af;
-      margin-bottom: 4px; font-family: sans-serif;
-    }
-    .per-receipt-cashier .r-label .trx-tag {
-      font-size: 0.65rem; color: #64748b; font-weight: 400;
-      font-family: 'Consolas', monospace;
-    }
-    .per-receipt-cashier input {
-      width: 100%; padding: 6px 10px; border: 1px solid #93c5fd;
-      border-radius: 6px; font-family: 'Consolas', monospace;
-      font-size: 0.85rem; background: white;
-    }
-    
-    .pmy-global {
-      background: #fef3c7; padding: 10px; border-radius: 8px;
-      margin-bottom: 15px; border-left: 4px solid #f59e0b;
-    }
-    .pmy-global label {
-      display: block; font-size: 0.75rem; font-weight: 700;
-      color: #92400e; margin-bottom: 4px; font-family: sans-serif;
-    }
-    .pmy-global input {
-      width: 100%; padding: 6px 10px; border: 1px solid #fcd34d;
-      border-radius: 6px; font-family: 'Consolas', monospace;
-      font-size: 0.85rem; background: white;
+
+      --c-bg: #f1f5f9;
+      --c-surface: #ffffff;
+      --c-border: #e2e8f0;
+      --c-text: #0f172a;
+      --c-text-muted: #64748b;
+      --c-primary: #2563eb;
+      --c-success: #10b981;
+      --c-success-hover: #059669;
+      --c-warning: #f59e0b;
+      --c-danger: #ef4444;
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
     }
 
-    .margin-control {
-      background: #e2e8f0; padding: 10px; border-radius: 8px;
-      margin-bottom: 15px;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: var(--c-bg);
+      min-height: 100vh;
+      padding: 24px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
-    .margin-control label {
-      display: block; font-size: 0.75rem; font-weight: 700;
-      color: #334155; margin-bottom: 4px; font-family: sans-serif;
+
+    .app { max-width: 1440px; margin: 0 auto; width: 100%; }
+
+    .app-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 20px; padding: 0 4px;
     }
-    .margin-control .value-display {
-      display: inline-block; background: #cbd5e1;
-      padding: 2px 8px; border-radius: 4px; font-size: 0.8rem;
-      margin-left: 8px; font-weight: 600;
-    }
-    .margin-control input[type="range"] { width: 100%; }
-    
-    .log-textarea {
-      width: 100%; flex: 1; min-height: 300px; max-height: 400px; padding: 15px;
-      border: 1px solid #cbd5e1; border-radius: 12px;
-      font-family: 'Consolas', monospace; font-size: 0.85rem;
-      background: #0f172a; color: #38bdf8; resize: vertical;
-      line-height: 1.4; margin-bottom: 15px;
-    }
-    .log-textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59,130,246,0.2); }
-    
-    .print-warning {
-      background: #fffbeb; border: 1px solid #fcd34d; color: #b45309;
-      padding: 10px; border-radius: 8px; font-size: 0.8rem;
-      margin-bottom: 15px; display: flex; align-items: flex-start;
-      gap: 8px; font-family: sans-serif; line-height: 1.4;
-    }
-    .btn-generate {
-      width: 100%; background: #10b981; color: white; border: none;
-      padding: 15px; border-radius: 12px; font-weight: 700;
-      font-size: 1rem; cursor: pointer; transition: 0.2s;
+    .app-header .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, var(--c-primary), #1e40af);
+      border-radius: var(--radius-md);
       display: flex; align-items: center; justify-content: center;
-      gap: 10px; font-family: sans-serif;
-      position: sticky; bottom: 0; z-index: 10;
-      box-shadow: 0 -4px 12px rgba(0,0,0,0.08);
+      color: white;
+      box-shadow: 0 4px 12px rgba(37,99,235,0.3);
+      flex-shrink: 0;
     }
-    .btn-generate:hover { background: #059669; transform: translateY(-2px); }
-    
-    .preview-panel {
-      flex: 1.5; min-width: 350px; background: white;
-      border-radius: 12px; padding: 15px; border: 2px dashed #cbd5e1;
+    .app-header h1 { font-size: 1.25rem; font-weight: 700; color: var(--c-text); letter-spacing: -0.3px; }
+    .app-header p { font-size: 0.8rem; color: var(--c-text-muted); margin-top: 2px; }
+
+.btn-toggle-cashier {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1.5px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: inherit;
+}
+.btn-toggle-cashier:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  background: #eff6ff;
+}
+.btn-toggle-cashier.active {
+  background: var(--c-success);
+  border-color: var(--c-success);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+.btn-toggle-cashier.active:hover {
+  background: var(--c-success-hover);
+  border-color: var(--c-success-hover);
+  color: white;
+}
+.btn-toggle-cashier .toggle-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: background 0.15s;
+}
+.btn-toggle-cashier.active .toggle-dot {
+  background: #bbf7d0;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+/* Class untuk hide floating box */
+.floating-cashier.hidden {
+  display: none !important;
+}
+    .layout {
+      display: grid;
+      grid-template-columns: 440px 1fr;
+      gap: 20px;
+      align-items: flex-start;
+    }
+
+    .card {
+      background: var(--c-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow-md);
+      border: 1px solid var(--c-border);
+      overflow: hidden;
+    }
+    .card-header {
+      padding: 14px 18px;
+      border-bottom: 1px solid var(--c-border);
+      display: flex; align-items: center; gap: 10px;
+      background: linear-gradient(180deg, #fafbfc, #f8fafc);
+    }
+    .card-header .icon {
+      width: 32px; height: 32px;
+      border-radius: var(--radius-sm);
+      background: #eff6ff; color: var(--c-primary);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .card-header .icon.success { background: #ecfdf5; color: var(--c-success); }
+    .card-header .icon.warn { background: #fffbeb; color: var(--c-warning); }
+    .card-header h2 { font-size: 0.95rem; font-weight: 600; color: var(--c-text); letter-spacing: -0.2px; }
+    .card-header .subtitle { font-size: 0.75rem; color: var(--c-text-muted); margin-top: 1px; }
+    .card-body { padding: 16px 18px; }
+
+    .form-panel {
+      display: flex; flex-direction: column; gap: 16px;
+      position: sticky; top: 24px;
+      max-height: calc(100vh - 48px);
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .form-panel::-webkit-scrollbar { width: 6px; }
+    .form-panel::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+    .log-textarea {
+      width: 100%;
+      min-height: 160px;
+      max-height: 260px;
+      padding: 12px 14px;
+      border: 1.5px solid var(--c-border);
+      border-radius: var(--radius-md);
+      font-family: 'Consolas', monospace;
+      font-size: 0.8rem;
+      background: #0f172a;
+      color: #38bdf8;
+      resize: vertical;
+      line-height: 1.5;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    .log-textarea:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+    }
+    .log-textarea::placeholder { color: #64748b; }
+
+    /* ============ FLOATING CASHIER BOX ============ */
+    .floating-cashier {
+      position: fixed;
+      top: 24px;
+      right: 24px;
+      width: 340px;
+      max-height: 85vh;
+      background: var(--c-surface);
+      border-radius: var(--radius-lg);
+      box-shadow: 0 12px 32px rgba(0,0,0,0.18);
+      border: 1px solid var(--c-border);
+      display: flex;
+      flex-direction: column;
+      z-index: 50;
+      overflow: hidden;
+    }
+    .floating-cashier .fc-header {
+      padding: 12px 14px;
+      background: linear-gradient(180deg, #fafbfc, #f8fafc);
+      border-bottom: 1px solid var(--c-border);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .floating-cashier .fc-header .icon {
+      width: 28px; height: 28px;
+      border-radius: 7px;
+      background: #ecfdf5; color: var(--c-success);
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+    }
+    .floating-cashier .fc-header h3 {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--c-text);
+      flex: 1;
+    }
+    .floating-cashier .fc-header .btn-add {
+  background: #34c759;          /* iOS system green */
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(52,199,89,0.35);
+  transition: all 0.15s;
+}
+.floating-cashier .fc-header .btn-add:hover {
+  background: #2fb350;
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(52,199,89,0.5);
+}
+.floating-cashier .fc-header .btn-add:active {
+  transform: scale(0.95);
+}
+
+.floating-cashier .fc-header .btn-close-fc {
+  background: #fee2e2;      /* merah lembut */
+  color: #ef4444;           /* X merah */
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.floating-cashier .fc-header .btn-close-fc:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}
+   
+
+    /* Search box */
+    .fc-search {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--c-border);
+      background: #f8fafc;
+      position: relative;
+    }
+    .fc-search input {
+      width: 100%;
+      padding: 8px 30px 8px 12px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 7px;
+      font-size: 0.8rem;
+      outline: none;
+      background: white;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .fc-search input:focus { border-color: var(--c-primary); }
+    .fc-search .fc-clear {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--c-text-muted);
+      font-size: 1rem;
+      display: none;
+      padding: 4px;
+    }
+    .fc-search .fc-clear.show { display: block; }
+
+    .fc-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 8px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-height: 100px;
+    }
+    .fc-list::-webkit-scrollbar { width: 5px; }
+    .fc-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+    .fc-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 7px 10px;
+      border-radius: 7px;
+      background: #f8fafc;
+      border: 1px solid transparent;
+      transition: all 0.15s;
+      font-size: 0.78rem;
+    }
+    .fc-item:hover {
+      background: #eff6ff;
+      border-color: #bfdbfe;
+    }
+    .fc-item.new-item {
+      animation: slideIn 0.4s ease, flash 2s ease;
+    }
+    @keyframes slideIn {
+      from { transform: translateY(-10px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes flash {
+      0% { background: #bbf7d0; }
+      100% { background: #f8fafc; }
+    }
+    .fc-item .fc-num {
+      flex-shrink: 0;
+      font-size: 0.62rem;
+      font-weight: 800;
+      color: var(--c-primary);
+      background: #dbeafe;
+      width: 20px; height: 20px;
+      border-radius: 5px;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .fc-item:first-child .fc-num {
+      background: var(--c-success);
+      color: white;
+    }
+    .fc-item .fc-id {
+      font-family: 'Consolas', monospace;
+      font-weight: 700;
+      color: var(--c-primary);
+      font-size: 0.75rem;
+      flex-shrink: 0;
+    }
+    .fc-item .fc-name {
+      flex: 1;
+      font-weight: 600;
+      color: var(--c-text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.78rem;
+    }
+    .fc-item mark {
+      background: #fde68a;
+      color: var(--c-text);
+      padding: 0 2px;
+      border-radius: 2px;
+      font-weight: 800;
+    }
+
+    /* Inline add form */
+    .fc-add-form {
+      padding: 10px;
+      border-top: 1px solid var(--c-border);
+      background: #f8fafc;
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .fc-add-form.show { display: flex; }
+    .fc-add-form input {
+      padding: 7px 10px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 6px;
+      font-size: 0.78rem;
+      outline: none;
+      font-family: inherit;
+    }
+    .fc-add-form input:focus { border-color: var(--c-primary); }
+    .fc-add-form .fc-form-actions {
+      display: flex;
+      gap: 6px;
+    }
+    .fc-add-form .fc-form-actions button {
+      flex: 1;
+      padding: 7px;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      cursor: pointer;
+      border: none;
+      transition: opacity 0.15s;
+    }
+    .fc-add-form .fc-form-actions .btn-cancel {
+      background: #e2e8f0;
+      color: var(--c-text);
+    }
+    .fc-add-form .fc-form-actions .btn-save {
+      background: var(--c-success);
+      color: white;
+    }
+    .fc-add-form .fc-form-actions button:hover { opacity: 0.9; }
+    .fc-add-form .fc-form-actions button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .fc-loading {
+      padding: 20px;
+      text-align: center;
+      color: var(--c-text-muted);
+      font-size: 0.78rem;
+    }
+    .fc-no-result {
+      padding: 20px;
+      text-align: center;
+      color: var(--c-text-muted);
+      font-size: 0.78rem;
+    }
+
+    /* ============ CASHIER INPUTS (for receipt) ============ */
+    .cashier-list {
+      display: flex; flex-direction: column; gap: 6px;
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+    .cashier-list::-webkit-scrollbar { width: 6px; }
+    .cashier-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+
+    .cashier-row {
+      display: flex; align-items: center; gap: 8px;
+      padding: 8px 10px;
+      border: 1px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      background: #f8fafc;
+      transition: border-color 0.15s;
+    }
+    .cashier-row:hover { border-color: #cbd5e1; }
+    .cashier-row.detected { background: #f0fdf4; border-color: #bbf7d0; }
+    .cashier-row.unknown { background: #fef2f2; border-color: #fecaca; }
+
+    .cashier-row .resit-num {
+      flex-shrink: 0;
+      font-size: 0.7rem;
+      font-weight: 600;
+      color: white;
+      background: var(--c-primary);
+      padding: 3px 7px;
+      border-radius: 5px;
+      letter-spacing: 0.2px;
+    }
+    .cashier-row.detected .resit-num { background: var(--c-success); }
+    .cashier-row.unknown .resit-num { background: var(--c-danger); }
+
+    .cashier-row .trx-num {
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      color: var(--c-text-muted);
+      font-family: 'Consolas', monospace;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .cashier-row input {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 5px;
+      font-family: 'Consolas', monospace;
+      font-size: 0.75rem;
+      background: white;
+      color: var(--c-text);
+    }
+    .cashier-row input:focus {
+      outline: none;
+      border-color: var(--c-primary);
+    }
+
+    .cashier-row .status-pill {
+      flex-shrink: 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.6rem;
+      font-weight: 700;
+      padding: 3px 4px;
+      border-radius: 5px;
+      letter-spacing: 0.2px;
+      text-transform: uppercase;
+    }
+    .status-pill.auto { background: #dcfce7; color: #166534; }
+    .status-pill.manual { background: #dbeafe; color: #1e40af; }
+    .status-pill.unknown { background: #fee2e2; color: #991b1b; }
+    .status-pill.loading { background: #f1f5f9; color: #64748b; }
+
+    .field { display: flex; flex-direction: column; gap: 6px; }
+    .field label {
+      font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted);
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+    .field input[type="text"] {
+      padding: 8px 12px;
+      border: 1.5px solid var(--c-border);
+      border-radius: var(--radius-sm);
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      background: white;
+      color: var(--c-text);
+    }
+    .field input[type="text"]:focus {
+      outline: none;
+      border-color: var(--c-primary);
+      box-shadow: 0 0 0 2px rgba(37,99,235,0.15);
+    }
+    .field .value-display {
+      display: inline-block;
+      background: #dbeafe; color: #1e40af;
+      padding: 2px 8px; border-radius: 4px;
+      font-size: 0.72rem; font-weight: 700;
+    }
+
+    input[type="range"] {
+      width: 100%; height: 6px;
+      border-radius: 3px; background: #e2e8f0;
+      outline: none; -webkit-appearance: none; appearance: none;
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--c-primary); cursor: pointer;
+      border: 3px solid white;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    }
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: var(--c-primary); cursor: pointer;
+      border: 3px solid white;
+    }
+
+    .btn-generate {
+      width: 100%;
+      background: linear-gradient(135deg, var(--c-success), var(--c-success-hover));
+      color: white; border: none; padding: 14px;
+      border-radius: var(--radius-md);
+      font-weight: 700; font-size: 0.95rem;
+      cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      gap: 10px;
+      transition: transform 0.1s, box-shadow 0.15s;
+      box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+    }
+    .btn-generate:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 16px rgba(16,185,129,0.4);
+    }
+
+    .preview-panel { min-height: 400px; display: flex; flex-direction: column; }
+    .preview-scroll {
+      padding: 20px;
       display: flex; flex-direction: column; align-items: center;
-      overflow-x: auto; max-height: 85vh;
+      gap: 20px; overflow-x: auto;
+      background: #f8fafc;
     }
-    .preview-label {
-      font-size: 0.8rem; text-transform: uppercase; color: #64748b;
-      margin-bottom: 10px; font-weight: 600; text-align: center;
-      font-family: sans-serif;
+
+    .empty-state {
+      display: flex; flex-direction: column; align-items: center;
+      justify-content: center; padding: 60px 20px;
+      color: var(--c-text-muted); text-align: center; gap: 12px;
     }
-    
+    .empty-state .empty-icon {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: #e2e8f0;
+      display: flex; align-items: center; justify-content: center;
+      color: #94a3b8;
+    }
+    .empty-state h3 { font-size: 0.95rem; font-weight: 600; color: var(--c-text); }
+    .empty-state p { font-size: 0.8rem; max-width: 300px; line-height: 1.5; }
+
+    /* ============ RECEIPT STYLES ============ */
     .receipt-preview-item {
       background: #fafafa; padding: 10px 5px;
       font-family: 'Consolas', monospace; font-weight: 400;
@@ -130,86 +604,120 @@
       padding-bottom: 10px; text-align: left;
     }
     .receipt-preview-item:last-child { margin-bottom: 0; border-bottom: none; padding-bottom: 0; }
-    
+
     .r-center { text-align: center !important; }
     .r-left { text-align: left !important; }
     .r-justify { text-align: justify !important; }
     .r-bold { font-weight: 900; }
     .r-normal { font-weight: 400; text-align: left; }
     .r-dash { border-top: 1px dashed #000; margin: 3px 0; }
-    
+
     .r-item-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; }
     .r-item-name { flex: 1; text-align: left; }
     .r-item-price { white-space: nowrap; text-align: right; }
     .r-nowrap { white-space: nowrap !important; display: block; width: 100%; text-align: left; }
-    
+
     .r-section-header-trx { max-width: var(--max-width-header-trx); width: 100%; margin: 0; }
     .r-section-item-number { max-width: var(--max-width-item-number); width: 100%; margin: 0; }
-    .r-section-membership-pmy { max-width: var(--max-width-membership-pmy); width: 100%; margin: 0; }
     .r-section-barcode-last { max-width: var(--max-width-barcode-last); width: 100%; margin: 0; }
-    
-    .r-header-main { font-size: var(--header-main-size); font-weight: 500; letter-spacing: -1.5px; line-height: 1; margin-top: 0; margin-bottom: 0; text-align: center; }
-    .r-header-branch { font-size: var(--header-branch-size); font-weight: 500; letter-spacing: -1.5px; margin-bottom: 2px; margin-top: 0; text-align: center; }
-    
-    .barcode-container { text-align: left; margin-top: 0px; margin-bottom: 0; line-height: 0; }
+
+    .r-header-main {
+      font-size: var(--header-main-size); font-weight: 500;
+      letter-spacing: -1.5px; line-height: 1;
+      margin-top: 0; margin-bottom: 0; text-align: center;
+    }
+    .r-header-branch {
+      font-size: var(--header-branch-size); font-weight: 500;
+      letter-spacing: -1.5px; margin-bottom: 2px; margin-top: 0; text-align: center;
+    }
+
+    .barcode-container { text-align: left; margin: 0; line-height: 0; }
     .barcode-container svg { max-width: 100%; height: auto; display: block; margin: 0; }
-    .barcode-text { text-align: center; font-size: var(--barcode-text-size); letter-spacing: 4.5px; font-weight: 400 !important; margin-top: 0; padding-top: 0; white-space: nowrap; display: block; width: 100%; line-height: 1; }
-    
+    .barcode-text {
+      text-align: center; font-size: var(--barcode-text-size);
+      letter-spacing: 4.5px; font-weight: 400 !important;
+      margin-top: 0; padding-top: 0; white-space: nowrap;
+      display: block; width: 100%; line-height: 1;
+    }
+
     .r-www { text-align: center; width: 100%; letter-spacing: normal; }
-    .r-membership-justify { display: flex; align-items: flex-start; gap: 0px; width: 100%; font-size: var(--body-font-size); font-weight: 600; white-space: nowrap; letter-spacing: 3px; text-align: left; }
-    .r-date-left { font-size: 10pt; font-weight: 400; letter-spacing: -1px; text-align: left; width: 100%; white-space: nowrap; overflow: hidden; }
-    .r-trx-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal; width: 100%; text-align: left; }
-    
+    .r-membership-justify {
+      display: flex; align-items: flex-start; gap: 0;
+      width: 100%; font-size: var(--body-font-size); font-weight: 600;
+      white-space: nowrap; letter-spacing: 3px; text-align: left;
+    }
+    .r-date-left {
+      font-size: 10pt; font-weight: 400; letter-spacing: -0.7px;
+      text-align: left; width: 100%; white-space: nowrap; overflow: hidden;
+    }
+    .r-trx-normal {
+      font-size: var(--body-font-size); font-weight: 900;
+      letter-spacing: normal; width: 100%; text-align: left;
+    }
     .r-trx-flex {
       display: flex; justify-content: space-between;
       align-items: flex-start; gap: 5px; width: 100%;
-      font-size: var(--body-font-size); font-weight: 900;
-      letter-spacing: normal;
+      font-size: var(--body-font-size); font-weight: 900; letter-spacing: normal;
     }
     .r-trx-flex .r-trx-label { text-align: left; flex: 1; white-space: nowrap; }
     .r-trx-flex .r-trx-star { text-align: right; white-space: nowrap; }
-    
-    .r-card-normal { font-size: var(--body-font-size); font-weight: 900; letter-spacing: -0.3pt; width: 100%; text-align: left; }
-    .r-price-row { display: flex; justify-content: space-between; align-items: flex-start; gap: 5px; width: 100%; font-weight: 900; }
+
+    .r-card-normal {
+      font-size: var(--body-font-size); font-weight: 900;
+      letter-spacing: -0.3pt; width: 100%; text-align: left;
+    }
+    .r-price-row {
+      display: flex; justify-content: space-between; align-items: flex-start;
+      gap: 5px; width: 100%; font-weight: 900;
+    }
     .r-price-row .r-label { text-align: left; flex: 1; }
     .r-price-row .r-value { text-align: right; white-space: nowrap; }
 
     .r-returned-title {
-      font-size: var(--body-font-size); letter-spacing: -0.4px;
+      font-size: var(--body-font-size); letter-spacing: -0.8px;
       white-space: nowrap; text-align: left; width: 100%;
       overflow: hidden; font-weight: 900; line-height: 1.1;
     }
     .r-returned-detail {
-      font-size: var(--body-font-size); letter-spacing: -1.21px;
-      white-space: nowrap; text-align: left; width: 100%;
+      font-size: var(--body-font-size); letter-spacing: -0.7px;
+      white-space: nowrap; text-align: left; width: var(--max-width-header-trx);
       overflow: hidden; font-weight: 400; line-height: 1.1;
     }
-
     .r-einvoice-remark-log {
-      font-size: var(--body-font-size); font-weight: 900;letter-spacing: -1px;
-      text-align: left; width: 100%; margin-top: 3px;
-      line-height: 1.1; color: #000;
+      font-size: var(--body-font-size); font-weight: 900; letter-spacing: -1px;
+      text-align: left; width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
     }
-
     .r-einvoice-remark {
-      font-size: 10pt; font-weight: 400; text-align: left;letter-spacing: -1px;
+      font-size: 10pt; font-weight: 400; text-align: left; letter-spacing: -1px;
       width: 100%; margin-top: 3px; line-height: 1.1; color: #000;
     }
 
+    /* ============ A4 PAGE ============ */
     .a4-preview-page {
-      width: 8.27in; height: 11.69in; background: #fff;
+      width: 8.27in;
+      height: 11.69in;
+      background: #fff;
       box-shadow: 0 4px 20px rgba(0,0,0,0.15);
-      padding: 0.4in; margin: 0 auto 20px auto;
-      box-sizing: border-box; display: grid;
-      grid-template-columns: 1fr 1fr; gap: 0.5in;
-      overflow: hidden; position: relative;
+      padding: 0.4in;
+      margin: 0 auto;
+      box-sizing: border-box;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5in;
+      overflow: hidden;
+      position: relative;
     }
     .a4-preview-page::after {
-      content: "A4"; position: absolute; top: 4px; right: 6px;
-      font-size: 9px; color: #94a3b8; font-family: sans-serif;
+      content: "A4";
+      position: absolute;
+      top: 4px;
+      right: 6px;
+      font-size: 9px;
+      color: #94a3b8;
       letter-spacing: 1px;
     }
-    .a4-single-col { grid-template-columns: 1fr; }
+    .a4-preview-page.a4-single-col { grid-template-columns: 1fr; }
+
     .split-part {
       width: 100%;
       height: 100%;
@@ -220,36 +728,50 @@
       align-items: flex-start;
     }
     .split-part > .receipt-preview-item {
-      margin: 0 !important; padding-bottom: 0 !important;
-      border-bottom: none !important; box-shadow: none !important;
+      margin: 0 !important;
+      padding-bottom: 0 !important;
+      border-bottom: none !important;
+      box-shadow: none !important;
       padding-top: 0 !important;
     }
 
+    /* ============ PRINT ============ */
     @media print {
       @page { size: A4 portrait; margin: 0; }
-      html, body { 
+      html, body {
         background: white !important; padding: 0 !important; margin: 0 !important;
         width: 8.27in !important; display: block !important;
         -webkit-print-color-adjust: exact; print-color-adjust: exact;
       }
-      .container, .receipt-wrapper, .preview-panel { 
+      .app-header, .form-panel, .card-header, .floating-cashier { display: none !important; }
+      .layout { display: block !important; }
+      .card, .card-body, .preview-panel, .preview-scroll {
         box-shadow: none !important; padding: 0 !important; margin: 0 !important;
         max-width: 100% !important; width: 100% !important;
         border: none !important; overflow: visible !important;
         display: block !important; background: white !important;
       }
-      h1, .form-panel, .preview-label, .print-warning { display: none !important; }
       #receiptPreviewContainer { display: block !important; width: 100% !important; }
       .a4-preview-page {
-        width: 8.27in !important; height: 11.69in !important;
-        box-shadow: none !important; padding: 0.4in !important; margin: 0 !important;
-        page-break-after: always; break-after: page; overflow: hidden !important;
+        width: 8.27in !important;
+        height: 11.69in !important;
+        box-shadow: none !important;
+        padding: 0.4in !important;
+        margin: 0 !important;
+        page-break-after: always;
+        break-after: page;
+        overflow: hidden !important;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5in;
       }
       .a4-preview-page:last-child { page-break-after: auto; break-after: auto; }
       .a4-preview-page::after { display: none !important; }
-      .receipt-preview-item { 
+      .a4-preview-page.a4-single-col { grid-template-columns: 1fr; }
+      .split-part { min-height: 0 !important; height: 100% !important; }
+      .receipt-preview-item {
         width: 3.2in !important; max-width: 3.2in !important;
-        font-size: var(--body-font-size) !important; font-weight: 600 !important; 
+        font-size: var(--body-font-size) !important; font-weight: 600 !important;
         padding: 0 !important; margin: 0 !important;
         line-height: 1.05 !important; box-shadow: none !important;
         letter-spacing: -1.2px; border-bottom: none !important;
@@ -258,70 +780,380 @@
       .r-header-main { font-size: var(--header-main-size) !important; line-height: 1 !important; margin-top: 0 !important; text-align: center !important; }
       .r-header-branch { font-size: var(--header-branch-size) !important; line-height: 1 !important; margin-top: 0 !important; margin-bottom: 2px !important; text-align: center !important; }
       .r-dash { margin: 2px 0 !important; }
-      .barcode-container { margin-top: 0 !important; margin-bottom: 0 !important; line-height: 0 !important; text-align: left !important; }
+      .barcode-container { margin: 0 !important; line-height: 0 !important; text-align: left !important; }
       .barcode-container svg { width: 100% !important; display: block !important; margin: 0 !important; }
       .barcode-text { font-size: var(--barcode-text-size) !important; letter-spacing: 4.5px !important; display: block; width: 100%; margin-top: 0 !important; padding-top: 0 !important; line-height: 1 !important; font-weight: 400 !important; text-align: center !important; }
       .r-www { text-align: center !important; }
-      .r-membership-justify { letter-spacing: 3px !important; gap: 0px !important; text-align: left !important; }
-      .r-card-normal { text-align: left !important;letter-spacing: -0.3px  }
+      .r-membership-justify { letter-spacing: 3px !important; gap: 0 !important; text-align: left !important; }
+      .r-card-normal { text-align: left !important; letter-spacing: -0.3px; }
       .r-trx-normal { text-align: left !important; }
       .r-trx-flex { display: flex !important; justify-content: space-between !important; }
-      .r-date-left { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
-      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important;letter-spacing: -0.5px  }
-      .r-einvoice-remark-log { font-size: 10pt !important; text-align: left !important;letter-spacing: -1.4px  }
-      .r-returned-title { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
-      .r-returned-detail { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; }
-      .split-part { min-height: 0 !important; }
+      .r-date-left { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; letter-spacing: -1px;}
+      .r-einvoice-remark { font-size: var(--body-font-size) !important; text-align: left !important; letter-spacing: -0.5px; }
+      .r-einvoice-remark-log { font-size: 10pt !important; text-align: left !important; letter-spacing: -1.4px; }
+      .r-returned-title { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; letter-spacing: -1.2px}
+      .r-returned-detail { font-size: 10pt !important; text-align: left !important; white-space: nowrap !important; letter-spacing: -1.2px}
+    }
+
+    @media (max-width: 1100px) {
+      .layout { grid-template-columns: 1fr; }
+      .form-panel { position: static; max-height: none; }
+      .floating-cashier { position: static; width: 100%; max-height: none; margin-top: 20px; }
     }
   </style>
 </head>
 <body>
 
-<div class="container">
-  <h1>Multi-Receipt â†’ A4 (Auto Split Fixed)</h1>
-  
-  <div class="receipt-wrapper">
-    <div class="form-panel">
-      <h2>Paste Log E-Journal (boleh lebih dari satu):</h2>
-
-      <textarea id="logInput" class="log-textarea" placeholder="Paste your POS logs here... (boleh paste multiple journals)"></textarea>
-
-      <div id="cashierInputsContainer"></div>
-
-      <div class="pmy-global">
-        <label>PMY Code (sama untuk semua resit)</label>
-        <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
-      </div>
-
-      <div class="margin-control">
-        <label>Print Margin <span class="value-display" id="marginValue">0mm</span></label>
-        <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
-      </div>
-
-      <!--
-<div class="print-warning">
-  <span>âš ï¸</span>
-  <div>
-    <strong>Notis Print A4:</strong><br>
-    â€¢ Paper: <strong>A4</strong><br>
-    â€¢ Scale: <strong>100%</strong> (jangan "Fit to page")<br>
-    â€¢ Margin: <strong>None / 0</strong><br>
-    â€¢ Background graphics: <strong>ON</strong>
+<header class="app-header">
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9V2h12v7"></path>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+      <rect x="6" y="14" width="12" height="8"></rect>
+    </svg>
   </div>
-</div>
--->
+  <div style="flex: 1;">
+    <h1>Multi-Receipt ? A4 Auto Split</h1>
+    <p>Paste log ? auto-detect cashier ? print A4</p>
+  </div>
+  <!-- Butang toggle Cashier -->
+  <button class="btn-toggle-cashier" id="btnToggleCashier" title="Show/Hide Cashier Box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+    </svg>
+    <span>Cashier</span>
+    <span class="toggle-dot"></span>
+  </button>
+</header>
 
-      <button class="btn-generate" id="generateBtn">ðŸ–¨ï¸ CONVERT & PRINT</button>
+  <div class="layout">
+    <div class="form-panel">
+
+      <div class="card">
+        <div class="card-header">
+          <div class="icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+            </svg>
+          </div>
+          <div>
+            <h2>Log E-Journal</h2>
+            <div class="subtitle">Paste satu atau lebih receipt</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <textarea id="logInput" class="log-textarea" placeholder="Paste POS logs here... (boleh paste multiple journals)"></textarea>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <div class="icon success">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+              <circle cx="9" cy="7" r="4"></circle>
+              <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+              <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+          </div>
+          <div>
+            <h2>Cashier</h2>
+            <div class="subtitle">Auto-detected dari Google Sheet</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div id="cashierInputsContainer" class="cashier-list">
+            <div style="color: var(--c-text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">Paste log untuk detect cashier</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card settings-card">
+        <div class="card-header settings-toggle" id="settingsToggle" style="cursor: pointer; user-select: none;">
+          <div class="icon warn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </div>
+          <div style="flex: 1;">
+            <h2>Settings</h2>
+            <div class="subtitle">PMY code & print margin</div>
+          </div>
+          <svg class="chevron" id="settingsChevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transition: transform 0.2s; color: var(--c-text-muted);">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </div>
+        <div class="card-body" id="settingsBody" style="display: none;">
+          <div style="display: flex; flex-direction: column; gap: 16px;">
+            <div class="field">
+              <label>PMY Code</label>
+              <input type="text" id="pmyCodeInput" value="PMY LS6.2 20141230" placeholder="Contoh: PMY LS6.2 20141230">
+            </div>
+            <div>
+              <label style="font-size: 0.72rem; font-weight: 600; color: var(--c-text-muted); text-transform: uppercase; letter-spacing: 0.5px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                <span>Print Margin</span>
+                <span class="value-display" id="marginValue">0mm</span>
+              </label>
+              <input type="range" id="marginRange" min="0" max="20" step="1" value="0">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-generate" id="generateBtn">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 6 2 18 2 18 9"></polyline>
+          <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+          <rect x="6" y="14" width="12" height="8"></rect>
+        </svg>
+        CONVERT & PRINT
+      </button>
     </div>
 
-    <div class="preview-panel">
-      <div class="preview-label">ðŸ” Live A4 Preview</div>
-      <div id="receiptPreviewContainer" style="display: flex; flex-direction: column; align-items: center; width: 100%;"></div>
+    <div class="card preview-panel">
+      <div class="card-header">
+        <div class="icon">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+          </svg>
+        </div>
+        <div>
+          <h2>Live A4 Preview</h2>
+          <div class="subtitle">Auto-split ikut tinggi column A4</div>
+        </div>
+      </div>
+      <div class="preview-scroll" id="receiptPreviewContainer">
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <h3>Belum ada receipt</h3>
+          <p>Paste log E-Journal di sebelah kiri untuk mula preview</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============ FLOATING CASHIER BOX ============ -->
+<div class="floating-cashier" id="floatingCashier">
+  <div class="fc-header">
+    <div class="icon">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+        <circle cx="9" cy="7" r="4"></circle>
+      </svg>
+    </div>
+    <h3>Cashier</h3>
+    <button class="btn-add" id="btnAddCashier" title="Tambah cashier baru">+</button>
+    <button class="btn-close-fc" id="btnCloseFc" title="Tutup (Ctrl+Shift+C)">×</button>
+  </div>
+
+  <!-- Search box -->
+  <div class="fc-search">
+    <input type="text" id="fcSearchInput" placeholder="Cari ID atau nama...">
+    <button class="fc-clear" id="fcClearBtn" title="Clear">x</button>
+  </div>
+
+  <div class="fc-list" id="fcList">
+    <div class="fc-loading">Memuatkan...</div>
+  </div>
+  <div class="fc-add-form" id="fcAddForm">
+    <input type="text" id="fcInputId" placeholder="ID (6 digit)" maxlength="6" inputmode="numeric">
+    <input type="text" id="fcInputName" placeholder="Nama cashier" maxlength="60">
+    <div class="fc-form-actions">
+      <button class="btn-cancel" id="fcBtnCancel">Batal</button>
+      <button class="btn-save" id="fcBtnSave">Simpan</button>
     </div>
   </div>
 </div>
 
 <script>
+  // ============ CASHIER API (Google Sheets) ============
+  const CASHIER_API_URL = 'https://script.google.com/macros/s/AKfycbwJoQAuQZJZxTEjcRi5JcZSIorwFiaSiI1VYSf3TLeN6NQZL6JrnKJohlJNWAUGd6uogA/exec';
+
+  let CASHIER_MAP = {};
+  let cashierLoaded = false;
+  let cashierRecords = [];
+  let fcSearchQuery = '';
+
+  async function loadCashierMap() {
+  try {
+    const res = await fetch(`${CASHIER_API_URL}?t=${Date.now()}`);
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data)) {
+      cashierRecords = json.data;
+      CASHIER_MAP = {};
+      json.data.forEach(r => {
+        if (r.id && r.name && r.name.trim()) {
+          CASHIER_MAP[r.id] = r.name.trim();
+        }
+      });
+      cashierLoaded = true;
+      console.log(`? Loaded ${Object.keys(CASHIER_MAP).length} cashier dari Google Sheet`);
+      renderFloatingCashier();        // ? WAJIB TAMBAH BALIK
+    } else {
+      console.warn('?? Gagal load cashier:', json.error);
+    }
+  } catch (err) {
+    console.error('? Error load cashier:', err);
+  }
+}
+
+  async function addCashierToSheet(id, name) {
+    const res = await fetch(CASHIER_API_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify({ action: 'add', id, name })
+    });
+    return await res.json();
+  }
+
+  // ============ FLOATING CASHIER BOX ============
+  const fcList = document.getElementById('fcList');
+  const fcAddForm = document.getElementById('fcAddForm');
+  const fcInputId = document.getElementById('fcInputId');
+  const fcInputName = document.getElementById('fcInputName');
+  const btnAddCashier = document.getElementById('btnAddCashier');
+  const fcBtnCancel = document.getElementById('fcBtnCancel');
+  const fcBtnSave = document.getElementById('fcBtnSave');
+  const fcSearchInput = document.getElementById('fcSearchInput');
+  const fcClearBtn = document.getElementById('fcClearBtn');
+
+  function highlightMatch(text, query) {
+    if (!query) return escapeHtml(text);
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const idx = lowerText.indexOf(lowerQuery);
+    if (idx === -1) return escapeHtml(text);
+    const before = text.slice(0, idx);
+    const match = text.slice(idx, idx + query.length);
+    const after = text.slice(idx + query.length);
+    return `${escapeHtml(before)}<mark>${escapeHtml(match)}</mark>${escapeHtml(after)}`;
+  }
+
+  function renderFloatingCashier() {
+    let displayRecords = [];
+    const q = fcSearchQuery.trim().toLowerCase();
+
+    if (!q) {
+      // Default: 9 terbaru
+      displayRecords = cashierRecords.slice(0, 9);
+    } else {
+      // Search: cari ID atau nama yang mengandungi query
+      displayRecords = cashierRecords.filter(r => {
+        const idMatch = String(r.id).toLowerCase().includes(q);
+        const nameMatch = String(r.name).toLowerCase().includes(q);
+        return idMatch || nameMatch;
+      }).slice(0, 30); // limit 30 hasil
+    }
+
+    if (displayRecords.length === 0) {
+      if (q) {
+        fcList.innerHTML = `<div class="fc-no-result">Tiada hasil untuk "${escapeHtml(fcSearchQuery)}"</div>`;
+      } else {
+        fcList.innerHTML = '<div class="fc-loading">Tiada rekod lagi. Klik + untuk tambah.</div>';
+      }
+      return;
+    }
+
+    fcList.innerHTML = displayRecords.map((r, i) => `
+      <div class="fc-item">
+        <span class="fc-num">${q ? (i + 1) : (i + 1)}</span>
+        <span class="fc-id">${highlightMatch(r.id, fcSearchQuery)}</span>
+        <span class="fc-name" title="${escapeHtml(r.name)}">${highlightMatch(r.name, fcSearchQuery)}</span>
+      </div>
+    `).join('');
+  }
+
+  function openAddForm() {
+    fcAddForm.classList.add('show');
+    fcInputId.value = '';
+    fcInputName.value = '';
+    setTimeout(() => fcInputId.focus(), 100);
+  }
+
+  function closeAddForm() {
+    fcAddForm.classList.remove('show');
+  }
+
+  btnAddCashier.addEventListener('click', () => {
+    if (fcAddForm.classList.contains('show')) {
+      closeAddForm();
+    } else {
+      openAddForm();
+    }
+  });
+
+  fcBtnCancel.addEventListener('click', closeAddForm);
+
+  fcBtnSave.addEventListener('click', async () => {
+    const id = fcInputId.value.trim();
+    const name = fcInputName.value.trim();
+
+    if (!/^\d{1,6}$/.test(id)) {
+      showToast('ID mesti 1-6 digit angka', 'error');
+      return;
+    }
+    if (!name) {
+      showToast('Nama tidak boleh kosong', 'error');
+      return;
+    }
+
+    fcBtnSave.disabled = true;
+    fcBtnSave.textContent = 'Menyimpan...';
+
+    try {
+      const json = await addCashierToSheet(id.padStart(6, '0'), name);
+      if (!json.success) throw new Error(json.error || 'Gagal simpan');
+
+      showToast('Cashier berjaya ditambah!', 'success');
+      closeAddForm();
+
+      await loadCashierMap();
+
+      setTimeout(() => {
+        const firstItem = fcList.querySelector('.fc-item');
+        if (firstItem) firstItem.classList.add('new-item');
+      }, 50);
+    } catch (err) {
+      showToast(err.message, 'error');
+    } finally {
+      fcBtnSave.disabled = false;
+      fcBtnSave.textContent = 'Simpan';
+    }
+  });
+
+  // Search events
+  fcSearchInput.addEventListener('input', (e) => {
+    fcSearchQuery = e.target.value;
+    fcClearBtn.classList.toggle('show', fcSearchQuery.length > 0);
+    renderFloatingCashier();
+  });
+  fcClearBtn.addEventListener('click', () => {
+    fcSearchInput.value = '';
+    fcSearchQuery = '';
+    fcClearBtn.classList.remove('show');
+    renderFloatingCashier();
+    fcSearchInput.focus();
+  });
+
+  [fcInputId, fcInputName].forEach(input => {
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') fcBtnSave.click();
+    });
+  });
+
+  // ============ CONSTANTS ============
   const logInput = document.getElementById('logInput');
   const generateBtn = document.getElementById('generateBtn');
   const previewContainer = document.getElementById('receiptPreviewContainer');
@@ -329,6 +1161,9 @@
   const pmyCodeInput = document.getElementById('pmyCodeInput');
   const marginRange = document.getElementById('marginRange');
   const marginValue = document.getElementById('marginValue');
+
+  const DEFAULT_CASHIER = 'KAHIRUL YAZID';
+  const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
 
   const PAYMENT_TYPES = [
     'VISA', 'MASTER', 'MASTERCARD', 'AMEX', 'AMERICAN EXPRESS',
@@ -339,18 +1174,14 @@
     'MAE', 'CIMB', 'MAYBANK', 'PUBLIC BANK', 'RHB', 'HONG LEONG',
     'INSTALLMENT', 'EPP', 'BNPL', 'ATOME', 'SPAYLATER', 'HUTANG',
     'SHOPEEPAY', 'LAZADA', 'ZALORA', 'FOODPANDA', 'GRABFOOD',
-    'DEBIT CARD', 'CREDIT CARD' , 'PCV' , 'PDV' , 'MRV' , 'CHANGE IN CASH'
+    'DEBIT CARD', 'CREDIT CARD', 'PCV', 'PDV', 'MRV', 'CHANGE IN CASH', 'PARKSON CARD'
   ];
 
   let cashierNames = [];
-  const DEFAULT_CASHIER = 'KAHIRUL YAZID';
-
-  const MEASURE_STYLE = 'padding:0 !important; margin:0 !important; border:none !important; box-shadow:none !important;';
+  let cashierManualFlags = {};
 
   function toTitleCase(str) {
-    return str.replace(/\w\S*/g, function(txt) {
-      return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();
-    });
+    return str.replace(/\w\S*/g, txt => txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase());
   }
 
   function escapeHtml(text) {
@@ -359,14 +1190,65 @@
     return text.replace(/[&<>"']/g, m => map[m]);
   }
 
+  function showToast(msg, type = '') {
+    const toast = document.createElement('div');
+    toast.textContent = msg;
+    toast.style.cssText = `
+      position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
+      background: ${type === 'error' ? '#ef4444' : '#10b981'};
+      color: white; padding: 12px 20px; border-radius: 10px;
+      font-size: 0.85rem; font-weight: 600; z-index: 9999;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    `;
+    document.body.appendChild(toast);
+    setTimeout(() => toast.remove(), 3000);
+  }
+
+  // ============ CASHIER ID EXTRACTION ============
+  function extractCashierId(receiptText) {
+    const mainMatch = receiptText.match(/\|N\d{7}\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
+    if (mainMatch && mainMatch[1]) return mainMatch[1];
+    const lines = receiptText.split('\n');
+    for (const line of lines) {
+      const m = line.match(/^\s*\|N(\d{7})\s+(\d{6})\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}/);
+      if (m && m[2]) return m[2];
+    }
+    return null;
+  }
+
+  function getCashierNameById(id) {
+    if (!id) return null;
+    const cleanId = String(id).replace(/\D/g, '').padStart(6, '0');
+    const name = CASHIER_MAP[cleanId];
+    if (name && name.trim().length > 0) return name.trim();
+    return null;
+  }
+
   function rebuildCashierInputs() {
     const log = logInput.value;
     const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
     const count = matches ? matches.length : 0;
 
+    if (count === 0) {
+      cashierInputsContainer.innerHTML = '<div style="color: var(--c-text-muted); font-size: 0.8rem; text-align: center; padding: 12px;">Paste log untuk detect cashier</div>';
+      cashierNames = [];
+      cashierManualFlags = {};
+      return;
+    }
+
     const newNames = [];
+    const detectedIds = [];
+
     for (let i = 0; i < count; i++) {
-      newNames.push(cashierNames[i] !== undefined ? cashierNames[i] : DEFAULT_CASHIER);
+      if (cashierManualFlags[i] && cashierNames[i] !== undefined) {
+        newNames.push(cashierNames[i]);
+        detectedIds.push(null);
+      } else {
+        const id = matches && matches[i] ? extractCashierId(matches[i]) : null;
+        detectedIds.push(id);
+        const mapped = getCashierNameById(id);
+        newNames.push(mapped || DEFAULT_CASHIER);
+      }
     }
     cashierNames = newNames;
 
@@ -375,17 +1257,36 @@
       let trxTag = '';
       if (matches && matches[i]) {
         const trxMatch = matches[i].match(/\|BCTRX#:\s*([^\s\n]+)/);
-        if (trxMatch) trxTag = 'Trx#: ' + trxMatch[1];
+        if (trxMatch) trxTag = trxMatch[1];
+      }
+
+      const id = detectedIds[i];
+      const mapped = id ? getCashierNameById(id) : null;
+      const isManual = cashierManualFlags[i];
+
+      let rowClass = 'cashier-row';
+      let statusPill = '';
+      if (isManual) {
+        statusPill = `<span class="status-pill manual">Manual</span>`;
+      } else if (id && mapped) {
+        rowClass += ' detected';
+        statusPill = `<span class="status-pill auto" title="ID ${id}">Auto</span>`;
+      } else if (id && !mapped) {
+        rowClass += ' unknown';
+        statusPill = `<span class="status-pill unknown" title="ID ${id} tiada dalam senarai">ID?</span>`;
+      } else if (!cashierLoaded) {
+        statusPill = `<span class="status-pill loading">Loading...</span>`;
+      } else {
+        statusPill = `<span class="status-pill manual">Manual</span>`;
       }
 
       const div = document.createElement('div');
-      div.className = 'per-receipt-cashier';
+      div.className = rowClass;
       div.innerHTML = `
-        <label class="r-label">
-          <span>Resit ${i + 1} â€” Cashier</span>
-          <span class="trx-tag">${escapeHtml(trxTag)}</span>
-        </label>
-        <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama cashier resit ${i + 1}">
+        <span class="resit-num">Resit ${i + 1}</span>
+        <span class="trx-num" title="${escapeHtml(trxTag)}">${escapeHtml(trxTag || '—')}</span>
+        <input type="text" data-index="${i}" value="${escapeHtml(cashierNames[i])}" placeholder="Nama">
+        ${statusPill}
       `;
       cashierInputsContainer.appendChild(div);
     }
@@ -394,17 +1295,28 @@
       input.addEventListener('input', (e) => {
         const idx = parseInt(e.target.getAttribute('data-index'), 10);
         cashierNames[idx] = e.target.value;
+        cashierManualFlags[idx] = true;
+        const row = input.closest('.cashier-row');
+        if (row) {
+          const pill = row.querySelector('.status-pill');
+          if (pill) {
+            pill.className = 'status-pill manual';
+            pill.textContent = 'Manual';
+            pill.title = '';
+          }
+          row.classList.remove('detected', 'unknown');
+        }
         updatePreview();
       });
     });
   }
 
   function parseSingleReceipt(receiptText, cashier, pmy) {
-    let cleanText = receiptText.replace(/[â€¢\x1b]/g, '');
-    
+    let cleanText = receiptText.replace(/[•\x1b]/g, '');
+
     const salesMatch = cleanText.match(/\*\*\*BEGIN SALES\*\*\*([\s\S]*?)\*\*\*END SALES\*\*\*/);
     if (!salesMatch) return null;
-    
+
     let receiptData = salesMatch[1];
 
     receiptData = receiptData.replace(/Terminal No\.:[^\n]*\n/g, '');
@@ -413,7 +1325,7 @@
 
     receiptData = receiptData.replace(/([^\n])(\|N|\|BC|\|4C|\|BCTRX)/g, '$1\n$2');
     receiptData = receiptData.replace(/\|N([A-Z])/g, '|N $1');
-    
+
     const lines = receiptData.split('\n').map(l => l.trim()).filter(l => l);
 
     let data = {
@@ -434,14 +1346,20 @@
     lines.forEach(line => {
       if (!line) return;
 
+      const cashierLineMatch = line.match(/^\|N(\d{7}\s+\d{6}\s+\d+\s+\d+\s+\d{2}\/\d{2}\/\d{2}\s+\d{2}:\d{2}\s+\d+)/);
+      if (cashierLineMatch) {
+        data.dateLine = cashierLineMatch[1].trim();
+        return;
+      }
+
       if (line.startsWith('|4C')) {
         const txt = line.substring(3).trim();
         if (!data.storeName) data.storeName = txt;
         else if (!data.branchName) data.branchName = txt;
       }
       else if (line.startsWith('|BCTRX#')) {
-        let rawTrx = line.substring(7).trim(); 
-        rawTrx = rawTrx.replace(/^:/, ''); 
+        let rawTrx = line.substring(7).trim();
+        rawTrx = rawTrx.replace(/^:/, '');
         const starMatch = rawTrx.match(/\s*\*+\s*$/);
         if (starMatch) {
           data.trxStars = starMatch[0].trim();
@@ -452,22 +1370,19 @@
       else if (line.startsWith('|N')) {
         const txt = line.substring(2).trim();
         if (!txt) return;
-
         const nClass = 'r-normal';
 
-        if (txt.includes('Purchases may be exchanged')) {
-          data.hasFooterNote = true;
-        }
+        if (txt.includes('Purchases may be exchanged')) data.hasFooterNote = true;
 
         if (isAddress && !txt.includes('SDN BHD') && !txt.includes('19860100')) {
           data.addressLines.push(txt);
-        } 
+        }
         else if (txt.includes('SDN BHD') || txt.includes('19860100') || txt.includes('WWW.')) {
           isAddress = false;
           data.companyLines.push(txt);
         }
         else if (txt.match(/\d{2}\/\d{2}\/\d{2} \d{2}:\d{2}/)) {
-          data.dateLine = txt;
+          if (!data.dateLine) data.dateLine = txt;
         }
         else if (txt.includes('----')) {
           data.bodyItems.push(`<div class="r-dash"></div>`);
@@ -475,47 +1390,47 @@
         else if (txt.match(/DISC:|DISCOUNT/i)) {
           const match = txt.match(/^(.*?)\s+(-?[\d\.,]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(match[1])}</span>
-                        <span class="r-item-price">${escapeHtml(match[2])}</span>
-                      </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(match[1])}</span>
+              <span class="r-item-price">${escapeHtml(match[2])}</span>
+            </div>`);
           } else {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(txt)}</span>
-                      </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(txt)}</span>
+            </div>`);
           }
         }
-        else if (txt.match(/PARKSON CARD\s*:\s*([\d\.,]+)/i)) {
-          const match = txt.match(/PARKSON CARD\s*:\s*([\d\.,]+)/i);
+        else if (txt.match(/PARKSON CARD\s*:\s*(-?[\d\.,]+)/i)) {
+          const match = txt.match(/PARKSON CARD\s*:\s*(-?[\d\.,]+)/i);
           data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">PARKSON CARD :</span>
-                        <span class="r-item-price">${escapeHtml(match[1])}</span>
-                      </div>`);
+            <span class="r-item-name">PARKSON CARD :</span>
+            <span class="r-item-price">${escapeHtml(match[1])}</span>
+          </div>`);
         }
         else if (/^\d{6,12}\s+[A-Z]/i.test(txt)) {
-          if (txt.match(/[\d\.,]+$/) && !txt.includes('X')) {
-             const match = txt.match(/^(.*?)\s+([\d\.,]+)$/);
-             if (match) {
-               data.bodyItems.push(`<div class="r-item-row ${nClass}">
-                    <span class="r-item-name">${escapeHtml(match[1].trim())}</span>
-                    <span class="r-item-price">${escapeHtml(match[2])}</span>
-                  </div>`);
-             } else {
-               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
-             }
-          } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
-          }
-        }
+  if (txt.match(/-?[\d\.,]+$/) && !txt.includes('X')) {
+    const match = txt.match(/^(.*?)\s+(-?[\d\.,]+)$/);
+    if (match) {
+      data.bodyItems.push(`<div class="r-item-row ${nClass}">
+        <span class="r-item-name">${escapeHtml(match[1].trim())}</span>
+        <span class="r-item-price">${escapeHtml(match[2])}</span>
+      </div>`);
+    } else {
+      data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+    }
+  } else {
+    data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+  }
+}
         else if (txt.match(/[\d\.,]+\s*X\s*[\d\.,]+(?:RM)?\s*[\d\.,]+/i)) {
           const parts = txt.match(/([\d\.,]+)\s*X\s*([\d\.,]+)(?:RM)?\s*([\d\.,]+)/i);
           if (parts) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                     <span class="r-item-name">${escapeHtml(parts[1])} x ${escapeHtml(parts[2])}RM</span>
-                     <span class="r-item-price">${escapeHtml(parts[3])}</span>
-                   </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(parts[1])} x ${escapeHtml(parts[2])}RM</span>
+              <span class="r-item-price">${escapeHtml(parts[3])}</span>
+            </div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}" style="padding-left:10px;">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}" style="padding-left:10px;">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.startsWith('S/N:')) {
@@ -527,53 +1442,47 @@
           data.bodyItems.push(`<div class="r-price-row ${nClass}"><span class="r-label">Number of Items:</span><span class="r-value">${escapeHtml(count)}</span></div>`);
         }
         else if (txt.match(/NORMAL POINTS|EXTRA POINTS|TOTAL POINTS/i)) {
-          const match = txt.match(/^(.*?)\s*:\s*([\d\.,]+)$/);
+          const match = txt.match(/^(.*?)\s*:\s*(-?[\d\.,]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
-                        <span class="r-item-name">${escapeHtml(match[1].trim())} :</span>
-                        <span class="r-item-price">${escapeHtml(match[2].trim())}</span>
-                      </div>`);
+            data.bodyItems.push(`<div class="r-item-row ${nClass}" style="padding-left:10px;">
+              <span class="r-item-name">${escapeHtml(match[1].trim())} :</span>
+              <span class="r-item-price">${escapeHtml(match[2].trim())}</span>
+            </div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/BALANCE|REDEEMABLE/i)) {
           const match = txt.match(/^(.*?)\s*:\s*([\d\.,A-Z]+)$/);
           if (match) {
-             data.bodyItems.push(`<div class="r-nowrap ${nClass}">${escapeHtml(match[1].trim())} :${escapeHtml(match[2].trim())}</div>`);
+            data.bodyItems.push(`<div class="r-nowrap ${nClass}">${escapeHtml(match[1].trim())} :${escapeHtml(match[2].trim())}</div>`);
           } else {
-             data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
           }
         }
         else if (txt.match(/MEMBERSHIP NUMBER/i)) {
-           const parts = txt.split(':');
-           if (parts.length >= 2) {
-               const label = parts[0].trim() + ' :';
-               const value = parts.slice(1).join(':').trim();
-               data.bodyItems.push(`<div class="r-membership-justify"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
-           } else {
-               data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
-           }
+          const parts = txt.split(':');
+          if (parts.length >= 2) {
+            const label = parts[0].trim() + ' :';
+            const value = parts.slice(1).join(':').trim();
+            data.bodyItems.push(`<div class="r-membership-justify"><span>${escapeHtml(label)}</span><span>${escapeHtml(value)}</span></div>`);
+          } else {
+            data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+          }
         }
         else if (txt.match(/APV AS AT/i)) {
-           data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+          data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
         }
         else {
-           data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
+          data.bodyItems.push(`<div class="${nClass}">${escapeHtml(txt)}</div>`);
         }
       }
       else if (line.startsWith('|BC')) {
         const txt = line.substring(3).trim();
         const bcClass = 'r-bold';
 
-        if (txt.startsWith('RETURNED ITEM(S)')) {
-          data.returnedItemTitle = txt;
-          return;
-        }
-        if (txt.startsWith('(ORG TRX#')) {
-          data.returnedItemDetail = txt;
-          return;
-        }
+        if (txt.startsWith('RETURNED ITEM(S)')) { data.returnedItemTitle = txt; return; }
+        if (txt.startsWith('(ORG TRX#')) { data.returnedItemDetail = txt; return; }
 
         if (txt.startsWith('(PLEASE PROCEED TO THE CUSTOMER SERVICE') ||
             txt.startsWith('(PLEASE PROCEED') ||
@@ -594,7 +1503,7 @@
           const parsed = parseFloat(amount.replace(/[,]/g, ''));
           if (!isNaN(parsed)) data.totalAmount = parsed;
           data.bodyItems.push(`<div class="r-price-row ${bcClass}"><span class="r-label">Total RM</span><span class="r-value">${escapeHtml(amount)}</span></div>`);
-        } 
+        }
         else if (txt.startsWith('ROUNDING DOWN') || txt.startsWith('ROUNDING UP')) {
           const parts = txt.split(' ');
           const amount = parts.pop();
@@ -622,12 +1531,8 @@
         else {
           let foundPayment = false;
           for (const pt of PAYMENT_TYPES) {
-            if (txt.toUpperCase().startsWith(pt)) {
-              foundPayment = true;
-              break;
-            }
+            if (txt.toUpperCase().startsWith(pt)) { foundPayment = true; break; }
           }
-
           if (foundPayment) {
             const lastSpace = txt.lastIndexOf(' ');
             if (lastSpace !== -1) {
@@ -648,9 +1553,7 @@
       }
     });
 
-    if (data.totalAmount > 10000) {
-      data.hasEInvoiceRemark = true;
-    }
+    if (data.totalAmount > 10000) data.hasEInvoiceRemark = true;
 
     if (data.returnedItemDetail) {
       data.bodyItems.unshift(`<div class="r-returned-detail">${escapeHtml(data.returnedItemDetail)}</div>`);
@@ -658,7 +1561,6 @@
     if (data.returnedItemTitle) {
       data.bodyItems.unshift(`<div class="r-returned-title">${escapeHtml(data.returnedItemTitle)}</div>`);
     }
-
     if (data.eInvoiceRemarkText) {
       const cleanText = data.eInvoiceRemarkText.trim();
       const titleCaseText = toTitleCase(cleanText);
@@ -679,18 +1581,17 @@
     headerHtml += `<div class="r-center r-normal" style="margin-top:2px;">`;
     data.companyLines.forEach(line => {
       if (line.includes('WWW.')) {
-           headerHtml += `<div class="r-www">${escapeHtml(line.toLowerCase())}</div>`;
+        headerHtml += `<div class="r-www">${escapeHtml(line.toLowerCase())}</div>`;
       } else {
-          headerHtml += `<div>${escapeHtml(line)}</div>`;
+        headerHtml += `<div>${escapeHtml(line)}</div>`;
       }
     });
     headerHtml += `</div>`;
-    if (data.dateLine) {
-      headerHtml += `<div class="r-date-left">${escapeHtml(data.dateLine)}</div>`;
-    }
+    if (data.dateLine) headerHtml += `<div class="r-date-left">${escapeHtml(data.dateLine)}</div>`;
+
     let trxDisplay = data.trxNo;
-    if(trxDisplay.startsWith(':')) trxDisplay = trxDisplay.substring(1);
-    
+    if (trxDisplay.startsWith(':')) trxDisplay = trxDisplay.substring(1);
+
     if (data.trxStars) {
       headerHtml += `<div class="r-trx-flex"><span class="r-trx-label">Trx#:${escapeHtml(trxDisplay)}</span><span class="r-trx-star">${escapeHtml(data.trxStars)}</span></div>`;
     } else {
@@ -704,33 +1605,26 @@
     let parts = barcodeDisplayText.split('-');
 
     if (parts.length === 3) {
-        let p1 = parts[0]; 
-        let p2 = parts[1]; 
-        let p3 = parts[2]; 
-        let cleanP3 = p3.replace(/^0+/, ''); 
-        let formattedP3 = '000' + cleanP3.padStart(6, '0');
-        barcodeDisplayText = 'T' + '000' + p1 + '-' + p2 + formattedP3;
+      let p1 = parts[0], p2 = parts[1], p3 = parts[2];
+      let cleanP3 = p3.replace(/^0+/, '');
+      let formattedP3 = '000' + cleanP3.padStart(6, '0');
+      barcodeDisplayText = 'T' + '000' + p1 + '-' + p2 + formattedP3;
     } else {
-        barcodeDisplayText = 'T' + barcodeDisplayText.replace(/-/g, '');
+      barcodeDisplayText = 'T' + barcodeDisplayText.replace(/-/g, '');
     }
 
     let footerHtml = `<div class="r-section-barcode-last">`;
-    footerHtml += `<div class="barcode-container">`;
-    footerHtml += `<svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg>`;
-    footerHtml += `</div>`;
+    footerHtml += `<div class="barcode-container"><svg class="barcode-svg" data-value="${escapeHtml(barcodeDisplayText)}"></svg></div>`;
     footerHtml += `<div class="barcode-text">${escapeHtml(barcodeDisplayText)}</div>`;
-    
     if (data.hasEInvoiceRemark) {
       footerHtml += `<div class="r-einvoice-remark">Transactions exceeding RM10,000    require a mandatory e-invoice issuance at Customer Service.</div>`;
     }
-    
     footerHtml += `</div>`;
-  
+
     let footerNoteHtml = '';
     footerNoteHtml += `<div class="r-justify r-normal" style="width: 100%;">Purchases may be exchanged or returned within 7 days (product exclusion applies). Any vouchers redeemed must be surrendered else the amount will be deducted from the refund. Terms apply.</div>`;
     footerNoteHtml += `<div class="r-center r-normal">customerservice@parkson.com.my</div>`;
     footerNoteHtml += `<div class="r-center r-normal">THANK YOU FOR YOUR PATRONAGE</div>`;
-
 
     let promoHtml = `<div class="r-bold" style="width: 100%; text-align: left;">****************************************</div>`;
     promoHtml += `<div class="r-bold" style="width: 100%; text-align: left;">* YOU ORDER, WE DELIVER!</div>`;
@@ -769,11 +1663,12 @@
   }
 
   function splitReceiptIntoParts(r, columnHeight) {
+    const promoCashierHtml = r.promoHtml + r.cashierHtml;
+
     const tailItems = [
-      ...r.bodyItems.map(html => ({ html })),
-      { html: r.footerNoteHtml },
-      { html: r.promoHtml },
-      { html: r.cashierHtml },
+      ...r.bodyItems.map(html => ({ html, type: 'body' })),
+      { html: r.footerNoteHtml, type: 'footerNote' },
+      { html: promoCashierHtml, type: 'promoCashier' },
     ].filter(x => x.html);
 
     const temp = document.createElement('div');
@@ -801,14 +1696,12 @@
 
     for (let i = 0; i < tailItems.length; i++) {
       const h = itemHeights[i];
-
       if (currentH + h > MAX && current.length > 0) {
         parts.push({ items: current, includeHeader: isFirstPart });
         isFirstPart = false;
         current = [];
         currentH = 0;
       }
-
       current.push(tailItems[i].html);
       currentH += h;
     }
@@ -837,16 +1730,28 @@
   function updatePreview() {
     const log = logInput.value;
     const pmy = pmyCodeInput.value;
-    
-    previewContainer.innerHTML = '';
-    
+
     const regex = /\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g;
     const matches = log.match(regex);
 
     if (!matches || matches.length === 0) {
-        previewContainer.innerHTML = `<div class="r-center" style="color:red; padding: 20px;">âŒ Tiada format ***BEGIN SALES*** yang sah dijumpai.</div>`;
-        return;
+      previewContainer.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+              <polyline points="14 2 14 8 20 8"></polyline>
+              <line x1="16" y1="13" x2="8" y2="13"></line>
+              <line x1="16" y1="17" x2="8" y2="17"></line>
+            </svg>
+          </div>
+          <h3>Belum ada receipt</h3>
+          <p>Paste log E-Journal di sebelah kiri untuk mula preview</p>
+        </div>`;
+      return;
     }
+
+    previewContainer.innerHTML = '';
 
     const receipts = [];
     matches.forEach((chunk, i) => {
@@ -866,7 +1771,6 @@
     hiddenWrap.remove();
 
     const SHORT_THRESHOLD = A4_COLUMN_H;
-
     const pages = [];
     let shortQueue = [];
 
@@ -927,14 +1831,14 @@
     previewContainer.innerHTML = finalHtml;
 
     setTimeout(() => {
-        document.querySelectorAll('.barcode-svg').forEach(svg => {
-          const val = svg.getAttribute('data-value');
-          if (val) {
-            try {
-              JsBarcode(svg, val, { format: "CODE128", width: 1.8, height: 18, displayValue: false, margin: 0 });
-            } catch (e) { console.error("Barcode error:", e); }
-          }
-        });
+      document.querySelectorAll('.barcode-svg').forEach(svg => {
+        const val = svg.getAttribute('data-value');
+        if (val) {
+          try {
+            JsBarcode(svg, val, { format: "CODE128", width: 1.8, height: 18, displayValue: false, margin: 0 });
+          } catch (e) { console.error("Barcode error:", e); }
+        }
+      });
     }, 50);
   }
 
@@ -943,11 +1847,11 @@
     updatePreview();
   });
   pmyCodeInput.addEventListener('input', updatePreview);
-  
+
   generateBtn.addEventListener('click', (e) => {
     e.preventDefault();
     updatePreview();
-    setTimeout(() => window.print(), 400); 
+    setTimeout(() => window.print(), 400);
   });
 
   marginRange.addEventListener('input', function() {
@@ -956,14 +1860,67 @@
     document.documentElement.style.setProperty('--print-margin', val + 'mm');
   });
 
-  if (document.readyState === 'complete') {
+  const settingsToggle = document.getElementById('settingsToggle');
+  const settingsBody = document.getElementById('settingsBody');
+  const settingsChevron = document.getElementById('settingsChevron');
+
+  settingsToggle.addEventListener('click', () => {
+    const isOpen = settingsBody.style.display !== 'none';
+    settingsBody.style.display = isOpen ? 'none' : 'block';
+    settingsChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  });
+
+// ============ TOGGLE FLOATING CASHIER ============
+const floatingCashierEl = document.getElementById('floatingCashier');
+const btnToggleCashier = document.getElementById('btnToggleCashier');
+
+const cashierBoxState = localStorage.getItem('cashierBoxVisible') !== 'hidden';
+
+function applyCashierBoxState(visible) {
+  if (visible) {
+    floatingCashierEl.classList.remove('hidden');
+    btnToggleCashier.classList.add('active');
+  } else {
+    floatingCashierEl.classList.add('hidden');
+    btnToggleCashier.classList.remove('active');
+  }
+  localStorage.setItem('cashierBoxVisible', visible ? 'visible' : 'hidden');
+}
+
+applyCashierBoxState(cashierBoxState);
+
+// X button — tutup cashier box
+document.getElementById('btnCloseFc').addEventListener('click', () => {
+  applyCashierBoxState(false);
+});
+
+btnToggleCashier.addEventListener('click', () => {
+  const isCurrentlyVisible = !floatingCashierEl.classList.contains('hidden');
+  applyCashierBoxState(!isCurrentlyVisible);
+});
+
+// Keyboard shortcut: Ctrl+Shift+C
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+    e.preventDefault();
+    const isCurrentlyVisible = !floatingCashierEl.classList.contains('hidden');
+    applyCashierBoxState(!isCurrentlyVisible);
+  }
+});
+
+// ============ INIT ============
+
+  async function init() {
+    await loadCashierMap();
     rebuildCashierInputs();
     updatePreview();
+    setInterval(loadCashierMap, 5 * 60 * 1000);
+  }
+
+  if (document.readyState === 'complete') {
+    init();
   } else {
-    window.addEventListener('load', () => {
-      rebuildCashierInputs();
-      updatePreview();
-    });
+    window.addEventListener('load', init);
   }
 </script>
 </body>
