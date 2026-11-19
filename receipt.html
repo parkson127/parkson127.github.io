@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Multi-Receipt ? A4 Auto Split</title>
+  <title>Multi-Receipt → A4 Auto Split</title>
   <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.5/dist/JsBarcode.all.min.js"></script>
   <style>
     :root {
@@ -813,8 +813,8 @@
     </svg>
   </div>
   <div style="flex: 1;">
-    <h1>Multi-Receipt ? A4 Auto Split</h1>
-    <p>Paste log ? auto-detect cashier ? print A4</p>
+    <h1>Multi-Receipt → A4 Auto Split</h1>
+    <p>Paste log → auto-detect cashier → print A4</p>
   </div>
   <!-- Butang toggle Cashier -->
   <button class="btn-toggle-cashier" id="btnToggleCashier" title="Show/Hide Cashier Box">
@@ -999,13 +999,13 @@
         }
       });
       cashierLoaded = true;
-      console.log(`? Loaded ${Object.keys(CASHIER_MAP).length} cashier dari Google Sheet`);
+      console.log(`✅ Loaded ${Object.keys(CASHIER_MAP).length} cashier dari Google Sheet`);
       renderFloatingCashier();        // ? WAJIB TAMBAH BALIK
     } else {
-      console.warn('?? Gagal load cashier:', json.error);
+      console.warn('⚠️ Gagal load cashier:', json.error);
     }
   } catch (err) {
-    console.error('? Error load cashier:', err);
+    console.error('❌ Error load cashier:', err);
   }
 }
 
