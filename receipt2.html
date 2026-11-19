@@ -60,6 +60,55 @@
     .app-header h1 { font-size: 1.25rem; font-weight: 700; color: var(--c-text); letter-spacing: -0.3px; }
     .app-header p { font-size: 0.8rem; color: var(--c-text-muted); margin-top: 2px; }
 
+.btn-toggle-cashier {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 16px;
+  border: 1.5px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text);
+  border-radius: 10px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  font-family: inherit;
+}
+.btn-toggle-cashier:hover {
+  border-color: var(--c-primary);
+  color: var(--c-primary);
+  background: #eff6ff;
+}
+.btn-toggle-cashier.active {
+  background: var(--c-success);
+  border-color: var(--c-success);
+  color: white;
+  box-shadow: 0 4px 12px rgba(16,185,129,0.3);
+}
+.btn-toggle-cashier.active:hover {
+  background: var(--c-success-hover);
+  border-color: var(--c-success-hover);
+  color: white;
+}
+.btn-toggle-cashier .toggle-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #cbd5e1;
+  transition: background 0.15s;
+}
+.btn-toggle-cashier.active .toggle-dot {
+  background: #bbf7d0;
+  box-shadow: 0 0 0 3px rgba(255,255,255,0.3);
+}
+
+/* Class untuk hide floating box */
+.floating-cashier.hidden {
+  display: none !important;
+}
     .layout {
       display: grid;
       grid-template-columns: 440px 1fr;
@@ -130,8 +179,8 @@
       position: fixed;
       top: 24px;
       right: 24px;
-      width: 320px;
-      max-height: 80vh;
+      width: 340px;
+      max-height: 85vh;
       background: var(--c-surface);
       border-radius: var(--radius-lg);
       box-shadow: 0 12px 32px rgba(0,0,0,0.18);
@@ -163,29 +212,100 @@
       flex: 1;
     }
     .floating-cashier .fc-header .btn-add {
-      background: var(--c-success);
-      color: white;
-      border: none;
-      width: 30px; height: 30px;
-      border-radius: 50%;
-      font-size: 1.3rem;
-      cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 2px 6px rgba(16,185,129,0.3);
-      transition: transform 0.15s;
-    }
-    .floating-cashier .fc-header .btn-add:hover { transform: scale(1.1); }
+  background: #34c759;          /* iOS system green */
+  color: white;
+  border: none;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  font-size: 1.4rem;
+  font-weight: 400;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 6px rgba(52,199,89,0.35);
+  transition: all 0.15s;
+}
+.floating-cashier .fc-header .btn-add:hover {
+  background: #2fb350;
+  transform: scale(1.08);
+  box-shadow: 0 3px 10px rgba(52,199,89,0.5);
+}
+.floating-cashier .fc-header .btn-add:active {
+  transform: scale(0.95);
+}
 
-    .floating-cashier .fc-list {
+.floating-cashier .fc-header .btn-close-fc {
+  background: #fee2e2;      /* merah lembut */
+  color: #ef4444;           /* X merah */
+  border: none;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  font-size: 1.1rem;
+  font-weight: 700;
+  line-height: 1;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+.floating-cashier .fc-header .btn-close-fc:hover {
+  background: #ef4444;
+  color: white;
+  transform: scale(1.1);
+}
+   
+
+    /* Search box */
+    .fc-search {
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--c-border);
+      background: #f8fafc;
+      position: relative;
+    }
+    .fc-search input {
+      width: 100%;
+      padding: 8px 30px 8px 12px;
+      border: 1.5px solid var(--c-border);
+      border-radius: 7px;
+      font-size: 0.8rem;
+      outline: none;
+      background: white;
+      font-family: inherit;
+      transition: border-color 0.15s;
+    }
+    .fc-search input:focus { border-color: var(--c-primary); }
+    .fc-search .fc-clear {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--c-text-muted);
+      font-size: 1rem;
+      display: none;
+      padding: 4px;
+    }
+    .fc-search .fc-clear.show { display: block; }
+
+    .fc-list {
       flex: 1;
       overflow-y: auto;
       padding: 8px;
       display: flex;
       flex-direction: column;
       gap: 5px;
+      min-height: 100px;
     }
-    .floating-cashier .fc-list::-webkit-scrollbar { width: 5px; }
-    .floating-cashier .fc-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+    .fc-list::-webkit-scrollbar { width: 5px; }
+    .fc-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
 
     .fc-item {
       display: flex;
@@ -243,6 +363,13 @@
       text-overflow: ellipsis;
       font-size: 0.78rem;
     }
+    .fc-item mark {
+      background: #fde68a;
+      color: var(--c-text);
+      padding: 0 2px;
+      border-radius: 2px;
+      font-weight: 800;
+    }
 
     /* Inline add form */
     .fc-add-form {
@@ -292,6 +419,12 @@
     }
 
     .fc-loading {
+      padding: 20px;
+      text-align: center;
+      color: var(--c-text-muted);
+      font-size: 0.78rem;
+    }
+    .fc-no-result {
       padding: 20px;
       text-align: center;
       color: var(--c-text-muted);
@@ -671,20 +804,28 @@
 </head>
 <body>
 
-<div class="app">
-  <header class="app-header">
-    <div class="logo">
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M6 9V2h12v7"></path>
-        <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
-        <rect x="6" y="14" width="12" height="8"></rect>
-      </svg>
-    </div>
-    <div>
-      <h1>Multi-Receipt → A4 Auto Split</h1>
-      <p>Paste log → auto-detect cashier → print A4</p>
-    </div>
-  </header>
+<header class="app-header">
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M6 9V2h12v7"></path>
+      <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path>
+      <rect x="6" y="14" width="12" height="8"></rect>
+    </svg>
+  </div>
+  <div style="flex: 1;">
+    <h1>Multi-Receipt → A4 Auto Split</h1>
+    <p>Paste log → auto-detect cashier → print A4</p>
+  </div>
+  <!-- Butang toggle Cashier -->
+  <button class="btn-toggle-cashier" id="btnToggleCashier" title="Show/Hide Cashier Box">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+      <circle cx="9" cy="7" r="4"></circle>
+    </svg>
+    <span>Cashier</span>
+    <span class="toggle-dot"></span>
+  </button>
+</header>
 
   <div class="layout">
     <div class="form-panel">
@@ -812,9 +953,17 @@
         <circle cx="9" cy="7" r="4"></circle>
       </svg>
     </div>
-    <h3>9 Cashier Terbaru</h3>
+    <h3>Cashier</h3>
     <button class="btn-add" id="btnAddCashier" title="Tambah cashier baru">+</button>
+    <button class="btn-close-fc" id="btnCloseFc" title="Tutup (Ctrl+Shift+C)">×</button>
   </div>
+
+  <!-- Search box -->
+  <div class="fc-search">
+    <input type="text" id="fcSearchInput" placeholder="Cari ID atau nama...">
+    <button class="fc-clear" id="fcClearBtn" title="Clear">x</button>
+  </div>
+
   <div class="fc-list" id="fcList">
     <div class="fc-loading">Memuatkan...</div>
   </div>
@@ -830,37 +979,36 @@
 
 <script>
   // ============ CASHIER API (Google Sheets) ============
-  const CASHIER_API_URL = 'https://script.google.com/macros/s/AKfycbzYSKMDLcRkYCi6KAVHRxX2QYNiY6gt3KSfOwMaruePNlVt2HOEMiDJ34m19_yTZJhvkQ/exec';
+  const CASHIER_API_URL = 'https://script.google.com/macros/s/AKfycbwJoQAuQZJZxTEjcRi5JcZSIorwFiaSiI1VYSf3TLeN6NQZL6JrnKJohlJNWAUGd6uogA/exec';
 
   let CASHIER_MAP = {};
   let cashierLoaded = false;
-  let cashierRecords = []; // array of { id, name, updatedAt }
+  let cashierRecords = [];
+  let fcSearchQuery = '';
 
-  // Load semua cashier dari Google Sheet
   async function loadCashierMap() {
-    try {
-      const res = await fetch(`${CASHIER_API_URL}?t=${Date.now()}`);
-      const json = await res.json();
-      if (json.success && Array.isArray(json.data)) {
-        cashierRecords = json.data;
-        CASHIER_MAP = {};
-        json.data.forEach(r => {
-          if (r.id && r.name && r.name.trim()) {
-            CASHIER_MAP[r.id] = r.name.trim();
-          }
-        });
-        cashierLoaded = true;
-        console.log(`✅ Loaded ${Object.keys(CASHIER_MAP).length} cashier dari Google Sheet`);
-        renderFloatingCashier();
-      } else {
-        console.warn('⚠️ Gagal load cashier:', json.error);
-      }
-    } catch (err) {
-      console.error('❌ Error load cashier:', err);
+  try {
+    const res = await fetch(`${CASHIER_API_URL}?t=${Date.now()}`);
+    const json = await res.json();
+    if (json.success && Array.isArray(json.data)) {
+      cashierRecords = json.data;
+      CASHIER_MAP = {};
+      json.data.forEach(r => {
+        if (r.id && r.name && r.name.trim()) {
+          CASHIER_MAP[r.id] = r.name.trim();
+        }
+      });
+      cashierLoaded = true;
+      console.log(`✅ Loaded ${Object.keys(CASHIER_MAP).length} cashier dari Google Sheet`);
+      renderFloatingCashier();        // ← WAJIB TAMBAH BALIK
+    } else {
+      console.warn('⚠️ Gagal load cashier:', json.error);
     }
+  } catch (err) {
+    console.error('❌ Error load cashier:', err);
   }
+}
 
-  // Tambah cashier baru ke Google Sheet
   async function addCashierToSheet(id, name) {
     const res = await fetch(CASHIER_API_URL, {
       method: 'POST',
@@ -878,19 +1026,51 @@
   const btnAddCashier = document.getElementById('btnAddCashier');
   const fcBtnCancel = document.getElementById('fcBtnCancel');
   const fcBtnSave = document.getElementById('fcBtnSave');
+  const fcSearchInput = document.getElementById('fcSearchInput');
+  const fcClearBtn = document.getElementById('fcClearBtn');
+
+  function highlightMatch(text, query) {
+    if (!query) return escapeHtml(text);
+    const lowerText = text.toLowerCase();
+    const lowerQuery = query.toLowerCase();
+    const idx = lowerText.indexOf(lowerQuery);
+    if (idx === -1) return escapeHtml(text);
+    const before = text.slice(0, idx);
+    const match = text.slice(idx, idx + query.length);
+    const after = text.slice(idx + query.length);
+    return `${escapeHtml(before)}<mark>${escapeHtml(match)}</mark>${escapeHtml(after)}`;
+  }
 
   function renderFloatingCashier() {
-    // Ambil 9 terbaru (paling atas dalam sheet = paling baru)
-    const recent = cashierRecords.slice(0, 9);
-    if (recent.length === 0) {
-      fcList.innerHTML = '<div class="fc-loading">Tiada rekod lagi. Klik + untuk tambah.</div>';
+    let displayRecords = [];
+    const q = fcSearchQuery.trim().toLowerCase();
+
+    if (!q) {
+      // Default: 9 terbaru
+      displayRecords = cashierRecords.slice(0, 9);
+    } else {
+      // Search: cari ID atau nama yang mengandungi query
+      displayRecords = cashierRecords.filter(r => {
+        const idMatch = String(r.id).toLowerCase().includes(q);
+        const nameMatch = String(r.name).toLowerCase().includes(q);
+        return idMatch || nameMatch;
+      }).slice(0, 30); // limit 30 hasil
+    }
+
+    if (displayRecords.length === 0) {
+      if (q) {
+        fcList.innerHTML = `<div class="fc-no-result">Tiada hasil untuk "${escapeHtml(fcSearchQuery)}"</div>`;
+      } else {
+        fcList.innerHTML = '<div class="fc-loading">Tiada rekod lagi. Klik + untuk tambah.</div>';
+      }
       return;
     }
-    fcList.innerHTML = recent.map((r, i) => `
+
+    fcList.innerHTML = displayRecords.map((r, i) => `
       <div class="fc-item">
-        <span class="fc-num">${i + 1}</span>
-        <span class="fc-id">${escapeHtml(r.id)}</span>
-        <span class="fc-name" title="${escapeHtml(r.name)}">${escapeHtml(r.name)}</span>
+        <span class="fc-num">${q ? (i + 1) : (i + 1)}</span>
+        <span class="fc-id">${highlightMatch(r.id, fcSearchQuery)}</span>
+        <span class="fc-name" title="${escapeHtml(r.name)}">${highlightMatch(r.name, fcSearchQuery)}</span>
       </div>
     `).join('');
   }
@@ -939,10 +1119,8 @@
       showToast('Cashier berjaya ditambah!', 'success');
       closeAddForm();
 
-      // Reload data dari Sheet
       await loadCashierMap();
 
-      // Highlight item teratas (baru)
       setTimeout(() => {
         const firstItem = fcList.querySelector('.fc-item');
         if (firstItem) firstItem.classList.add('new-item');
@@ -955,7 +1133,20 @@
     }
   });
 
-  // Enter untuk submit
+  // Search events
+  fcSearchInput.addEventListener('input', (e) => {
+    fcSearchQuery = e.target.value;
+    fcClearBtn.classList.toggle('show', fcSearchQuery.length > 0);
+    renderFloatingCashier();
+  });
+  fcClearBtn.addEventListener('click', () => {
+    fcSearchInput.value = '';
+    fcSearchQuery = '';
+    fcClearBtn.classList.remove('show');
+    renderFloatingCashier();
+    fcSearchInput.focus();
+  });
+
   [fcInputId, fcInputName].forEach(input => {
     input.addEventListener('keydown', (e) => {
       if (e.key === 'Enter') fcBtnSave.click();
@@ -1033,7 +1224,6 @@
     return null;
   }
 
-  // ============ CASHIER INPUTS UI ============
   function rebuildCashierInputs() {
     const log = logInput.value;
     const matches = log.match(/\*\*\*BEGIN SALES\*\*\*[\s\S]*?\*\*\*END SALES\*\*\*/g);
@@ -1121,7 +1311,6 @@
     });
   }
 
-  // ============ RECEIPT PARSING ============
   function parseSingleReceipt(receiptText, cashier, pmy) {
     let cleanText = receiptText.replace(/[•\x1b]/g, '');
 
@@ -1473,9 +1662,6 @@
     return Math.floor(usable) - 4;
   }
 
-  // ============================================================
-  // SPLIT MANUAL — item kekal utuh, promo+cashier di part terakhir
-  // ============================================================
   function splitReceiptIntoParts(r, columnHeight) {
     const promoCashierHtml = r.promoHtml + r.cashierHtml;
 
@@ -1541,9 +1727,6 @@
     </div>`);
   }
 
-  // ============================================================
-  // UPDATE PREVIEW
-  // ============================================================
   function updatePreview() {
     const log = logInput.value;
     const pmy = pmyCodeInput.value;
@@ -1659,7 +1842,6 @@
     }, 50);
   }
 
-  // ============ EVENTS ============
   logInput.addEventListener('input', () => {
     rebuildCashierInputs();
     updatePreview();
@@ -1688,7 +1870,46 @@
     settingsChevron.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
   });
 
-  // ============ INIT ============
+// ============ TOGGLE FLOATING CASHIER ============
+const floatingCashierEl = document.getElementById('floatingCashier');
+const btnToggleCashier = document.getElementById('btnToggleCashier');
+
+const cashierBoxState = localStorage.getItem('cashierBoxVisible') !== 'hidden';
+
+function applyCashierBoxState(visible) {
+  if (visible) {
+    floatingCashierEl.classList.remove('hidden');
+    btnToggleCashier.classList.add('active');
+  } else {
+    floatingCashierEl.classList.add('hidden');
+    btnToggleCashier.classList.remove('active');
+  }
+  localStorage.setItem('cashierBoxVisible', visible ? 'visible' : 'hidden');
+}
+
+applyCashierBoxState(cashierBoxState);
+
+// X button — tutup cashier box
+document.getElementById('btnCloseFc').addEventListener('click', () => {
+  applyCashierBoxState(false);
+});
+
+btnToggleCashier.addEventListener('click', () => {
+  const isCurrentlyVisible = !floatingCashierEl.classList.contains('hidden');
+  applyCashierBoxState(!isCurrentlyVisible);
+});
+
+// Keyboard shortcut: Ctrl+Shift+C
+document.addEventListener('keydown', (e) => {
+  if (e.ctrlKey && e.shiftKey && e.key === 'C') {
+    e.preventDefault();
+    const isCurrentlyVisible = !floatingCashierEl.classList.contains('hidden');
+    applyCashierBoxState(!isCurrentlyVisible);
+  }
+});
+
+// ============ INIT ============
+
   async function init() {
     await loadCashierMap();
     rebuildCashierInputs();
